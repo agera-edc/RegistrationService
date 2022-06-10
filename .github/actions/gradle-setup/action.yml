@@ -8,7 +8,7 @@ runs:
       uses: actions/checkout@v2
       with:
         repository: eclipse-dataspaceconnector/DataSpaceConnector
-        path: ${{ runner.temp }}/DataSpaceConnector
+        path: DataSpaceConnector
         ref: 5191d3e6dd9ac5d78264d05ae69edb4d297b606a
 
     # Install Java and cache MVD Gradle build.
@@ -27,7 +27,7 @@ runs:
       with:
         path: ~/.m2
         # .git/FETCH_HEAD contains latest commit ID
-        key: ${{ runner.os }}-m2-${{ hashFiles('${{ runner.temp }}/DataSpaceConnector/.git/FETCH_HEAD') }}
+        key: ${{ runner.os }}-m2-${{ hashFiles('DataSpaceConnector/.git/FETCH_HEAD') }}
 
     # Install EDC packages into ~/.m2.
     # This action only runs if the packages could not be restored from the cache.
@@ -36,4 +36,8 @@ runs:
         ./gradlew publishToMavenLocal -Pskip.signing
       if: steps.cache.outputs.cache-hit != 'true' # only on cache miss
       shell: bash
-      working-directory: ${{ runner.temp }}/DataSpaceConnector
+      working-directory: DataSpaceConnector
+
+    - name: Delete EDC packages
+      run: mv DataSpaceConnector ${{ runner.temp }}
+      shell: bash
