@@ -67,7 +67,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: nikitasavinov/checkstyle-action@0.5.1
         with:
-          checkstyle_config: DataSpaceConnector/resources/edc-checkstyle-config.xml
+          checkstyle_config: ${{ runner.temp }}/DataSpaceConnector/resources/edc-checkstyle-config.xml
           level: error
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: 'checkstyle'
