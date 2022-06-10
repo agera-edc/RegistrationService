@@ -11,6 +11,7 @@ class IntegrationTestUtils {
 
     public static Participant createParticipant() {
         return new Participant()
+                .status(FAKER.options().option(Participant.StatusEnum.class))
                 .name(FAKER.lorem().characters())
                 .url(FAKER.internet().url())
                 .addSupportedProtocolsItem(FAKER.lorem().word())
