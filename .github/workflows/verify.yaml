@@ -73,4 +73,5 @@ jobs:
           tool_name: 'checkstyle'
           checkstyle_version: '9.0'
           reporter: 'github-pr-check'
-          filter_mode: 'nofilter'
+          # Include only violations on added or modified files
+          filter_mode: 'file'
