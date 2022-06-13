@@ -21,6 +21,7 @@ jobs:
         uses: nikitasavinov/checkstyle-action@0.6.0
         with:
           checkstyle_config: resources/checkstyle-config.xml
+          level: error
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: 'checkstyle'
           checkstyle_version: '9.0'
