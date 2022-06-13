@@ -15,12 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Copy EDC checkstyle config
+        run: cp ${{ runner.temp }}/DataSpaceConnector/resources/edc-checkstyle-config.xml .
+
       # lets run Checkstyle explicitly (as opposed to within gradle) due to better reporting capabilities
       - name: Run Checkstyle
         if: github.event_name == 'pull_request'
         uses: nikitasavinov/checkstyle-action@0.6.0
         with:
-          checkstyle_config: resources/edc-checkstyle-config.xml
+          checkstyle_config: edc-checkstyle-config.xml
           level: error
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: 'checkstyle'
