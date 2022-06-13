@@ -12,18 +12,22 @@
  *
  */
 
-package org.eclipse.dataspaceconnector.registration.api;
+package org.eclipse.dataspaceconnector.registration;
 
+import org.eclipse.dataspaceconnector.registration.api.RegistrationApiController;
+import org.eclipse.dataspaceconnector.registration.api.RegistrationService;
+import org.eclipse.dataspaceconnector.registration.store.InMemoryParticipantStore;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.WebService;
 import org.eclipse.dataspaceconnector.spi.system.Inject;
+import org.eclipse.dataspaceconnector.spi.system.Provider;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtension;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
 
 /**
  * EDC extension to boot the services used by the Registration Service.
  */
-public class RegistrationServiceApiExtension implements ServiceExtension {
+public class RegistrationServiceExtension implements ServiceExtension {
 
     @Inject
     private WebService webService;
@@ -37,4 +41,10 @@ public class RegistrationServiceApiExtension implements ServiceExtension {
         var registrationService = new RegistrationService(monitor, participantStore);
         webService.registerResource(new RegistrationApiController(registrationService));
     }
+
+    @Provider(isDefault = true)
+    public ParticipantStore participantStore() {
+        return new InMemoryParticipantStore();
+    }
+
 }

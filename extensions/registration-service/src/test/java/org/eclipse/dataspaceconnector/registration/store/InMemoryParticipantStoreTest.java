@@ -12,7 +12,7 @@
  *
  */
 
-package org.eclipse.dataspaceconnector.registration.store.memory;
+package org.eclipse.dataspaceconnector.registration.store;
 
 import org.eclipse.dataspaceconnector.registration.TestUtils;
 import org.eclipse.dataspaceconnector.registration.store.model.Participant;
