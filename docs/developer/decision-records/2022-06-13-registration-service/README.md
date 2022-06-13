@@ -17,7 +17,7 @@ The MVD's Registration Service will be written in Java and re-use the runtime fr
 Potentially long-running operations such as onboarding and offboarding must be asynchronous and are handled using the state machine concept. The state 
 machine is operated in such a way that domain objects are loaded from storage, processed and then put back into storage to make the registration service runtime stateless.
 
-In the first version the Registration Service will use in-memory storage.
+In the MVD version the Registration Service will use in-memory storage.
 
 ## Deployment
 
@@ -25,12 +25,12 @@ The Registration Service will be deployed as a separate component in the Dataspa
 
 ## Identity
 
-the Registration Service has its own `did:web` deployed that points to the Self-description document endpoint. From the Self-description document potential 
-Dataspace participants can retrieve the enrollment API endpoint.
+the Registration Service will have its own `did:web` deployed that points to the Self-description document endpoint. From the Self-description document 
+potential Dataspace participants can retrieve the enrollment API endpoint.
 
 ## Operations
 
-In current version the Registration Service is going to support 2 types of operations:
+This document specifies only operations supported by the Registration Service in MVD version:
 - Dataspace participant onboarding
 - Listing all Dataspace participants
 
