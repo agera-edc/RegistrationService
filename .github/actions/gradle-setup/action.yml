@@ -38,6 +38,6 @@ runs:
       shell: bash
       working-directory: DataSpaceConnector
 
-    - name: Move EDC packages out of build directory
-      run: mv DataSpaceConnector ${{ runner.temp }}
+    - name: Delete EDC packages
+      run: rm -r DataSpaceConnector
       shell: bash

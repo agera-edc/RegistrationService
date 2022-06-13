@@ -14,21 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/gradle-setup
-
-      - name: Copy EDC checkstyle config
-        run: cp ${{ runner.temp }}/DataSpaceConnector/resources/edc-checkstyle-config.xml .
 
       # lets run Checkstyle explicitly (as opposed to within gradle) due to better reporting capabilities
       - name: Run Checkstyle
         if: github.event_name == 'pull_request'
         uses: nikitasavinov/checkstyle-action@0.6.0
         with:
-          checkstyle_config: edc-checkstyle-config.xml
-          level: error
+          checkstyle_config: resources/checkstyle-config.xml
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: 'checkstyle'
           checkstyle_version: '9.0'
-          # Filtering does not work on github-check, needs github-pr-check
           reporter: 'github-pr-check'
           filter_mode: 'nofilter'
