@@ -56,18 +56,6 @@ In simple scenarios, enrollment could be fast and fully automated. However, in a
 
 There could be different "types" of onboarding, e.g. onboarding a participant or a credential issuer, so the architecture has to support that.
 
-#### Pre-conditions
-
-1. A root CA is established and trusted by all participants. (Intermediate CAs are out of scope in this simplified discussion)
-2. Company1 knows the DID URL of the Dataspace it intends to join.
-3. The Dataspace Authority Identity Hub contains a VC signed by the root CA, establishing the Dataspace Authority DID as the effective Dataspace Authority for Dataspace D.
-4. The Company1 Identity Hub contains VCs that satisfy the Dataspace Authority enrollment policy. For example, it could be a credential signed by the German Government that establishes Company1 to be based in Germany, and a credential signed by Auditor1 that establishes Company1 to be ISO27001 certified.
-
-#### Post-conditions
-
-1. The Company1 Identity Hub contains a Verifiable Credential signed by the Dataspace Authority, that establishes membership in Dataspace D. This is used by other participants to authorize requests from Company1.
-3. The Company1 DID URL is stored in the Dataspace Authority Participant Registry. This is used to serve participant requests.
-
 #### Flow sequence
 
 ![dataspace-enrollment](dataspace-enrollment.png)
@@ -125,13 +113,7 @@ A typical EDC deployment caches contract offers from other participants in a fed
 
 In this flow, the EDC for Company1 obtains a list of Dataspace Participants and resolves their IDS endpoints.
 
-#### Pre-conditions
-
-1. Participants are registered as (currently valid) Dataspace Participants
-
-#### Post-conditions
-
-None
+A precondition for this operation is that participants are registered as (currently valid) Dataspace Participants.
 
 #### Flow sequence
 
