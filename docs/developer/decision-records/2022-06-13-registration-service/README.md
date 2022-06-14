@@ -64,8 +64,7 @@ There could be different "types" of onboarding, e.g. onboarding a participant or
 
 #### Post-conditions
 
-1. The Company1 Identity Hub contains a VC (X.509 certificate) signed by the Dataspace Authority, that establishes membership in Dataspace D. This is used by other participants to authorize requests from Company1.
-2. The X.509 certificate is stored in the Dataspace Authority Certificate Log. This is used for auditing and revocation.
+1. The Company1 Identity Hub contains a Verifiable Credential signed by the Dataspace Authority, that establishes membership in Dataspace D. This is used by other participants to authorize requests from Company1.
 3. The Company1 DID URL is stored in the Dataspace Authority Participant Registry. This is used to serve participant requests.
 
 #### Flow sequence
@@ -84,6 +83,32 @@ There could be different "types" of onboarding, e.g. onboarding a participant or
 10. The DA sends the Verifiable Credential to Company1's Identity Hub for storage. It uses the Identity Hub bearer token (from the Distributed authorization sub-flow) to authenticate the request.
 11. Company1's Identity Hub validates the bearer token and stores the membership Verifiable Credential.
 
+#### Data model 
+
+To initiate onboarding, clients send an `OnboardingRequest` to the dataspace authority's enrollment API endpoint:
+
+```java
+public class OnboardingRequest {
+    /**
+     * For the MVD this is a JWT that contains the candidate's DID URI, signed with its private key.
+     * In future versions this could also contain other tokens.
+     */
+    private String identityToken;
+}
+```
+The identityToken is a JWT containing URI where the Self Description Document is located.
+Upon receiving an OnboardingRequest, the registration service creates a participant record, that contains all information about a participant.
+
+```java
+public class ParticipantRecord {
+    private String id; //internal identifier
+    private String dataspaceIdentifier; //did-uri, or any other external identifier of the participant
+    private String name; //for convenience, may be omitted
+    private ParticipantStatusInfo status; // see below
+    private Map<String, Object> extensibleProperties; // may be empty
+}
+```
+
 ### List participants flow
 
 #### Participants
@@ -96,7 +121,7 @@ There could be different "types" of onboarding, e.g. onboarding a participant or
 
 A typical EDC deployment caches contract offers from other participants in a federated catalog, so that users can quickly browse and negotiate contracts. To regularly retrieve offers, it regularly contacts the Dataspace Registry to refresh its list of Dataspace Participants, then obtains contract offers from each participants to refresh its cache.
 
-In this flow, the EDC for Company1 obtains a list of Dataspace Participants and resolves their IDS endpoints. Using these IDS endpoints (e.g. for listing contract offers) is outside the scope of this flow (see *IDS Flows* below).
+In this flow, the EDC for Company1 obtains a list of Dataspace Participants and resolves their IDS endpoints.
 
 #### Pre-conditions
 
@@ -119,3 +144,8 @@ None
 7. The Registry obtains the list of Dataspace Participant DID URIs from its storage...
 8. ... and returns it synchronously to the caller (Company1 EDC).
 9. The EDC for Company1 iterates through the Participants' DID URIs, and retrieves the collection of their IDS endpoints from their DID Documents.
+
+## References
+
+- [Identity Hub in MVD](https://github.com/agera-edc/IdentityHubFork/blob/main/docs/developer/decision-records/2022-06-08-identity-hub/README.md)
+- [Technical specification of Registration Service](https://github.com/Metaform/mvd/blob/main/registration-service/registration-service-tech-spec.md)
