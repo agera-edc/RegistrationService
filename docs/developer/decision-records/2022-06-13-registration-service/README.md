@@ -24,7 +24,7 @@ The Registration Service will be deployed as a separate component in the Dataspa
 
 ## Identity
 
-the Registration Service will have its own `did:web` document deployed, that points to the enrollment API endpoint.
+The Registration Service will have its own `did:web` document deployed, that points to the enrollment API endpoint.
 
 Please note that in the future versions the `did:web` document points to the Self-Description Document url that allows to retreive the enrollment API endpoint. 
 MVD version is using a simplification omitting the Self-Description Document in the process.
