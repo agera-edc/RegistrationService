@@ -60,6 +60,8 @@ There could be different "types" of onboarding, e.g. onboarding a participant or
 
 ![dataspace-enrollment](dataspace-enrollment.png)
 
+As a precondition to this operation Company1 knows the DID URL of the Dataspace it intends to join.
+
 1. The Client for Company1 initiates the enrollment process based on the Dataspace DID URL. It retrieves the DID Document, and parses it to retrieve Dataspace 
    enrollment HTTP endpoint.
 2. The client needs access to the Company1 Private Key to sign a JWS. The client sends an HTTP request to the Dataspace Authority enrollment endpoint. The 
