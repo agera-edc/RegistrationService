@@ -102,5 +102,6 @@ class RegistrationServiceTest {
                 .usingRecursiveComparison()
                 .ignoringFieldsOfTypes(ParticipantStatus.class)
                 .isEqualTo(participant);
+        service.stop();
     }
 }
