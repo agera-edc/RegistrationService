@@ -1,45 +1,42 @@
 # Registration Service
 
-Registration Service is a component of the dataspace providing Dataspace Authority. In current version the Dataspace Authority is centralised. In future 
-versions, the Authority could also be partly or fully decentralized.
+Registration Service is a component of a Dataspace Authority. In current version to support the [Minimum Viable Dataspace](https://github.com/eclipse-dataspaceconnector/MinimumViableDataspace) (MVD), the Dataspace Authority is centralised. In future versions, the Authority could also be partly or fully decentralized.
 
-Responsibilities of the Dataspace Authority in MVD version:
-- Establishes a DID defining the Dataspace.
+Responsibilities of the Dataspace Authority in MVD:
+- Establishes a DID (Decentralized Identifier) defining the Dataspace.
 - Manages policies defining who is allowed to participate in the dataspace.
 - Manages enrollment process of the Dataspace participants.
-- Lists the available Dataspace participants.
+- Lists the DID of available Dataspace participants.
 
 ## Architecture 
 
-The MVD's Registration Service will be written in Java and re-use the runtime framework and modules from EDC. This enables us to leverage the same functionality such as policy validation, re-use domain objects and architectural principles.
+The Registration Service is written in Java and uses the runtime framework and modules from [EDC](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector). It leverages design patterns, domain objects, and policy validation modules from EDC.
 
-Potentially long-running operations such as onboarding and offboarding must be asynchronous and are handled using the state machine concept. The state 
-machine is operated in such a way that domain objects are loaded from storage, processed and then put back into storage to make the registration service runtime stateless.
+Potentially long-running operations such as onboarding and offboarding are asynchronous and backed by a state machine. The state machine relies on a persistence store, while the registration service is stateless.
 
-In the MVD version the Registration Service will use in-memory storage.
+The Registration Service currently uses in-memory storage.
 
 ## Deployment
 
-The Registration Service will be deployed as a separate component in the Dataspace environment.
+The Registration Service is deployed as a separate component in the Dataspace environment. Deployment workflows and artifacts are provided in the  [Minimum Viable Dataspace](https://github.com/eclipse-dataspaceconnector/MinimumViableDataspace) repository.
 
 ## Identity
 
-The Registration Service will have its own `did:web` document deployed, that points to the enrollment API endpoint.
+The Registration Service endpoint can be resolved from the `did:web` document deployed for the Dataspace Authority.
 
-Please note that in the future versions the `did:web` document points to the Self-Description Document url that allows to retreive the enrollment API endpoint. 
-MVD version is using a simplification omitting the Self-Description Document in the process.
+In future versions, the Registration Service endpoint will be resolved in a Self-Description Document whose URL is available in the the `did:web` document. This version uses a simplified process omitting the Self-Description Document.
 
 ## Operations
 
-This document specifies only operations supported by the Registration Service in MVD version:
+Operations supported by the Registration Service:
 - Dataspace participant onboarding
 - Listing all Dataspace participants
 
-Other operations that will be supported in future versions of the Registration Service:
+Operations that will be supported in future versions of the Registration Service:
 - Dataspace participant offboarding
 - Blacklisting
 
-### 1. Onboarding
+### 1. Dataspace participant onboarding
 
 #### Participants
 
