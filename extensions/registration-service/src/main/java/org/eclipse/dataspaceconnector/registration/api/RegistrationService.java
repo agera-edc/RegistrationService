@@ -21,14 +21,11 @@ import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantSt
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
-import org.eclipse.dataspaceconnector.spi.observe.Observable;
-import org.eclipse.dataspaceconnector.spi.observe.ObservableImpl;
 import org.eclipse.dataspaceconnector.spi.retry.WaitStrategy;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
@@ -43,7 +40,6 @@ public class RegistrationService {
     private final ParticipantStore participantStore;
     private final CredentialsVerifier credentialsVerifier;
     private final StateMachine stateMachine;
-    private final Observable<ParticipantListener> observable = new ObservableImpl<>();
 
     public RegistrationService(Monitor monitor, ParticipantStore participantStore, CredentialsVerifier credentialsVerifier, ExecutorInstrumentation executorInstrumentation) {
         this.monitor = monitor;
@@ -58,10 +54,6 @@ public class RegistrationService {
                 .build();
     }
 
-    public void registerListener(ParticipantListener listener) {
-        observable.registerListener(listener);
-    }
-
     /**
      * Lists all dataspace participants.
      *
@@ -74,7 +66,7 @@ public class RegistrationService {
 
     public void addParticipant(Participant participant) {
         monitor.info("Adding a participant in the dataspace.");
-        update(participant, o -> o.onCreation(participant));
+        participantStore.save(participant);
     }
 
     public void start() {
@@ -87,7 +79,7 @@ public class RegistrationService {
 
     private Boolean processOnboardingInitiated(Participant participant) {
         participant.transitionAuthorizing();
-        update(participant, o -> o.preAuthorizing(participant));
+        participantStore.save(participant);
         return true;
     }
 
@@ -95,18 +87,12 @@ public class RegistrationService {
         var verificationResult = credentialsVerifier.verifyCredentials();
         if (verificationResult) {
             participant.transitionAuthorized();
-            update(participant, o -> o.preAuthorized(participant));
+            participantStore.save(participant);
         } else {
             participant.transitionDenied();
-            update(participant, o -> o.preDenied(participant));
+            participantStore.save(participant);
         }
         return true;
-    }
-
-
-    private void update(Participant participant, Consumer<ParticipantListener> observe) {
-        observable.invokeForEach(observe);
-        participantStore.save(participant);
     }
 
     private StateProcessorImpl<Participant> processNegotiationsInState(ParticipantStatus status, Function<Participant, Boolean> function) {
