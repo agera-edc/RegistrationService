@@ -14,6 +14,10 @@
 
 package org.eclipse.dataspaceconnector.registration.authority.spi;
 
+/**
+ * Placeholder for future verifier definition that will verify caller identity,
+ * and fetch and evaluate verifiable presentations.
+ */
 public interface CredentialsVerifier {
     boolean verifyCredentials();
 }

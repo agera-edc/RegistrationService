@@ -43,7 +43,9 @@ components:
           type: string
           enum:
           - ONBOARDING_INITIATED
+          - AUTHORIZING
           - AUTHORIZED
+          - DENIED
         supportedProtocols:
           type: array
           items:
