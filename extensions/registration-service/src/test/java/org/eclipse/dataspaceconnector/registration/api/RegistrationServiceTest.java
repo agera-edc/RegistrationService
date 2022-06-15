@@ -18,11 +18,11 @@ import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
-import org.eclipse.dataspaceconnector.spi.monitor.ConsoleMonitor;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.stubbing.Answer;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -34,7 +34,9 @@ import static org.eclipse.dataspaceconnector.registration.authority.model.Partic
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.DENIED;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -90,7 +92,10 @@ class RegistrationServiceTest {
         when(participantStore.listParticipantsWithStatus(eq(startState)))
                 .thenReturn(List.of(participant), List.of());
         var latch = new CountDownLatch(1);
-        service.registerListener(new LatchListener(latch, endState));
+        doAnswer((Answer<Object>) invocation -> {
+            latch.countDown();
+            return null;
+        }).when(participantStore).save(any());
 
         service.start();
         assertThat(latch.await(30, SECONDS)).isTrue();
