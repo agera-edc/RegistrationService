@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 
 class RegistrationServiceTest {
 
-    Monitor monitor = new ConsoleMonitor();
+    Monitor monitor = mock(Monitor.class);
     ParticipantStore participantStore = mock(ParticipantStore.class);
     CredentialsVerifier credentialsVerifier = mock(CredentialsVerifier.class);
     RegistrationService service = new RegistrationService(monitor, participantStore, credentialsVerifier, ExecutorInstrumentation.noop());
@@ -90,8 +90,7 @@ class RegistrationServiceTest {
         when(participantStore.listParticipantsWithStatus(eq(startState)))
                 .thenReturn(List.of(participant), List.of());
         var latch = new CountDownLatch(1);
-        var listener = new LatchListener(latch, endState);
-        service.registerListener(listener);
+        service.registerListener(new LatchListener(latch, endState));
 
         service.start();
         assertThat(latch.await(30, SECONDS)).isTrue();
