@@ -44,23 +44,11 @@ public class RegistrationServiceExtension implements ServiceExtension {
     @Inject
     private ExecutorInstrumentation executorInstrumentation;
 
-    private RegistrationService registrationService;
-
     @Override
     public void initialize(ServiceExtensionContext context) {
         var monitor = context.getMonitor();
-        registrationService = new RegistrationService(monitor, participantStore, credentialsVerifier, executorInstrumentation);
+        var registrationService = new RegistrationService(monitor, participantStore, credentialsVerifier, executorInstrumentation);
         webService.registerResource(new RegistrationApiController(registrationService));
-    }
-
-    @Override
-    public void start() {
-        registrationService.start();
-    }
-
-    @Override
-    public void shutdown() {
-        registrationService.stop();
     }
 
     @Provider(isDefault = true)
