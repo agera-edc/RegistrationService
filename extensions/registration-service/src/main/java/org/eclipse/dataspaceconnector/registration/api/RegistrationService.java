@@ -16,8 +16,8 @@ package org.eclipse.dataspaceconnector.registration.api;
 
 import org.eclipse.dataspaceconnector.common.statemachine.StateMachine;
 import org.eclipse.dataspaceconnector.common.statemachine.StateProcessorImpl;
-import org.eclipse.dataspaceconnector.registration.store.model.Participant;
-import org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus;
+import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
+import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.observe.Observable;

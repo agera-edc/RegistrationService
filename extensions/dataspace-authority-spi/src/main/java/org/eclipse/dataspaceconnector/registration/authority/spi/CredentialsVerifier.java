@@ -12,9 +12,8 @@
  *
  */
 
-package org.eclipse.dataspaceconnector.registration.store.model;
+package org.eclipse.dataspaceconnector.registration.authority.spi;
 
-public enum ParticipantStatus {
-    ONBOARDING_INITIATED, // onboarding request received
-    AUTHORIZED, // participant is fully onboarded
+public interface CredentialsVerifier {
+    boolean verifyCredentials();
 }

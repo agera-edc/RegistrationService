@@ -14,8 +14,8 @@
 
 package org.eclipse.dataspaceconnector.registration.api;
 
-import org.eclipse.dataspaceconnector.registration.store.model.Participant;
-import org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus;
+import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
+import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.spi.observe.Observable;
 
 /**
@@ -26,6 +26,7 @@ import org.eclipse.dataspaceconnector.spi.observe.Observable;
  * Therefore, when using a persistent store implementation, it
  * is guaranteed to be called at least once.
  */
+@SuppressWarnings("unused")
 public interface ParticipantListener {
 
     /**
@@ -38,10 +39,28 @@ public interface ParticipantListener {
 
     /**
      * Called after a {@link Participant} has moved to state
+     * {@link ParticipantStatus#AUTHORIZING}, but before the change is persisted.
+     *
+     * @param participant the participant whose state has changed.
+     */
+    default void preAuthorizing(Participant participant) {
+    }
+
+    /**
+     * Called after a {@link Participant} has moved to state
      * {@link ParticipantStatus#AUTHORIZED}, but before the change is persisted.
      *
      * @param participant the participant whose state has changed.
      */
     default void preAuthorized(Participant participant) {
+    }
+
+    /**
+     * Called after a {@link Participant} has moved to state
+     * {@link ParticipantStatus#DENIED}, but before the change is persisted.
+     *
+     * @param participant the participant whose state has changed.
+     */
+    default void preDenied(Participant participant) {
     }
 }

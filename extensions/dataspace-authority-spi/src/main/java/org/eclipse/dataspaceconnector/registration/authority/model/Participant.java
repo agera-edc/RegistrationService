@@ -12,18 +12,21 @@
  *
  */
 
-package org.eclipse.dataspaceconnector.registration.store.model;
+package org.eclipse.dataspaceconnector.registration.authority.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus.AUTHORIZED;
-import static org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus.ONBOARDING_INITIATED;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZED;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.DENIED;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 
 /**
  * Dataspace participant.
@@ -31,9 +34,9 @@ import static org.eclipse.dataspaceconnector.registration.store.model.Participan
 @JsonDeserialize(builder = Participant.Builder.class)
 public class Participant {
 
-    private final List<String> supportedProtocols = new ArrayList<>();
     private String name;
     private String url;
+    private List<String> supportedProtocols = new ArrayList<>();
     private ParticipantStatus status = ONBOARDING_INITIATED;
 
     private Participant() {
@@ -48,15 +51,23 @@ public class Participant {
     }
 
     public List<String> getSupportedProtocols() {
-        return supportedProtocols;
+        return Collections.unmodifiableList(supportedProtocols);
     }
 
     public ParticipantStatus getStatus() {
         return status;
     }
 
+    public void transitionAuthorizing() {
+        transition(AUTHORIZED, AUTHORIZING);
+    }
+
     public void transitionAuthorized() {
         transition(AUTHORIZED, ONBOARDING_INITIATED);
+    }
+
+    public void transitionDenied() {
+        transition(DENIED, ONBOARDING_INITIATED);
     }
 
     /**

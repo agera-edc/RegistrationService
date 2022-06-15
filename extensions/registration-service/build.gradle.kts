@@ -15,11 +15,12 @@ dependencies {
     implementation("${edcGroup}:state-machine-lib:${edcVersion}")
 
     implementation(project(":extensions:participant-store-spi"))
+    implementation(project(":extensions:dataspace-authority-spi"))
     testImplementation("org.assertj:assertj-core:${assertj}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("com.github.javafaker:javafaker:${faker}")
-    testImplementation(testFixtures(project(":extensions:participant-store-spi")))
+    testImplementation(testFixtures(project(":extensions:dataspace-authority-spi")))
 }
 
