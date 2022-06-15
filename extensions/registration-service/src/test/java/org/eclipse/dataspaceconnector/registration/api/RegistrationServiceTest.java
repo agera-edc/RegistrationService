@@ -15,8 +15,6 @@
 package org.eclipse.dataspaceconnector.registration.api;
 
 import org.eclipse.dataspaceconnector.registration.store.model.Participant;
-import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
-import org.eclipse.dataspaceconnector.registration.store.model.Participant;
 import org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.ConsoleMonitor;
@@ -35,7 +33,6 @@ import static org.eclipse.dataspaceconnector.registration.store.model.Participan
 import static org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus.ONBOARDING_INITIATED;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipant;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

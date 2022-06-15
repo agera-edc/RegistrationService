@@ -19,10 +19,10 @@ import org.eclipse.dataspaceconnector.registration.store.model.Participant;
 import org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus;
 
 public class TestUtils {
+    static final Faker FAKER = new Faker();
+
     private TestUtils() {
     }
-
-    static final Faker FAKER = new Faker();
 
     public static Participant.Builder createParticipant() {
         return Participant.Builder.newInstance()

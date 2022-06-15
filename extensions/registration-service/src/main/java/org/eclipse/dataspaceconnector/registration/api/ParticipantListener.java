@@ -3,8 +3,6 @@ package org.eclipse.dataspaceconnector.registration.api;
 import org.eclipse.dataspaceconnector.registration.store.model.Participant;
 import org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.spi.observe.Observable;
-import org.eclipse.dataspaceconnector.spi.types.domain.contract.negotiation.ContractNegotiation;
-import org.eclipse.dataspaceconnector.spi.types.domain.contract.negotiation.ContractNegotiationStates;
 
 /**
  * Interface implemented by listeners registered to observe participant state changes

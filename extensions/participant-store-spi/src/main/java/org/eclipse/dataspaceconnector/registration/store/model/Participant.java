@@ -18,8 +18,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,9 +31,9 @@ import static org.eclipse.dataspaceconnector.registration.store.model.Participan
 @JsonDeserialize(builder = Participant.Builder.class)
 public class Participant {
 
+    private final List<String> supportedProtocols = new ArrayList<>();
     private String name;
     private String url;
-    private final List<String> supportedProtocols = new ArrayList<>();
     private ParticipantStatus status = ONBOARDING_INITIATED;
 
     private Participant() {

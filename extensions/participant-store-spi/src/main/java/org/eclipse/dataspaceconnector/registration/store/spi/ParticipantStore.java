@@ -15,7 +15,6 @@
 package org.eclipse.dataspaceconnector.registration.store.spi;
 
 import org.eclipse.dataspaceconnector.registration.store.model.Participant;
-import org.eclipse.dataspaceconnector.registration.store.model.Participant;
 import org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus;
 
 import java.util.Collection;

@@ -14,8 +14,6 @@
 
 package org.eclipse.dataspaceconnector.registration.api;
 
-import org.eclipse.dataspaceconnector.registration.store.model.Participant;
-import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.common.statemachine.StateMachine;
 import org.eclipse.dataspaceconnector.common.statemachine.StateProcessorImpl;
 import org.eclipse.dataspaceconnector.registration.store.model.Participant;
@@ -56,23 +54,8 @@ public class RegistrationService {
                 .build();
     }
 
-    public void registerListener(ParticipantListener listener){
+    public void registerListener(ParticipantListener listener) {
         observable.registerListener(listener);
-    }
-
-    private Boolean processOnboardingInitiated(Participant participant) {
-        participant.transitionAuthorized();
-        update(participant, o -> o.preAuthorized(participant));
-        return true;
-    }
-
-    private void update(Participant participant, Consumer<ParticipantListener> observe) {
-        observable.invokeForEach(observe);
-        participantStore.save(participant);
-    }
-
-    private StateProcessorImpl<Participant> processNegotiationsInState(ParticipantStatus status, Function<Participant, Boolean> function) {
-        return new StateProcessorImpl<>(() -> participantStore.nextForState(status, batchSize), function);
     }
 
     /**
@@ -96,5 +79,20 @@ public class RegistrationService {
 
     public void stop() {
         stateMachine.stop();
+    }
+
+    private Boolean processOnboardingInitiated(Participant participant) {
+        participant.transitionAuthorized();
+        update(participant, o -> o.preAuthorized(participant));
+        return true;
+    }
+
+    private void update(Participant participant, Consumer<ParticipantListener> observe) {
+        observable.invokeForEach(observe);
+        participantStore.save(participant);
+    }
+
+    private StateProcessorImpl<Participant> processNegotiationsInState(ParticipantStatus status, Function<Participant, Boolean> function) {
+        return new StateProcessorImpl<>(() -> participantStore.nextForState(status, batchSize), function);
     }
 }
