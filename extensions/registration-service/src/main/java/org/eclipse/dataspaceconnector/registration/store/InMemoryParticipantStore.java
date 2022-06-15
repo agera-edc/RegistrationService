@@ -15,12 +15,15 @@
 package org.eclipse.dataspaceconnector.registration.store;
 
 import org.eclipse.dataspaceconnector.registration.store.model.Participant;
+import org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * In-memory store for dataspace participants.
@@ -35,7 +38,12 @@ public class InMemoryParticipantStore implements ParticipantStore {
     }
 
     @Override
-    public void addParticipant(Participant participant) {
+    public void save(Participant participant) {
         storage.put(participant.getName(), participant);
+    }
+
+    @Override
+    public Collection<Participant> listParticipantsWithStatus(ParticipantStatus status) {
+        return storage.values().stream().filter(p -> p.getStatus() == status).collect(Collectors.toList());
     }
 }

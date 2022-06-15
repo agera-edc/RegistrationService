@@ -19,6 +19,7 @@ import org.eclipse.dataspaceconnector.registration.api.RegistrationService;
 import org.eclipse.dataspaceconnector.registration.store.InMemoryParticipantStore;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.WebService;
+import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.eclipse.dataspaceconnector.spi.system.Inject;
 import org.eclipse.dataspaceconnector.spi.system.Provider;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtension;
@@ -35,10 +36,13 @@ public class RegistrationServiceExtension implements ServiceExtension {
     @Inject
     private ParticipantStore participantStore;
 
+    @Inject
+    private ExecutorInstrumentation executorInstrumentation;
+
     @Override
     public void initialize(ServiceExtensionContext context) {
         var monitor = context.getMonitor();
-        var registrationService = new RegistrationService(monitor, participantStore);
+        var registrationService = new RegistrationService(monitor, participantStore, executorInstrumentation);
         webService.registerResource(new RegistrationApiController(registrationService));
     }
 
@@ -46,5 +50,4 @@ public class RegistrationServiceExtension implements ServiceExtension {
     public ParticipantStore participantStore() {
         return new InMemoryParticipantStore();
     }
-
 }

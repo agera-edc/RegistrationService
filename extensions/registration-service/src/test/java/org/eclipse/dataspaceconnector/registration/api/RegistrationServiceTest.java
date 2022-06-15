@@ -31,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipant;
 import static org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus.AUTHORIZED;
 import static org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus.ONBOARDING_INITIATED;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -65,9 +64,10 @@ class RegistrationServiceTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void advancesStateFromOnboardingInitiatedToAuthorized() throws InterruptedException {
         var participant = participantBuilder.status(ONBOARDING_INITIATED).build();
-        when(participantStore.nextForState(eq(ONBOARDING_INITIATED), anyInt()))
+        when(participantStore.listParticipantsWithStatus(eq(ONBOARDING_INITIATED)))
                 .thenReturn(List.of(participant), List.of());
 
         var latch = new CountDownLatch(1);

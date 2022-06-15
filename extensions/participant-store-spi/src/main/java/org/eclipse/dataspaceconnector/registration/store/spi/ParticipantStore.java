@@ -25,5 +25,5 @@ public interface ParticipantStore {
 
     void save(Participant participant);
 
-    Collection<Participant> nextForState(ParticipantStatus state, int batchSize);
+    Collection<Participant> listParticipantsWithStatus(ParticipantStatus state);
 }

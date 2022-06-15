@@ -41,7 +41,6 @@ public class RegistrationService {
     private final ParticipantStore participantStore;
     private final StateMachine stateMachine;
     private final Observable<ParticipantListener> observable = new ObservableImpl<>();
-    private final int batchSize = 5;
 
     public RegistrationService(Monitor monitor, ParticipantStore participantStore, ExecutorInstrumentation executorInstrumentation) {
         this.monitor = monitor;
@@ -93,6 +92,6 @@ public class RegistrationService {
     }
 
     private StateProcessorImpl<Participant> processNegotiationsInState(ParticipantStatus status, Function<Participant, Boolean> function) {
-        return new StateProcessorImpl<>(() -> participantStore.nextForState(status, batchSize), function);
+        return new StateProcessorImpl<>(() -> participantStore.listParticipantsWithStatus(status), function);
     }
 }
