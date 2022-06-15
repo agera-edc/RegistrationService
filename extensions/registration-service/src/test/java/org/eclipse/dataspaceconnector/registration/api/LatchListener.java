@@ -34,20 +34,20 @@ class LatchListener implements ParticipantListener {
 
     @Override
     public void preAuthorizing(Participant participant) {
-        latch(AUTHORIZING);
+        countDownLatchIfExpectedStatusIs(AUTHORIZING);
     }
 
     @Override
     public void preAuthorized(Participant participant) {
-        latch(AUTHORIZED);
+        countDownLatchIfExpectedStatusIs(AUTHORIZED);
     }
 
     @Override
     public void preDenied(Participant participant) {
-        latch(DENIED);
+        countDownLatchIfExpectedStatusIs(DENIED);
     }
 
-    private void latch(ParticipantStatus status) {
+    private void countDownLatchIfExpectedStatusIs(ParticipantStatus status) {
         if (status == this.status) {
             latch.countDown();
         }
