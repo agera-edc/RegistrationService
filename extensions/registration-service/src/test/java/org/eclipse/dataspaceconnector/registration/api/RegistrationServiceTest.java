@@ -94,7 +94,7 @@ class RegistrationServiceTest {
         service.registerListener(listener);
 
         service.start();
-        assertThat(latch.await(10, SECONDS)).isTrue();
+        assertThat(latch.await(30, SECONDS)).isTrue();
 
         verify(participantStore).save(captor.capture());
         assertThat(captor.getValue().getStatus()).isEqualTo(endState);
