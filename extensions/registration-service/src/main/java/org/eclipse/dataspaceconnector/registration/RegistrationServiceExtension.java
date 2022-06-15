@@ -16,6 +16,8 @@ package org.eclipse.dataspaceconnector.registration;
 
 import org.eclipse.dataspaceconnector.registration.api.RegistrationApiController;
 import org.eclipse.dataspaceconnector.registration.api.RegistrationService;
+import org.eclipse.dataspaceconnector.registration.authority.DummyCredentialsVerifier;
+import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.store.InMemoryParticipantStore;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.WebService;
@@ -37,17 +39,25 @@ public class RegistrationServiceExtension implements ServiceExtension {
     private ParticipantStore participantStore;
 
     @Inject
+    private CredentialsVerifier credentialsVerifier;
+
+    @Inject
     private ExecutorInstrumentation executorInstrumentation;
 
     @Override
     public void initialize(ServiceExtensionContext context) {
         var monitor = context.getMonitor();
-        var registrationService = new RegistrationService(monitor, participantStore, executorInstrumentation);
+        var registrationService = new RegistrationService(monitor, participantStore, credentialsVerifier, executorInstrumentation);
         webService.registerResource(new RegistrationApiController(registrationService));
     }
 
     @Provider(isDefault = true)
     public ParticipantStore participantStore() {
         return new InMemoryParticipantStore();
+    }
+
+    @Provider(isDefault = true)
+    public CredentialsVerifier credentialsVerifier() {
+        return new DummyCredentialsVerifier();
     }
 }

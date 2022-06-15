@@ -18,6 +18,7 @@ import org.eclipse.dataspaceconnector.common.statemachine.StateMachine;
 import org.eclipse.dataspaceconnector.common.statemachine.StateProcessorImpl;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
+import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.observe.Observable;
@@ -30,7 +31,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.eclipse.dataspaceconnector.registration.store.model.ParticipantStatus.ONBOARDING_INITIATED;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 
 /**
  * Registration service for dataspace participants.
@@ -39,17 +41,20 @@ public class RegistrationService {
 
     private final Monitor monitor;
     private final ParticipantStore participantStore;
+    private final CredentialsVerifier credentialsVerifier;
     private final StateMachine stateMachine;
     private final Observable<ParticipantListener> observable = new ObservableImpl<>();
 
-    public RegistrationService(Monitor monitor, ParticipantStore participantStore, ExecutorInstrumentation executorInstrumentation) {
+    public RegistrationService(Monitor monitor, ParticipantStore participantStore, CredentialsVerifier credentialsVerifier, ExecutorInstrumentation executorInstrumentation) {
         this.monitor = monitor;
         this.participantStore = participantStore;
+        this.credentialsVerifier = credentialsVerifier;
 
         // default wait five seconds
         WaitStrategy waitStrategy = () -> 5000L;
         stateMachine = StateMachine.Builder.newInstance("registration-service", monitor, executorInstrumentation, waitStrategy)
                 .processor(processNegotiationsInState(ONBOARDING_INITIATED, this::processOnboardingInitiated))
+                .processor(processNegotiationsInState(AUTHORIZING, this::processAuthorizing))
                 .build();
     }
 
@@ -81,10 +86,23 @@ public class RegistrationService {
     }
 
     private Boolean processOnboardingInitiated(Participant participant) {
-        participant.transitionAuthorized();
-        update(participant, o -> o.preAuthorized(participant));
+        participant.transitionAuthorizing();
+        update(participant, o -> o.preAuthorizing(participant));
         return true;
     }
+
+    private Boolean processAuthorizing(Participant participant) {
+        var verificationResult = credentialsVerifier.verifyCredentials();
+        if (verificationResult) {
+            participant.transitionAuthorized();
+            update(participant, o -> o.preAuthorized(participant));
+        } else {
+            participant.transitionDenied();
+            update(participant, o -> o.preDenied(participant));
+        }
+        return true;
+    }
+
 
     private void update(Participant participant, Consumer<ParticipantListener> observe) {
         observable.invokeForEach(observe);

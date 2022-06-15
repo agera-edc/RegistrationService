@@ -59,15 +59,15 @@ public class Participant {
     }
 
     public void transitionAuthorizing() {
-        transition(AUTHORIZED, AUTHORIZING);
+        transition(AUTHORIZING, ONBOARDING_INITIATED);
     }
 
     public void transitionAuthorized() {
-        transition(AUTHORIZED, ONBOARDING_INITIATED);
+        transition(AUTHORIZED, AUTHORIZING);
     }
 
     public void transitionDenied() {
-        transition(DENIED, ONBOARDING_INITIATED);
+        transition(DENIED, AUTHORIZING);
     }
 
     /**
