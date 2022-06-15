@@ -15,14 +15,14 @@ The Registration Service API definition is available in an [Open API yaml file](
 
 ## API Rest client
 
-The Registration Service APi can be called using the [rest-client](../../../../rest-client) generated from OpenApi definition.
+The Registration Service API can be called using the [rest-client](../../../../rest-client) generated from OpenApi definition.
 
 ```java
 ApiClient apiClient = ApiClientFactory.createApiClient(API_URL);
 RegistryApi api = new RegistryApi(apiClient);
 ```
 
-Currently the Registration Service is not published to any public artifactory so this rest client can be used in local development after publishing the 
+Currently the Registration Service is not published to any public artifactory so the rest client can be used in local development after publishing the 
 Registration Service artifacts locally
 
 ```
