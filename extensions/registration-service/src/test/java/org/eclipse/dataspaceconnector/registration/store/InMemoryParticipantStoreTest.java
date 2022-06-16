@@ -16,11 +16,11 @@ package org.eclipse.dataspaceconnector.registration.store;
 
 import org.eclipse.dataspaceconnector.registration.TestUtils;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
-import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.*;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZED;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
 
 class InMemoryParticipantStoreTest {
 
