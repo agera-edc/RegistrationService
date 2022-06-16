@@ -38,20 +38,12 @@ public class RegistrationService {
 
     private final Monitor monitor;
     private final ParticipantStore participantStore;
-    private final CredentialsVerifier credentialsVerifier;
-    private final StateMachine stateMachine;
 
-    public RegistrationService(Monitor monitor, ParticipantStore participantStore, CredentialsVerifier credentialsVerifier, ExecutorInstrumentation executorInstrumentation) {
+    public RegistrationService(Monitor monitor, ParticipantStore participantStore) {
         this.monitor = monitor;
         this.participantStore = participantStore;
-        this.credentialsVerifier = credentialsVerifier;
 
         // default wait five seconds
-        WaitStrategy waitStrategy = () -> 5000L;
-        stateMachine = StateMachine.Builder.newInstance("registration-service", monitor, executorInstrumentation, waitStrategy)
-                .processor(processNegotiationsInState(ONBOARDING_INITIATED, this::processOnboardingInitiated))
-                .processor(processNegotiationsInState(AUTHORIZING, this::processAuthorizing))
-                .build();
     }
 
     /**
@@ -67,35 +59,5 @@ public class RegistrationService {
     public void addParticipant(Participant participant) {
         monitor.info("Adding a participant in the dataspace.");
         participantStore.save(participant);
-    }
-
-    public void start() {
-        stateMachine.start();
-    }
-
-    public void stop() {
-        stateMachine.stop();
-    }
-
-    private Boolean processOnboardingInitiated(Participant participant) {
-        participant.transitionAuthorizing();
-        participantStore.save(participant);
-        return true;
-    }
-
-    private Boolean processAuthorizing(Participant participant) {
-        var verificationResult = credentialsVerifier.verifyCredentials();
-        if (verificationResult) {
-            participant.transitionAuthorized();
-            participantStore.save(participant);
-        } else {
-            participant.transitionDenied();
-            participantStore.save(participant);
-        }
-        return true;
-    }
-
-    private StateProcessorImpl<Participant> processNegotiationsInState(ParticipantStatus status, Function<Participant, Boolean> function) {
-        return new StateProcessorImpl<>(() -> participantStore.listParticipantsWithStatus(status), function);
     }
 }
