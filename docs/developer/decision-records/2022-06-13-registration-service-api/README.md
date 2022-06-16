@@ -1,6 +1,6 @@
 # Registration Service API
 
-Registration Service is a component of Dataspace Authority. 
+Registration Service is a component of a Dataspace Authority. 
 One of the responsibilities of the Registration Service is a management of the participants in the Dataspace.
 
 The Registration Service exposes an API that offers following operations:
