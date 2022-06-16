@@ -4,7 +4,7 @@ Registration Service is a component of a Dataspace Authority.
 One of the responsibilities of the Registration Service is the management of the participants in the Dataspace.
 
 The Registration Service exposes an API that offers the following operations:
-- Add participant to the Dataspace
+- Add a participant to the Dataspace
 - List participants in the Dataspace
 
 The Registration Service is written in Java and uses the runtime framework and modules from [EDC](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector).
