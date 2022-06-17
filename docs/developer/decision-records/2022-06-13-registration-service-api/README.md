@@ -9,9 +9,9 @@ The Registration Service exposes an API that offers the following operations:
 
 The Registration Service is written in Java and uses the runtime framework and modules from [EDC](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector).
 
-## OpenAPI 
+## OpenApi 
 
-The Registration Service API definition is available in an [Open API yaml file](../../../../resources/openapi/yaml/registration-service.yaml). 
+The Registration Service API definition is available in an [OpenApi yaml file](../../../../resources/openapi/yaml/registration-service.yaml). 
 
 ## API Rest client
 
