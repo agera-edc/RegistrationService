@@ -14,22 +14,12 @@
 
 package org.eclipse.dataspaceconnector.registration.api;
 
-import org.eclipse.dataspaceconnector.common.statemachine.StateMachine;
-import org.eclipse.dataspaceconnector.common.statemachine.StateProcessorImpl;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
-import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
-import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
-import org.eclipse.dataspaceconnector.spi.retry.WaitStrategy;
-import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-
-import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
-import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 
 /**
  * Registration service for dataspace participants.
@@ -38,20 +28,10 @@ public class RegistrationService {
 
     private final Monitor monitor;
     private final ParticipantStore participantStore;
-    private final CredentialsVerifier credentialsVerifier;
-    private final StateMachine stateMachine;
 
-    public RegistrationService(Monitor monitor, ParticipantStore participantStore, CredentialsVerifier credentialsVerifier, ExecutorInstrumentation executorInstrumentation) {
+    public RegistrationService(Monitor monitor, ParticipantStore participantStore) {
         this.monitor = monitor;
         this.participantStore = participantStore;
-        this.credentialsVerifier = credentialsVerifier;
-
-        // default wait five seconds
-        WaitStrategy waitStrategy = () -> 5000L;
-        stateMachine = StateMachine.Builder.newInstance("registration-service", monitor, executorInstrumentation, waitStrategy)
-                .processor(processParticipantsInState(ONBOARDING_INITIATED, this::processOnboardingInitiated))
-                .processor(processParticipantsInState(AUTHORIZING, this::processAuthorizing))
-                .build();
     }
 
     /**
@@ -72,40 +52,5 @@ public class RegistrationService {
     public void addParticipant(Participant participant) {
         monitor.info("Adding a participant in the dataspace.");
         participantStore.save(participant);
-    }
-
-    /**
-     * Start the participant manager state machine processor thread.
-     */
-    public void start() {
-        stateMachine.start();
-    }
-
-    /**
-     * Stop the participant manager state machine processor thread.
-     */
-    public void stop() {
-        stateMachine.stop();
-    }
-
-    private Boolean processOnboardingInitiated(Participant participant) {
-        participant.transitionAuthorizing();
-        participantStore.save(participant);
-        return true;
-    }
-
-    private Boolean processAuthorizing(Participant participant) {
-        var credentialsValid = credentialsVerifier.verifyCredentials();
-        if (credentialsValid) {
-            participant.transitionAuthorized();
-        } else {
-            participant.transitionDenied();
-        }
-        participantStore.save(participant);
-        return true;
-    }
-
-    private StateProcessorImpl<Participant> processParticipantsInState(ParticipantStatus status, Function<Participant, Boolean> function) {
-        return new StateProcessorImpl<>(() -> participantStore.listParticipantsWithStatus(status), function);
     }
 }
