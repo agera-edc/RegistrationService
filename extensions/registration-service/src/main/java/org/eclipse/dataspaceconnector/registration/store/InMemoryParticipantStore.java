@@ -20,9 +20,9 @@ import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 public class InMemoryParticipantStore implements ParticipantStore {
 
-    private final Map<String, Participant> storage = new LinkedHashMap<>();
+    private final Map<String, Participant> storage = new ConcurrentHashMap<>();
 
     @Override
     public List<Participant> listParticipants() {
