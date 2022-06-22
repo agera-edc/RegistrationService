@@ -14,6 +14,9 @@
 
 package org.eclipse.dataspaceconnector.registration;
 
+import org.eclipse.dataspaceconnector.api.auth.AuthenticationRequestFilter;
+import org.eclipse.dataspaceconnector.api.auth.AuthenticationService;
+import org.eclipse.dataspaceconnector.extension.jersey.mapper.EdcApiExceptionMapper;
 import org.eclipse.dataspaceconnector.registration.api.RegistrationApiController;
 import org.eclipse.dataspaceconnector.registration.api.RegistrationService;
 import org.eclipse.dataspaceconnector.registration.authority.DummyCredentialsVerifier;
@@ -37,6 +40,9 @@ public class RegistrationServiceExtension implements ServiceExtension {
     private WebService webService;
 
     @Inject
+    private AuthenticationService authenticationService;
+
+    @Inject
     private ParticipantStore participantStore;
 
     @Inject
@@ -55,6 +61,9 @@ public class RegistrationServiceExtension implements ServiceExtension {
 
         var registrationService = new RegistrationService(monitor, participantStore);
         webService.registerResource(new RegistrationApiController(registrationService));
+
+        webService.registerResource(new AuthenticationRequestFilter(authenticationService));
+        webService.registerResource(new EdcApiExceptionMapper(true));
     }
 
     @Override

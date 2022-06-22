@@ -5,6 +5,8 @@ plugins {
     `maven-publish`
 }
 
+val edcVersion: String by project
+val edcGroup: String by project
 val jacksonVersion: String by project
 val jupiterVersion: String by project
 val assertj: String by project
@@ -17,6 +19,8 @@ dependencies {
 
     api(project(":rest-client"))
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("${edcGroup}:identity-did-crypto:${edcVersion}")
+
     testImplementation("org.assertj:assertj-core:${assertj}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("com.github.javafaker:javafaker:${faker}")

@@ -44,7 +44,11 @@ public class RegistrationApiCommandLineClientTest {
 
         var request = MAPPER.writeValueAsString(participant);
 
-        var addCmdExitCode = cmd.execute("-s", API_URL, "participants", "add", "--request", request);
+        var addCmdExitCode = cmd.execute(
+                "-d", "did:web:did-server:test-authority",
+                "-k", "../client-cli/src/test/resources/private_p256.pem",
+                "-s", API_URL,
+                "participants", "add", "--request", request);
         assertThat(addCmdExitCode).isEqualTo(0);
         assertThat(getParticipants(cmd)).contains(participant);
     }
@@ -52,8 +56,10 @@ public class RegistrationApiCommandLineClientTest {
     private List<Participant> getParticipants(CommandLine cmd) throws JsonProcessingException {
         var writer = new StringWriter();
         cmd.setOut(new PrintWriter(writer));
-        var listCmdExitCode = cmd.execute("participants", "list");
-
+        var listCmdExitCode = cmd.execute(
+                "-d", "did:web:did-server:test-authority",
+                "-k", "../client-cli/src/test/resources/private_p256.pem",
+                "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);
 
         var output = writer.toString();

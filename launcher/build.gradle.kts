@@ -23,13 +23,13 @@ val edcGroup: String by project
 
 dependencies {
     implementation(project(":extensions:registration-service"))
+    implementation(project(":extensions:auth-jws"))
+    implementation(project(":extensions:identity-did-web-over-unsecured-http")) // TODO remove this...
+    // implementation("${edcGroup}:identity-did-web:${edcVersion}") // TODO ... and add this
     implementation("${edcGroup}:core:${edcVersion}")
     implementation("${edcGroup}:observability-api:${edcVersion}")
     implementation("${edcGroup}:filesystem-configuration:${edcVersion}")
     implementation("${edcGroup}:http:${edcVersion}")
-
-    // API key authentication (also used for CORS support)
-    implementation("${edcGroup}:auth-tokenbased:${edcVersion}")
 
 }
 

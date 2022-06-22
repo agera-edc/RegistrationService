@@ -13,6 +13,7 @@ val faker: String by project
 dependencies {
     implementation("${edcGroup}:core:${edcVersion}")
     implementation("${edcGroup}:state-machine-lib:${edcVersion}")
+    implementation("${edcGroup}:auth-spi:${edcVersion}")
 
     implementation(project(":extensions:participant-store-spi"))
     implementation(project(":extensions:dataspace-authority-spi"))

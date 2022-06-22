@@ -19,6 +19,8 @@ import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
+import java.nio.file.Path;
+
 @Command(name = "registration-service-cli", mixinStandardHelpOptions = true,
         description = "Client utility for MVD registration service.",
         subcommands = {
@@ -27,6 +29,12 @@ import picocli.CommandLine.Command;
 public class RegistrationServiceCli {
     @CommandLine.Option(names = "-s", required = true, description = "Registration service URL", defaultValue = "http://localhost:8181/api")
     String service;
+
+    @CommandLine.Option(names = "-d", required = true, description = "Client DID")
+    String clientDid;
+
+    @CommandLine.Option(names = "-k", required = true, description = "Private key")
+    Path privateKey;
 
     RegistryApi registryApiClient;
 
@@ -49,7 +57,7 @@ public class RegistrationServiceCli {
 
     private void init() {
         var apiClient = ApiClientFactory.createApiClient(service);
+        apiClient.setRequestInterceptor(new JsonWebSignatureHeaderInterceptor(this));
         registryApiClient = new RegistryApi(apiClient);
-
     }
 }
