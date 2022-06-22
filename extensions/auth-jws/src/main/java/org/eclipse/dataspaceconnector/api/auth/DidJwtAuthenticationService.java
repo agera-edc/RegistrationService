@@ -52,10 +52,10 @@ public class DidJwtAuthenticationService implements AuthenticationService {
                 .map(headers::get)
                 .filter(list -> !list.isEmpty())
                 .anyMatch(list -> list.stream()
-                        .anyMatch(this::checkBasicAuthValid));
+                        .anyMatch(this::jwtAuthValid));
     }
 
-    private boolean checkBasicAuthValid(String authHeader) {
+    private boolean jwtAuthValid(String authHeader) {
         var separatedAuthHeader = authHeader.split(" ");
 
         if (separatedAuthHeader.length != 2 || !"Bearer".equals(separatedAuthHeader[0])) {
