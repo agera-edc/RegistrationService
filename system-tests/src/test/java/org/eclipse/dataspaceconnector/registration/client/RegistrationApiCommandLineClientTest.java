@@ -46,7 +46,7 @@ public class RegistrationApiCommandLineClientTest {
 
         var addCmdExitCode = cmd.execute(
                 "-d", "did:web:did-server:test-authority",
-                "-k", "../client-cli/src/test/resources/private_p256.pem",
+                "-k", "../rest-client/src/test/resources/private_p256.pem",
                 "-s", API_URL,
                 "participants", "add", "--request", request);
         assertThat(addCmdExitCode).isEqualTo(0);
@@ -58,7 +58,7 @@ public class RegistrationApiCommandLineClientTest {
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
                 "-d", "did:web:did-server:test-authority",
-                "-k", "../client-cli/src/test/resources/private_p256.pem",
+                "-k", "../rest-client/src/test/resources/private_p256.pem",
                 "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);
 

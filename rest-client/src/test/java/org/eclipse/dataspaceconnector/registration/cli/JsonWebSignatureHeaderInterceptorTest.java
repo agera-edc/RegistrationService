@@ -18,14 +18,15 @@ import com.github.javafaker.Faker;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.SignedJWT;
 import org.eclipse.dataspaceconnector.iam.did.crypto.credentials.VerifiableCredentialFactory;
+import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPrivateKeyWrapper;
 import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPublicKeyWrapper;
+import org.eclipse.dataspaceconnector.registration.client.JsonWebSignatureHeaderInterceptor;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,21 +36,20 @@ class JsonWebSignatureHeaderInterceptorTest {
 
     @Test
     void accept() throws Exception {
-        var cli = new RegistrationServiceCli();
-        cli.privateKey = Path.of("src/test/resources/private_p256.pem");
+        var privateKey = Path.of("src/test/resources/private_p256.pem");
+        var ecKey = (ECKey) ECKey.parseFromPEMEncodedObjects(Files.readString(privateKey));
+        var privateKeyWrapper = new EcPrivateKeyWrapper(ecKey);
         var publicKey = Files.readString(Path.of("src/test/resources/public_p256.pem"));
         String clientDid = FAKER.lorem().sentence();
-        cli.clientDid = clientDid;
         String targetUrl = randomUrl();
-        cli.service = targetUrl;
-        var interceptor = new JsonWebSignatureHeaderInterceptor(cli);
+        var interceptor = new JsonWebSignatureHeaderInterceptor(clientDid, targetUrl, privateKeyWrapper);
 
-        HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(randomUrl()));
+        var builder = HttpRequest.newBuilder().uri(URI.create(randomUrl()));
         interceptor.accept(builder);
         var httpHeaders = builder.build().headers();
         assertThat(httpHeaders.map())
                 .containsOnlyKeys("Authorization");
-        List<String> authorizationHeaders = httpHeaders.allValues("Authorization");
+        var authorizationHeaders = httpHeaders.allValues("Authorization");
         assertThat(authorizationHeaders).hasSize(1);
         var authorizationHeader = authorizationHeaders.get(0);
         var authHeaderParts = authorizationHeader.split(" ", 2);

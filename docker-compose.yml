@@ -8,6 +8,7 @@ services:
         JVM_ARGS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     environment:
       JWT_AUDIENCE: http://localhost:8181/api
+      EDC_IAM_DID_WEB_USE_HTTPS: false
     ports:
       - "8181:8181"
       - "5005:5005"

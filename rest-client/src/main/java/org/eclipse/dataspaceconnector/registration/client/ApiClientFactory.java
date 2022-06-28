@@ -14,6 +14,8 @@
 
 package org.eclipse.dataspaceconnector.registration.client;
 
+import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
+
 /**
  * Factory class for {@link ApiClient}.
  */
@@ -24,12 +26,15 @@ public class ApiClientFactory {
     /**
      * Create a new instance of {@link ApiClient} configured to access the given URL.
      *
-     * @param baseUri API base URL.
-     * @return a new instance of {@link ApiClient}.
+     * @param baseUri    API base URL.
+     * @param issuer     Issuer claim for JSON Web Token.
+     * @param privateKey Key used to sign JSON Web Token.
+     * @return API client.
      */
-    public static ApiClient createApiClient(String baseUri) {
+    public static ApiClient createApiClient(String baseUri, String issuer, PrivateKeyWrapper privateKey) {
         var apiClient = new ApiClient();
         apiClient.updateBaseUri(baseUri);
+        apiClient.setRequestInterceptor(new JsonWebSignatureHeaderInterceptor(issuer, baseUri, privateKey));
         return apiClient;
     }
 }

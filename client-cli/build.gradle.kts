@@ -19,7 +19,6 @@ dependencies {
 
     api(project(":rest-client"))
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    implementation("${edcGroup}:identity-did-crypto:${edcVersion}")
 
     testImplementation("org.assertj:assertj-core:${assertj}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")

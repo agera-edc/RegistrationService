@@ -100,7 +100,7 @@ class ParticipantsCommandTest {
     private int executeParticipantsAdd(String request) {
         return cmd.execute(
                 "-d", "did:web:did-server:test-authority",
-                "-k", "../client-cli/src/test/resources/private_p256.pem",
+                "-k", "../rest-client/src/test/resources/private_p256.pem",
                 "-s", serverUrl,
                 "participants", "add",
                 "--request", request);
@@ -109,7 +109,7 @@ class ParticipantsCommandTest {
     private int executeParticipantsAdd() {
         return cmd.execute(
                 "-d", "did:web:did-server:test-authority",
-                "-k", "../client-cli/src/test/resources/private_p256.pem",
+                "-k", "../rest-client/src/test/resources/private_p256.pem",
                 "-s", serverUrl,
                 "participants", "list");
     }

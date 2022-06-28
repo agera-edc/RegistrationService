@@ -17,7 +17,7 @@
 // https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/java.md
 
 plugins {
-    java
+    `java-library`
     id("org.openapi.generator") version "5.4.0"
     `maven-publish`
 }
@@ -57,10 +57,25 @@ sourceSets {
     }
 }
 
+val edcVersion: String by project
+val edcGroup: String by project
 val jacksonVersion: String by project
+val jupiterVersion: String by project
+val assertj: String by project
+val mockitoVersion: String by project
+val faker: String by project
 
-// Dependencies copied from build/generate-resources/main/build.gradle
+
 dependencies {
+    api("${edcGroup}:identity-did-crypto:${edcVersion}")
+
+    testImplementation("org.assertj:assertj-core:${assertj}")
+    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    testImplementation("com.github.javafaker:javafaker:${faker}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
+
+    // Dependencies copied from build/generate-resources/main/build.gradle
     implementation("io.swagger:swagger-annotations:1.5.22")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
