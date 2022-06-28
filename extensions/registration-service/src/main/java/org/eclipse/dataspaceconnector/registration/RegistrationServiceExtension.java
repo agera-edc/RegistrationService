@@ -36,6 +36,7 @@ import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
  */
 public class RegistrationServiceExtension implements ServiceExtension {
 
+    public static final String CONTEXT_ALIAS = "authority";
     @Inject
     private WebService webService;
 
@@ -60,10 +61,10 @@ public class RegistrationServiceExtension implements ServiceExtension {
         participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation);
 
         var registrationService = new RegistrationService(monitor, participantStore);
-        webService.registerResource(new RegistrationApiController(registrationService));
+        webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
 
-        webService.registerResource(new AuthenticationRequestFilter(authenticationService));
-        webService.registerResource(new EdcApiExceptionMapper(true));
+        webService.registerResource(CONTEXT_ALIAS, new AuthenticationRequestFilter(authenticationService));
+        webService.registerResource(CONTEXT_ALIAS, new EdcApiExceptionMapper(true));
     }
 
     @Override

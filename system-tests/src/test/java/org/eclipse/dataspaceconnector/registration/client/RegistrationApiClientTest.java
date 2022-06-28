@@ -30,7 +30,7 @@ import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PRIVA
 
 @IntegrationTest
 public class RegistrationApiClientTest {
-    static final String API_URL = "http://localhost:8181/api";
+    static final String API_URL = "http://localhost:8182/authority";
 
     Participant participant = createParticipant();
 

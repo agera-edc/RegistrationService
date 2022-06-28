@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 - 2022 Microsoft Corporation
+ *  Copyright (c) 2022 Microsoft Corporation
  *
  *  This program and the accompanying materials are made available under the
  *  terms of the Apache License, Version 2.0 which is available at
@@ -84,7 +84,7 @@ public class DidJwtAuthenticationService implements AuthenticationService {
 
         var verificationResult = VerifiableCredentialFactory.verify(jwt, publicKey.getContent(), audience);
         if (verificationResult.failed()) {
-            monitor.debug("Invalid JWT (verification error)");
+            publicKey.getFailureMessages().forEach(message -> monitor.debug("Invalid JWT (verification error). " + message));
             return false;
         }
 
