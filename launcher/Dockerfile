@@ -12,7 +12,7 @@ RUN apt update \
 WORKDIR /app
 COPY ./build/libs/app.jar /app
 
-EXPOSE 8181
+EXPOSE 8182
 
 # health status is determined by the availability of the /health endpoint
 HEALTHCHECK --interval=5s --timeout=5s --retries=10 CMD curl --fail http://localhost:8181/api/check/health

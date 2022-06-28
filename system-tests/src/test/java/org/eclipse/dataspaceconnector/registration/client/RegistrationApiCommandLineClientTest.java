@@ -33,8 +33,6 @@ import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PRIVA
 
 @IntegrationTest
 public class RegistrationApiCommandLineClientTest {
-    static final String API_URL = "http://localhost:8181/api";
-
     static final ObjectMapper MAPPER = new ObjectMapper();
     Participant participant = createParticipant();
 
@@ -49,7 +47,6 @@ public class RegistrationApiCommandLineClientTest {
         var addCmdExitCode = cmd.execute(
                 "-d", DID_WEB,
                 "-k", PRIVATE_KEY_FILE,
-                "-s", API_URL,
                 "participants", "add", "--request", request);
         assertThat(addCmdExitCode).isEqualTo(0);
         assertThat(getParticipants(cmd)).contains(participant);
