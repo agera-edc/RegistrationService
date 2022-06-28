@@ -61,7 +61,7 @@ class ParticipantsCommandTest {
         when(app.registryApiClient.listParticipants())
                 .thenReturn(participants);
 
-        var exitCode = cmd.execute("-s", serverUrl, "participants", "list");
+        var exitCode = executeParticipantsAdd();
         assertThat(exitCode).isEqualTo(0);
         assertThat(serverUrl).isEqualTo(app.service);
 
@@ -78,7 +78,7 @@ class ParticipantsCommandTest {
         doNothing().when(app.registryApiClient).addParticipant(participantArgCaptor.capture());
         var request = MAPPER.writeValueAsString(participant1);
 
-        var exitCode = cmd.execute("-s", serverUrl, "participants", "add", "--request", request);
+        var exitCode = executeParticipantsAdd(request);
 
         assertThat(exitCode).isEqualTo(0);
         assertThat(serverUrl).isEqualTo(app.service);
@@ -88,12 +88,29 @@ class ParticipantsCommandTest {
     }
 
     @Test
-    void invalidRequest_Add_Failure() throws Exception {
+    void invalidRequest_Add_Failure() {
         var request = "Invalid json";
 
-        var exitCode = cmd.execute("-s", serverUrl, "participants", "add", "--request", request);
+        var exitCode = executeParticipantsAdd(request);
 
         assertThat(exitCode).isNotEqualTo(0);
         assertThat(serverUrl).isEqualTo(app.service);
+    }
+
+    private int executeParticipantsAdd(String request) {
+        return cmd.execute(
+                "-d", "did:web:did-server:test-authority",
+                "-k", "../client-cli/src/test/resources/private_p256.pem",
+                "-s", serverUrl,
+                "participants", "add",
+                "--request", request);
+    }
+
+    private int executeParticipantsAdd() {
+        return cmd.execute(
+                "-d", "did:web:did-server:test-authority",
+                "-k", "../client-cli/src/test/resources/private_p256.pem",
+                "-s", serverUrl,
+                "participants", "list");
     }
 }
