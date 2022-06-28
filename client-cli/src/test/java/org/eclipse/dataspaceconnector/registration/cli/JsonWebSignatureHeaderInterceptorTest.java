@@ -56,8 +56,8 @@ class JsonWebSignatureHeaderInterceptorTest {
         assertThat(authHeaderParts[0]).isEqualTo("Bearer");
         var jwt = SignedJWT.parse(authHeaderParts[1]);
         var key = new EcPublicKeyWrapper((ECKey) ECKey.parseFromPEMEncodedObjects(publicKey));
-        var verified = VerifiableCredentialFactory.verify(jwt, key, targetUrl);
-        assertThat(verified).isTrue();
+        var verificationResult = VerifiableCredentialFactory.verify(jwt, key, targetUrl);
+        assertThat(verificationResult.succeeded()).isTrue();
         assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo(clientDid);
     }
 

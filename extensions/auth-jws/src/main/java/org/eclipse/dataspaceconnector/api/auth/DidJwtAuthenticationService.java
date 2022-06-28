@@ -82,8 +82,8 @@ public class DidJwtAuthenticationService implements AuthenticationService {
             return false;
         }
 
-        var verified = VerifiableCredentialFactory.verify(jwt, publicKey.getContent(), audience);
-        if (!verified) {
+        var verificationResult = VerifiableCredentialFactory.verify(jwt, publicKey.getContent(), audience);
+        if (verificationResult.failed()) {
             monitor.debug("Invalid JWT (verification error)");
             return false;
         }
