@@ -25,6 +25,8 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.registration.client.IntegrationTestUtils.createParticipant;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DID_WEB;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PRIVATE_KEY_FILE;
 
 @IntegrationTest
 public class RegistrationApiClientTest {
@@ -34,11 +36,11 @@ public class RegistrationApiClientTest {
 
     @Test
     void listParticipants() throws Exception {
-        var privateKey = Path.of("../rest-client/src/test/resources/private_p256.pem");
+        var privateKey = Path.of(PRIVATE_KEY_FILE);
         var ecKey = (ECKey) ECKey.parseFromPEMEncodedObjects(Files.readString(privateKey));
         var privateKeyWrapper = new EcPrivateKeyWrapper(ecKey);
 
-        var apiClient = ApiClientFactory.createApiClient(API_URL, "did:web:did-server:test-authority", privateKeyWrapper);
+        var apiClient = ApiClientFactory.createApiClient(API_URL, DID_WEB, privateKeyWrapper);
         var api = new RegistryApi(apiClient);
 
         assertThat(api.listParticipants())

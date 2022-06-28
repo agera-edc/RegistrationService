@@ -28,6 +28,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.registration.client.IntegrationTestUtils.createParticipant;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DID_WEB;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PRIVATE_KEY_FILE;
 
 @IntegrationTest
 public class RegistrationApiCommandLineClientTest {
@@ -45,8 +47,8 @@ public class RegistrationApiCommandLineClientTest {
         var request = MAPPER.writeValueAsString(participant);
 
         var addCmdExitCode = cmd.execute(
-                "-d", "did:web:did-server:test-authority",
-                "-k", "../rest-client/src/test/resources/private_p256.pem",
+                "-d", DID_WEB,
+                "-k", PRIVATE_KEY_FILE,
                 "-s", API_URL,
                 "participants", "add", "--request", request);
         assertThat(addCmdExitCode).isEqualTo(0);
@@ -57,8 +59,8 @@ public class RegistrationApiCommandLineClientTest {
         var writer = new StringWriter();
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
-                "-d", "did:web:did-server:test-authority",
-                "-k", "../rest-client/src/test/resources/private_p256.pem",
+                "-d", DID_WEB,
+                "-k", PRIVATE_KEY_FILE,
                 "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);
 
