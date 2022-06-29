@@ -77,7 +77,7 @@ class ParticipantsCommandTest {
 
         assertThat(exitCode).isEqualTo(0);
         assertThat(serverUrl).isEqualTo(app.service);
-        verify(app.registryApiClient).addParticipant(did, idsUrl);
+        verify(app.registryApiClient).addParticipant(idsUrl, did);
     }
 
     private int executeParticipantsAdd(String idsUrl) {
