@@ -32,7 +32,7 @@ public class RegistrationApiClientTest {
     static final String API_URL = "http://localhost:8182/authority";
 
     static final Faker FAKER = new Faker();
-    String participant = FAKER.internet().url();
+    String participantUrl = FAKER.internet().url();
 
     @Test
     void listParticipants() throws Exception {
@@ -44,11 +44,11 @@ public class RegistrationApiClientTest {
         var api = new RegistryApi(apiClient);
 
         assertThat(api.listParticipants())
-                .noneSatisfy(p -> participant.equals(p.getUrl()));
+                .noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
 
-        api.addParticipant(participant);
+        api.addParticipant(participantUrl);
 
         assertThat(api.listParticipants())
-                .anySatisfy(p -> participant.equals(p.getUrl()));
+                .anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
     }
 }

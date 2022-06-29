@@ -30,7 +30,8 @@ import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import java.util.List;
 import java.util.Objects;
 
-import static org.eclipse.dataspaceconnector.registration.DidJwtAuthenticationFilter.ISSUER_HEADER;
+import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter.CALLER_DID_HEADER;
+
 
 /**
  * Registration Service API controller to manage dataspace participants.
@@ -68,7 +69,7 @@ public class RegistrationApiController {
     @POST
     public void addParticipant(
             @HeaderParam(TEMPORARY_IDS_URL_HEADER) String idsUrl, @Context HttpHeaders headers) {
-        var issuer = Objects.requireNonNull(headers.getHeaderString(ISSUER_HEADER));
+        var issuer = Objects.requireNonNull(headers.getHeaderString(CALLER_DID_HEADER));
 
         service.addParticipant(issuer, idsUrl);
     }
