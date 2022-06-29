@@ -23,15 +23,9 @@ import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 
 import java.util.List;
-import java.util.Objects;
-
-import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter.CALLER_DID_HEADER;
-
 
 /**
  * Registration Service API controller to manage dataspace participants.
@@ -43,6 +37,8 @@ import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticat
 public class RegistrationApiController {
 
     private static final String TEMPORARY_IDS_URL_HEADER = "IdsUrl";
+
+    private static final String CALLER_DID_HEADER = "CallerDid";
 
     private final RegistrationService service;
 
@@ -68,9 +64,8 @@ public class RegistrationApiController {
     @ApiResponse(responseCode = "204", description = "No content")
     @POST
     public void addParticipant(
-            @HeaderParam(TEMPORARY_IDS_URL_HEADER) String idsUrl, @Context HttpHeaders headers) {
-        var issuer = Objects.requireNonNull(headers.getHeaderString(CALLER_DID_HEADER));
-
-        service.addParticipant(issuer, idsUrl);
+            @HeaderParam(TEMPORARY_IDS_URL_HEADER) String idsUrl,
+            @HeaderParam(CALLER_DID_HEADER) String did) {
+        service.addParticipant(did, idsUrl);
     }
 }
