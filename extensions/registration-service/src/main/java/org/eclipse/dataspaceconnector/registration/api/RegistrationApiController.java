@@ -36,8 +36,14 @@ import java.util.List;
 @Path("/registry")
 public class RegistrationApiController {
 
+    /**
+     * A IDS URL (this will be removed in https://github.com/agera-edc/MinimumViableDataspace/issues/174)
+     */
     private static final String TEMPORARY_IDS_URL_HEADER = "IdsUrl";
 
+    /**
+     * A DID that identifies the caller (in the next PR to the same branch, this will be removed from operation parameters and extracted from the passed JWT. This is only here as a stopgap to make PRs smaller)
+     */
     private static final String CALLER_DID_HEADER = "CallerDid";
 
     private final RegistrationService service;
