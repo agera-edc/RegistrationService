@@ -17,6 +17,7 @@ package org.eclipse.dataspaceconnector.registration.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli;
 import org.eclipse.dataspaceconnector.registration.client.models.Participant;
 import org.junit.jupiter.api.Test;
@@ -27,29 +28,26 @@ import java.io.StringWriter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspaceconnector.registration.client.IntegrationTestUtils.createParticipant;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DID_WEB;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PRIVATE_KEY_FILE;
 
 @IntegrationTest
 public class RegistrationApiCommandLineClientTest {
     static final ObjectMapper MAPPER = new ObjectMapper();
-    Participant participant = createParticipant();
+    static final Faker FAKER = new Faker();
+    String idsUrl = FAKER.internet().url();
 
     @Test
     void listParticipants() throws Exception {
         CommandLine cmd = RegistrationServiceCli.getCommandLine();
 
-        assertThat(getParticipants(cmd)).doesNotContain(participant);
-
-        var request = MAPPER.writeValueAsString(participant);
-
         var addCmdExitCode = cmd.execute(
                 "-d", DID_WEB,
                 "-k", PRIVATE_KEY_FILE,
-                "participants", "add", "--request", request);
+                "participants", "add",
+                "--ids-url", idsUrl);
         assertThat(addCmdExitCode).isEqualTo(0);
-        assertThat(getParticipants(cmd)).contains(participant);
+        assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
     }
 
     private List<Participant> getParticipants(CommandLine cmd) throws JsonProcessingException {

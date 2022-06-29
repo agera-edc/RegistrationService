@@ -21,7 +21,6 @@ import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import org.eclipse.dataspaceconnector.registration.client.models.Participant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
@@ -30,8 +29,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.registration.cli.TestUtils.createParticipant;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +41,7 @@ class ParticipantsCommandTest {
     Participant participant1 = createParticipant();
     Participant participant2 = createParticipant();
     String serverUrl = FAKER.internet().url();
+    String idsUrl = FAKER.internet().url();
 
     RegistrationServiceCli app = new RegistrationServiceCli();
     CommandLine cmd = new CommandLine(app);
@@ -73,37 +71,21 @@ class ParticipantsCommandTest {
     }
 
     @Test
-    void add() throws Exception {
-        var participantArgCaptor = ArgumentCaptor.forClass(Participant.class);
-        doNothing().when(app.registryApiClient).addParticipant(participantArgCaptor.capture());
-        var request = MAPPER.writeValueAsString(participant1);
-
-        var exitCode = executeParticipantsAdd(request);
+    void add() {
+        var exitCode = executeParticipantsAdd(idsUrl);
 
         assertThat(exitCode).isEqualTo(0);
         assertThat(serverUrl).isEqualTo(app.service);
-        verify(app.registryApiClient).addParticipant(isA(Participant.class));
-        assertThat(participantArgCaptor.getValue())
-                .usingRecursiveComparison().isEqualTo(participant1);
+        verify(app.registryApiClient).addParticipant(idsUrl);
     }
 
-    @Test
-    void invalidRequest_Add_Failure() {
-        var request = "Invalid json";
-
-        var exitCode = executeParticipantsAdd(request);
-
-        assertThat(exitCode).isNotEqualTo(0);
-        assertThat(serverUrl).isEqualTo(app.service);
-    }
-
-    private int executeParticipantsAdd(String request) {
+    private int executeParticipantsAdd(String idsUrl) {
         return cmd.execute(
                 "-d", "did:web:did-server:test-authority",
                 "-k", "../rest-client/src/test/resources/private_p256.pem",
                 "-s", serverUrl,
                 "participants", "add",
-                "--request", request);
+                "--ids-url", idsUrl);
     }
 
     private int executeParticipantsAdd() {

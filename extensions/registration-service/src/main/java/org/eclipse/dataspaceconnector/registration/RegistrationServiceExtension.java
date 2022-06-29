@@ -61,7 +61,7 @@ public class RegistrationServiceExtension implements ServiceExtension {
         participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation);
 
         var registrationService = new RegistrationService(monitor, participantStore);
-        webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
+        webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService, monitor));
 
         webService.registerResource(CONTEXT_ALIAS, new AuthenticationRequestFilter(authenticationService));
         webService.registerResource(CONTEXT_ALIAS, new EdcApiExceptionMapper(true));
