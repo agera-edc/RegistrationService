@@ -33,6 +33,11 @@ import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
  */
 public class RegistrationServiceExtension implements ServiceExtension {
 
+    public static final String CONTEXT_ALIAS = "authority";
+
+    @Inject
+    private Monitor monitor;
+
     @Inject
     private WebService webService;
 
@@ -49,12 +54,11 @@ public class RegistrationServiceExtension implements ServiceExtension {
 
     @Override
     public void initialize(ServiceExtensionContext context) {
-        var monitor = context.getMonitor();
 
         participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation);
 
         var registrationService = new RegistrationService(monitor, participantStore);
-        webService.registerResource(new RegistrationApiController(registrationService));
+        webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
     }
 
     @Override
