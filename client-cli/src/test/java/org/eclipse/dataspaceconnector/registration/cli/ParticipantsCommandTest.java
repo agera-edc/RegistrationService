@@ -42,6 +42,7 @@ class ParticipantsCommandTest {
     Participant participant2 = createParticipant();
     String serverUrl = FAKER.internet().url();
     String idsUrl = FAKER.internet().url();
+    String did = FAKER.internet().url();
 
     RegistrationServiceCli app = new RegistrationServiceCli();
     CommandLine cmd = new CommandLine(app);
@@ -59,7 +60,7 @@ class ParticipantsCommandTest {
         when(app.registryApiClient.listParticipants())
                 .thenReturn(participants);
 
-        var exitCode = executeParticipantsAdd();
+        var exitCode = executeParticipantsList();
         assertThat(exitCode).isEqualTo(0);
         assertThat(serverUrl).isEqualTo(app.service);
 
@@ -81,16 +82,16 @@ class ParticipantsCommandTest {
 
     private int executeParticipantsAdd(String idsUrl) {
         return cmd.execute(
-                "-d", "did:web:did-server:test-authority",
+                "-d", did,
                 "-k", "../rest-client/src/test/resources/private_p256.pem",
                 "-s", serverUrl,
                 "participants", "add",
                 "--ids-url", idsUrl);
     }
 
-    private int executeParticipantsAdd() {
+    private int executeParticipantsList() {
         return cmd.execute(
-                "-d", "did:web:did-server:test-authority",
+                "-d", did,
                 "-k", "../rest-client/src/test/resources/private_p256.pem",
                 "-s", serverUrl,
                 "participants", "list");

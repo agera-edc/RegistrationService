@@ -30,18 +30,23 @@ import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PRIVA
 @IntegrationTest
 public class RegistrationApiClientTest {
     static final String API_URL = "http://localhost:8182/authority";
-
     static final Faker FAKER = new Faker();
+    static RegistryApi api;
+
     String participantUrl = FAKER.internet().url();
 
-    @Test
-    void listParticipants() throws Exception {
+    @BeforeAll
+    static void setUpClass() throws Exception {
         var privateKey = Path.of(PRIVATE_KEY_FILE);
         var ecKey = (ECKey) ECKey.parseFromPEMEncodedObjects(Files.readString(privateKey));
         var privateKeyWrapper = new EcPrivateKeyWrapper(ecKey);
 
         var apiClient = ApiClientFactory.createApiClient(API_URL, DID_WEB, privateKeyWrapper);
-        var api = new RegistryApi(apiClient);
+        api = new RegistryApi(apiClient);
+    }
+
+    @Test
+    void listParticipants() {
 
         assertThat(api.listParticipants())
                 .noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
