@@ -41,7 +41,7 @@ class InMemoryParticipantStoreTest {
     void saveAndListParticipants_removesDuplicates() {
         store.save(participant1);
         store.save(participant1OtherEntry);
-        assertThat(store.listParticipants()).containsOnly(participant1);
+        assertThat(store.listParticipants()).containsOnly(participant1OtherEntry);
     }
 
     @Test

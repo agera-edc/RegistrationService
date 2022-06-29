@@ -31,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DID_WEB;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PRIVATE_KEY_FILE;
 
-@IntegrationTest
 public class RegistrationApiCommandLineClientTest {
     static final ObjectMapper MAPPER = new ObjectMapper();
     static final Faker FAKER = new Faker();

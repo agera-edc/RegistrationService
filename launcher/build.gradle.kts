@@ -23,12 +23,11 @@ val edcGroup: String by project
 
 dependencies {
     implementation(project(":extensions:registration-service"))
-    implementation(project(":extensions:auth-jws"))
     implementation("${edcGroup}:identity-did-web:${edcVersion}")
+    implementation("${edcGroup}:identity-did-core:${edcVersion}")
     implementation("${edcGroup}:core:${edcVersion}")
     implementation("${edcGroup}:observability-api:${edcVersion}")
     implementation("${edcGroup}:filesystem-configuration:${edcVersion}")
-    implementation("${edcGroup}:http:${edcVersion}")
 }
 
 application {

@@ -11,10 +11,9 @@ val mockitoVersion: String by project
 val faker: String by project
 
 dependencies {
-    implementation("${edcGroup}:core:${edcVersion}")
+    implementation("${edcGroup}:http:${edcVersion}")
     implementation("${edcGroup}:state-machine-lib:${edcVersion}")
     implementation("${edcGroup}:identity-did-crypto:${edcVersion}")
-    implementation("${edcGroup}:auth-spi:${edcVersion}")
 
     implementation(project(":extensions:participant-store-spi"))
     implementation(project(":extensions:dataspace-authority-spi"))

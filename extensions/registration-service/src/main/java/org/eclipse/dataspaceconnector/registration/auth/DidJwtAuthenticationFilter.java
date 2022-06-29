@@ -12,55 +12,48 @@
  *
  */
 
-package org.eclipse.dataspaceconnector.api.auth;
+package org.eclipse.dataspaceconnector.registration.auth;
 
 
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
 import org.eclipse.dataspaceconnector.iam.did.crypto.credentials.VerifiableCredentialFactory;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidPublicKeyResolver;
+import org.eclipse.dataspaceconnector.spi.exception.AuthenticationFailedException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 
 import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-public class DidJwtAuthenticationService implements AuthenticationService {
+/**
+ * Intercepts all requests sent to this resource and authenticates them using DID Web.
+ */
+
+public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
+    public static final String ISSUER_HEADER = "Issuer";
 
     private final Monitor monitor;
     private final DidPublicKeyResolver didPublicKeyResolver;
     private final String audience;
 
-    public DidJwtAuthenticationService(Monitor monitor, DidPublicKeyResolver didPublicKeyResolver, String audience) {
+    public DidJwtAuthenticationFilter(Monitor monitor, DidPublicKeyResolver didPublicKeyResolver, String audience) {
         this.monitor = monitor;
         this.didPublicKeyResolver = didPublicKeyResolver;
         this.audience = audience;
     }
 
-    /**
-     * Validates if the request is authenticated
-     *
-     * @param headers The headers, that contains the credential to be used, in this case the Basic-Auth credentials.
-     * @return True if the credentials are correct.
-     */
     @Override
-    public boolean isAuthenticated(Map<String, List<String>> headers) {
+    public void filter(ContainerRequestContext requestContext) {
+        var headers = requestContext.getHeaders();
         Objects.requireNonNull(headers, "headers");
 
-        return headers.keySet().stream()
-                .filter(k -> k.equalsIgnoreCase("Authorization"))
-                .map(headers::get)
-                .filter(list -> !list.isEmpty())
-                .anyMatch(list -> list.stream()
-                        .anyMatch(this::jwtAuthValid));
-    }
-
-    private boolean jwtAuthValid(String authHeader) {
+        var authHeader = headers.getFirst("Authorization");
         var separatedAuthHeader = authHeader.split(" ");
 
         if (separatedAuthHeader.length != 2 || !"Bearer".equals(separatedAuthHeader[0])) {
             monitor.debug("Authorization header value is not a valid Bearer token");
-            return false;
+            throw new AuthenticationFailedException();
         }
 
         var credential = separatedAuthHeader[1];
@@ -72,23 +65,24 @@ public class DidJwtAuthenticationService implements AuthenticationService {
             issuer = jwt.getJWTClaimsSet().getIssuer();
         } catch (ParseException e) {
             monitor.debug("Invalid JWT (parse error)");
-            return false;
+            throw new AuthenticationFailedException();
         }
 
         var publicKey = didPublicKeyResolver.resolvePublicKey(issuer);
 
         if (publicKey.failed()) {
-            publicKey.getFailureMessages().forEach(monitor::debug);
-            return false;
+            publicKey.getFailureMessages().forEach(message -> monitor.debug(() -> "Failed obtaining public key for DID: " + issuer + ". " + message));
+            throw new AuthenticationFailedException();
         }
 
         var verificationResult = VerifiableCredentialFactory.verify(jwt, publicKey.getContent(), audience);
         if (verificationResult.failed()) {
-            publicKey.getFailureMessages().forEach(message -> monitor.debug("Invalid JWT (verification error). " + message));
-            return false;
+            publicKey.getFailureMessages().forEach(message -> monitor.debug(() -> "Invalid JWT (verification error). " + message));
+            throw new AuthenticationFailedException();
         }
 
         monitor.debug("Valid JWT");
-        return true;
+
+        headers.putSingle(ISSUER_HEADER, issuer);
     }
 }
