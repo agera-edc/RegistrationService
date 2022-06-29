@@ -60,7 +60,7 @@ class ParticipantsCommandTest {
         when(app.registryApiClient.listParticipants())
                 .thenReturn(participants);
 
-        var exitCode = executeParticipantsAdd();
+        var exitCode = executeParticipantsList();
         assertThat(exitCode).isEqualTo(0);
         assertThat(serverUrl).isEqualTo(app.service);
 
@@ -88,7 +88,7 @@ class ParticipantsCommandTest {
                 "--ids-url", idsUrl);
     }
 
-    private int executeParticipantsAdd() {
+    private int executeParticipantsList() {
         return cmd.execute(
                 "-d", did,
                 "-s", serverUrl,
