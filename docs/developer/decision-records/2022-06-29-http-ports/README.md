@@ -24,4 +24,4 @@ DID-based JWS authentication will be used for the Registration Service controlle
 
 However, for docker health check (used in `docker-compose up --wait` in CI to wait until containers have successfully started), we use `curl` to access the health endpoint, which is deployed in the EDC default context. Therefore, we do not want to apply our authentication filter to the `default` context, and need to introduce an additional context for the API controller.
 
-It is also good practice not to expose health and management endpoints to public API.
+It is also good practice not to expose health and management endpoints to public access. Deploying them on a different ports allow deployments to expose their port on internal routes only.
