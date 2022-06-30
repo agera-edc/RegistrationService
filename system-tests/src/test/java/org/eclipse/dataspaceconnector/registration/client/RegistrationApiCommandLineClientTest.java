@@ -42,6 +42,7 @@ public class RegistrationApiCommandLineClientTest {
         CommandLine cmd = RegistrationServiceCli.getCommandLine();
 
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+
         var addCmdExitCode = cmd.execute(
                 "-d", DID_WEB,
                 "-k", PRIVATE_KEY_FILE,
