@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 public class RegistrationApiClientTest {
-    static final String API_URL = "http://localhost:8181/api";
+    static final String API_URL = "http://localhost:8182/authority";
     static final Faker FAKER = new Faker();
 
     ApiClient apiClient = ApiClientFactory.createApiClient(API_URL);

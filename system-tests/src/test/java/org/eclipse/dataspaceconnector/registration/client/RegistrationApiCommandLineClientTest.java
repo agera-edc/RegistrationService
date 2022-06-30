@@ -40,6 +40,10 @@ public class RegistrationApiCommandLineClientTest {
     void listParticipants() throws Exception {
         CommandLine cmd = RegistrationServiceCli.getCommandLine();
 
+        assertThat(getParticipants(cmd)).doesNotContain(participant);
+
+        var request = MAPPER.writeValueAsString(participant);
+
         var addCmdExitCode = cmd.execute(
                 "-d", did,
                 "participants", "add",
