@@ -18,6 +18,7 @@ package org.eclipse.dataspaceconnector.registration.auth;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.eclipse.dataspaceconnector.iam.did.crypto.credentials.VerifiableCredentialFactory;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidPublicKeyResolver;
 import org.eclipse.dataspaceconnector.spi.exception.AuthenticationFailedException;
@@ -51,6 +52,36 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
         var headers = requestContext.getHeaders();
         Objects.requireNonNull(headers, "headers");
 
+        String credential = getCredential(headers);
+        SignedJWT jwt = parseJsonWebToken(credential);
+        String issuer = getIssuerClaim(jwt);
+        verifyTokenSignature(jwt, issuer);
+
+        monitor.debug("Valid JWT");
+
+        headers.putSingle(CALLER_DID_HEADER, issuer);
+    }
+
+
+    @NotNull
+    private SignedJWT parseJsonWebToken(String credential) {
+        try {
+            return SignedJWT.parse(credential);
+        } catch (ParseException e) {
+            throw authenticationFailure("Invalid JWT (parse error)", List.of(e.getMessage()));
+        }
+    }
+
+    private String getIssuerClaim(SignedJWT jwt) {
+        try {
+            return jwt.getJWTClaimsSet().getIssuer();
+        } catch (ParseException e) {
+            throw authenticationFailure("Invalid JWT (parse error)", List.of(e.getMessage()));
+        }
+    }
+
+
+    private String getCredential(MultivaluedMap<String, String> headers) {
         var authHeader = headers.getFirst("Authorization");
         if (authHeader == null) {
             throw authenticationFailure("Cannot authenticate request", List.of("Missing Authorization header"));
@@ -61,17 +92,10 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
             throw authenticationFailure("Cannot authenticate request", List.of("Authorization header value is not a valid Bearer token"));
         }
 
-        var credential = separatedAuthHeader[1];
+        return separatedAuthHeader[1];
+    }
 
-        SignedJWT jwt;
-        String issuer;
-        try {
-            jwt = SignedJWT.parse(credential);
-            issuer = jwt.getJWTClaimsSet().getIssuer();
-        } catch (ParseException e) {
-            throw authenticationFailure("Invalid JWT (parse error)", List.of(e.getMessage()));
-        }
-
+    private void verifyTokenSignature(SignedJWT jwt, String issuer) {
         var publicKey = didPublicKeyResolver.resolvePublicKey(issuer);
 
         if (publicKey.failed()) {
@@ -82,10 +106,6 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
         if (verificationResult.failed()) {
             throw authenticationFailure("Invalid JWT (verification error)", verificationResult.getFailureMessages());
         }
-
-        monitor.debug("Valid JWT");
-
-        headers.putSingle(CALLER_DID_HEADER, issuer);
     }
 
     @NotNull
