@@ -22,8 +22,10 @@ import org.eclipse.dataspaceconnector.iam.did.crypto.credentials.VerifiableCrede
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidPublicKeyResolver;
 import org.eclipse.dataspaceconnector.spi.exception.AuthenticationFailedException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -51,12 +53,12 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
 
         var authHeader = headers.getFirst("Authorization");
         if (authHeader == null) {
-            throw authenticationFailure("Missing Authorization header");
+            throw authenticationFailure("Cannot authenticate request", List.of("Missing Authorization header"));
         }
         var separatedAuthHeader = authHeader.split(" ");
 
         if (separatedAuthHeader.length != 2 || !"Bearer".equals(separatedAuthHeader[0])) {
-            throw authenticationFailure("Authorization header value is not a valid Bearer token");
+            throw authenticationFailure("Cannot authenticate request", List.of("Authorization header value is not a valid Bearer token"));
         }
 
         var credential = separatedAuthHeader[1];
@@ -67,20 +69,18 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
             jwt = SignedJWT.parse(credential);
             issuer = jwt.getJWTClaimsSet().getIssuer();
         } catch (ParseException e) {
-            throw authenticationFailure("Invalid JWT (parse error). " + e.getMessage());
+            throw authenticationFailure("Invalid JWT (parse error)", List.of(e.getMessage()));
         }
 
         var publicKey = didPublicKeyResolver.resolvePublicKey(issuer);
 
         if (publicKey.failed()) {
-            publicKey.getFailureMessages().forEach(message -> monitor.debug(() -> "Failed obtaining public key for DID: " + issuer + ". " + message));
-            throw authenticationFailure("Failed obtaining public key for DID");
+            throw authenticationFailure("Failed obtaining public key for DID: " + issuer, publicKey.getFailureMessages());
         }
 
         var verificationResult = VerifiableCredentialFactory.verify(jwt, publicKey.getContent(), audience);
         if (verificationResult.failed()) {
-            verificationResult.getFailureMessages().forEach(message -> monitor.debug(() -> "Invalid JWT (verification error). " + message));
-            throw authenticationFailure("Invalid JWT (verification error)");
+            throw authenticationFailure("Invalid JWT (verification error)", verificationResult.getFailureMessages());
         }
 
         monitor.debug("Valid JWT");
@@ -88,8 +88,9 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
         headers.putSingle(CALLER_DID_HEADER, issuer);
     }
 
-    private AuthenticationFailedException authenticationFailure(String message) {
-        monitor.debug(message);
-        return new AuthenticationFailedException(message);
+    @NotNull
+    private AuthenticationFailedException authenticationFailure(String message, List<String> failureMessages) {
+        failureMessages.forEach(m -> monitor.debug(() -> message + ". " + m));
+        return new AuthenticationFailedException(message + ". " + String.join(". ", failureMessages));
     }
 }

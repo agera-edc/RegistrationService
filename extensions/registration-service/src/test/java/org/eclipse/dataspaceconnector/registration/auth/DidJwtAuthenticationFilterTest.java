@@ -88,7 +88,7 @@ class DidJwtAuthenticationFilterTest {
 
     @Test
     void filter_onMissingAuthHeader_fails() {
-        assertNotAuthenticated("Missing Authorization header");
+        assertNotAuthenticated("Cannot authenticate request. Missing Authorization header");
     }
 
     @ParameterizedTest
@@ -100,7 +100,7 @@ class DidJwtAuthenticationFilterTest {
             "Bearer" })
     void filter_onInvalidAuthHeader_fails(String header) {
         headers.putSingle(AUTHORIZATION, header);
-        assertNotAuthenticated("Authorization header value is not a valid Bearer token");
+        assertNotAuthenticated("Cannot authenticate request. Authorization header value is not a valid Bearer token");
     }
 
     @Test
@@ -115,18 +115,18 @@ class DidJwtAuthenticationFilterTest {
         when(didPublicKeyResolver.resolvePublicKey(issuer))
                 .thenReturn(Result.failure(FAKER.lorem().sentence()));
 
-        assertNotAuthenticated("Failed obtaining public key for DID");
+        assertNotAuthenticated("Failed obtaining public key for DID: " + issuer);
     }
 
     @Test
     void filter_onJwtVerificationFailure_fails() {
         headers.putSingle(AUTHORIZATION, "Bearer " + getTokenFor("other audience " + FAKER.lorem().word()));
-        assertNotAuthenticated("Invalid JWT (verification error)");
+        assertNotAuthenticated("Invalid JWT (verification error). Claim verification failed.");
     }
 
     private ThrowableAssertAlternative<AuthenticationFailedException> assertNotAuthenticated(String message) {
         return assertThatExceptionOfType(AuthenticationFailedException.class)
                 .isThrownBy(() -> filter.filter(request))
-                .withMessage(message);
+                .withMessageContaining(message);
     }
 }
