@@ -14,9 +14,6 @@
 
 package org.eclipse.dataspaceconnector.registration.cli;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.ECKey;
-import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPrivateKeyWrapper;
 import org.eclipse.dataspaceconnector.registration.client.ApiClientFactory;
 import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import picocli.CommandLine;
@@ -38,7 +35,7 @@ public class RegistrationServiceCli {
     @CommandLine.Option(names = "-d", required = true, description = "Client DID")
     String clientDid;
 
-    @CommandLine.Option(names = "-k", required = true, description = "Private key")
+    @CommandLine.Option(names = "-k", required = true, description = "File containing the private key in PEM format")
     Path privateKey;
 
     RegistryApi registryApiClient;
@@ -61,15 +58,13 @@ public class RegistrationServiceCli {
     }
 
     private void init() {
-        EcPrivateKeyWrapper privateKeyWrapper;
+        String privateKeyData;
         try {
-            var ecKey = (ECKey) ECKey.parseFromPEMEncodedObjects(Files.readString(privateKey));
-            privateKeyWrapper = new EcPrivateKeyWrapper(ecKey);
+            privateKeyData = Files.readString(privateKey);
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error reading file " + privateKey, e);
         }
+        var privateKeyWrapper = KeyUtils.parseFromPemEncodedObjects(privateKeyData);
         var apiClient = ApiClientFactory.createApiClient(service, clientDid, privateKeyWrapper);
         registryApiClient = new RegistryApi(apiClient);
     }

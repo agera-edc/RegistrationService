@@ -15,7 +15,7 @@
 package org.eclipse.dataspaceconnector.registration.cli;
 
 import com.github.javafaker.Faker;
-import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.SignedJWT;
 import org.eclipse.dataspaceconnector.iam.did.crypto.credentials.VerifiableCredentialFactory;
 import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPrivateKeyWrapper;
@@ -36,9 +36,8 @@ class JsonWebSignatureHeaderInterceptorTest {
 
     @Test
     void accept() throws Exception {
-        var privateKey = Path.of("src/test/resources/private_p256.pem");
-        var ecKey = (ECKey) ECKey.parseFromPEMEncodedObjects(Files.readString(privateKey));
-        var privateKeyWrapper = new EcPrivateKeyWrapper(ecKey);
+        var privateKey = JWK.parseFromPEMEncodedObjects(Files.readString(Path.of("src/test/resources/private_p256.pem")));
+        var privateKeyWrapper = new EcPrivateKeyWrapper(privateKey.toECKey());
         var publicKey = Files.readString(Path.of("src/test/resources/public_p256.pem"));
         String clientDid = FAKER.lorem().sentence();
         String targetUrl = randomUrl();
@@ -55,7 +54,7 @@ class JsonWebSignatureHeaderInterceptorTest {
         var authHeaderParts = authorizationHeader.split(" ", 2);
         assertThat(authHeaderParts[0]).isEqualTo("Bearer");
         var jwt = SignedJWT.parse(authHeaderParts[1]);
-        var key = new EcPublicKeyWrapper((ECKey) ECKey.parseFromPEMEncodedObjects(publicKey));
+        var key = new EcPublicKeyWrapper(JWK.parseFromPEMEncodedObjects(publicKey).toECKey());
         var verificationResult = VerifiableCredentialFactory.verify(jwt, key, targetUrl);
         assertThat(verificationResult.succeeded()).isTrue();
         assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo(clientDid);

@@ -45,7 +45,7 @@ public class RegistrationApiCommandLineClientTest {
 
         var addCmdExitCode = cmd.execute(
                 "-d", DID_WEB,
-                "-k", PRIVATE_KEY_FILE,
+                "-k", PRIVATE_KEY_FILE.toString(),
                 "participants", "add",
                 "--ids-url", idsUrl);
         assertThat(addCmdExitCode).isEqualTo(0);
@@ -57,7 +57,7 @@ public class RegistrationApiCommandLineClientTest {
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
                 "-d", DID_WEB,
-                "-k", PRIVATE_KEY_FILE,
+                "-k", PRIVATE_KEY_FILE.toString(),
                 "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);
 

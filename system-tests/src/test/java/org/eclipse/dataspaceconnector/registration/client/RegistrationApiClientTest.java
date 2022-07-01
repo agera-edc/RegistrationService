@@ -15,14 +15,13 @@
 package org.eclipse.dataspaceconnector.registration.client;
 
 import com.github.javafaker.Faker;
-import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
 import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPrivateKeyWrapper;
 import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DID_WEB;
@@ -38,8 +37,7 @@ public class RegistrationApiClientTest {
 
     @BeforeAll
     static void setUpClass() throws Exception {
-        var privateKey = Path.of(PRIVATE_KEY_FILE);
-        var ecKey = (ECKey) ECKey.parseFromPEMEncodedObjects(Files.readString(privateKey));
+        var ecKey = JWK.parseFromPEMEncodedObjects(Files.readString(PRIVATE_KEY_FILE)).toECKey();
         var privateKeyWrapper = new EcPrivateKeyWrapper(ecKey);
 
         var apiClient = ApiClientFactory.createApiClient(API_URL, DID_WEB, privateKeyWrapper);
