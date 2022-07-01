@@ -22,6 +22,16 @@ import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
 
 public class CryptoUtils {
 
+    /**
+     * Parses a private key from the specified string of one or more PEM-encoded objects.
+     * <p>
+     * The data must contain a PKCS#8 PrivateKeyInfo (PEM header: BEGIN PRIVATE KEY) object.
+     *
+     * @param pemEncodedObjects The string of PEM-encoded object(s).
+     * @return The wrapper for the private key.
+     * @throws IllegalArgumentException If key parsing failed, the key type is not supported, or
+     *                                  the private key is missing.
+     */
     public static PrivateKeyWrapper parseFromPemEncodedObjects(String pemEncodedObjects) {
         try {
             var jwk = JWK.parseFromPEMEncodedObjects(pemEncodedObjects);

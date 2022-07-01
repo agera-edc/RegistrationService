@@ -17,11 +17,14 @@ dependencies {
 
     implementation(project(":extensions:participant-store-spi"))
     implementation(project(":extensions:dataspace-authority-spi"))
+
     testImplementation("org.assertj:assertj-core:${assertj}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${jupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
     testImplementation("com.github.javafaker:javafaker:${faker}")
     testImplementation(testFixtures(project(":extensions:dataspace-authority-spi")))
+    testImplementation(testFixtures(project(":rest-client")))
 }
 

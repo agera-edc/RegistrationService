@@ -29,21 +29,21 @@ class CryptoUtilsTest {
     }
 
     @Test
-    void parseFromPemEncodedObjects_whenPrivateKeyMissing_fails() {
+    void parseFromPemEncodedObjects_onMissingPrivateKey_fails() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> CryptoUtils.parseFromPemEncodedObjects(TestKeyData.PUBLIC_KEY_P256))
                 .withMessageContaining("Missing private key");
     }
 
     @Test
-    void parseFromPemEncodedObjects_whenUnsupportedKeyType_fails() {
+    void parseFromPemEncodedObjects_onUnsupportedKeyType_fails() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> CryptoUtils.parseFromPemEncodedObjects(TestKeyData.PRIVATE_KEY_RSA))
                 .withMessageContaining("Unsupported key type: RSA");
     }
 
     @Test
-    void parseFromPemEncodedObjects_whenKeyNotParsed_fails() {
+    void parseFromPemEncodedObjects_onKeyNotParsed_fails() {
         var garbledPrivateKeyData = TestKeyData.PRIVATE_KEY_P256.replace('=', 'x');
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> CryptoUtils.parseFromPemEncodedObjects(garbledPrivateKeyData))

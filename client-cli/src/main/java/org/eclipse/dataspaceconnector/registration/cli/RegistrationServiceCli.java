@@ -36,7 +36,7 @@ public class RegistrationServiceCli {
     String clientDid;
 
     @CommandLine.Option(names = "-k", required = true, description = "File containing the private key in PEM format")
-    Path privateKey;
+    Path privateKeyFile;
 
     RegistryApi registryApiClient;
 
@@ -60,9 +60,9 @@ public class RegistrationServiceCli {
     private void init() {
         String privateKeyData;
         try {
-            privateKeyData = Files.readString(privateKey);
+            privateKeyData = Files.readString(privateKeyFile);
         } catch (IOException e) {
-            throw new RuntimeException("Error reading file " + privateKey, e);
+            throw new RuntimeException("Error reading file " + privateKeyFile, e);
         }
         var privateKeyWrapper = CryptoUtils.parseFromPemEncodedObjects(privateKeyData);
         var apiClient = ApiClientFactory.createApiClient(service, clientDid, privateKeyWrapper);

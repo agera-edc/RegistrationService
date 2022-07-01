@@ -14,9 +14,12 @@
 
 package org.eclipse.dataspaceconnector.registration.client;
 
-public class TestUtils {
+class TestUtils {
     private TestUtils() {
     }
 
+    /**
+     * The DID that resolves to the sample DID Document in docker compose (served by the nginx container)
+     */
     static final String DID_WEB = "did:web:did-server:test-authority";
 }
