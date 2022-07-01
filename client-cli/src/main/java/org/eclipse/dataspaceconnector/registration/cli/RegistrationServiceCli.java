@@ -64,7 +64,7 @@ public class RegistrationServiceCli {
         } catch (IOException e) {
             throw new RuntimeException("Error reading file " + privateKey, e);
         }
-        var privateKeyWrapper = KeyUtils.parseFromPemEncodedObjects(privateKeyData);
+        var privateKeyWrapper = CryptoUtils.parseFromPemEncodedObjects(privateKeyData);
         var apiClient = ApiClientFactory.createApiClient(service, clientDid, privateKeyWrapper);
         registryApiClient = new RegistryApi(apiClient);
     }

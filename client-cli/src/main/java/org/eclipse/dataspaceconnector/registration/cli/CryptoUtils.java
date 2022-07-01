@@ -20,17 +20,20 @@ import com.nimbusds.jose.jwk.KeyType;
 import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPrivateKeyWrapper;
 import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
 
-class KeyUtils {
+public class CryptoUtils {
 
-    static PrivateKeyWrapper parseFromPemEncodedObjects(String pemEncodedObjects) {
+    public static PrivateKeyWrapper parseFromPemEncodedObjects(String pemEncodedObjects) {
         try {
             var jwk = JWK.parseFromPEMEncodedObjects(pemEncodedObjects);
+            if (!jwk.isPrivate()) {
+                throw new IllegalArgumentException("Missing private key");
+            }
             if (jwk.getKeyType() == KeyType.EC) {
                 return new EcPrivateKeyWrapper(jwk.toECKey());
             }
             throw new IllegalArgumentException("Unsupported key type: " + jwk.getKeyType());
         } catch (JOSEException e) {
-            throw new RuntimeException("Key parsing failed: " + e);
+            throw new IllegalArgumentException("Key parsing failed: " + e);
         }
     }
 }

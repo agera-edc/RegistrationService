@@ -21,12 +21,11 @@ import org.eclipse.dataspaceconnector.iam.did.crypto.credentials.VerifiableCrede
 import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPrivateKeyWrapper;
 import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPublicKeyWrapper;
 import org.eclipse.dataspaceconnector.registration.client.JsonWebSignatureHeaderInterceptor;
+import org.eclipse.dataspaceconnector.registration.client.TestKeyData;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,9 +35,8 @@ class JsonWebSignatureHeaderInterceptorTest {
 
     @Test
     void accept() throws Exception {
-        var privateKey = JWK.parseFromPEMEncodedObjects(Files.readString(Path.of("src/test/resources/private_p256.pem")));
+        var privateKey = JWK.parseFromPEMEncodedObjects(TestKeyData.PRIVATE_KEY_P256);
         var privateKeyWrapper = new EcPrivateKeyWrapper(privateKey.toECKey());
-        var publicKey = Files.readString(Path.of("src/test/resources/public_p256.pem"));
         String clientDid = FAKER.lorem().sentence();
         String targetUrl = randomUrl();
         var interceptor = new JsonWebSignatureHeaderInterceptor(clientDid, targetUrl, privateKeyWrapper);
@@ -54,7 +52,7 @@ class JsonWebSignatureHeaderInterceptorTest {
         var authHeaderParts = authorizationHeader.split(" ", 2);
         assertThat(authHeaderParts[0]).isEqualTo("Bearer");
         var jwt = SignedJWT.parse(authHeaderParts[1]);
-        var key = new EcPublicKeyWrapper(JWK.parseFromPEMEncodedObjects(publicKey).toECKey());
+        var key = new EcPublicKeyWrapper(JWK.parseFromPEMEncodedObjects(TestKeyData.PUBLIC_KEY_P256).toECKey());
         var verificationResult = VerifiableCredentialFactory.verify(jwt, key, targetUrl);
         assertThat(verificationResult.succeeded()).isTrue();
         assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo(clientDid);

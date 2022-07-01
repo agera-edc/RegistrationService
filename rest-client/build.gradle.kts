@@ -20,6 +20,7 @@ plugins {
     `java-library`
     id("org.openapi.generator") version "5.4.0"
     `maven-publish`
+    `java-test-fixtures`
 }
 
 // Configure OpenAPI Generator

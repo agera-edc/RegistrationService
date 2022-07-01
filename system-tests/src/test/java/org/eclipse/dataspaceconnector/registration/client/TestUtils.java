@@ -14,13 +14,9 @@
 
 package org.eclipse.dataspaceconnector.registration.client;
 
-import java.nio.file.Path;
-
 public class TestUtils {
     private TestUtils() {
     }
-
-    static final Path PRIVATE_KEY_FILE = Path.of("../rest-client/src/test/resources/private_p256.pem");
 
     static final String DID_WEB = "did:web:did-server:test-authority";
 }
