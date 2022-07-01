@@ -67,7 +67,7 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
             jwt = SignedJWT.parse(credential);
             issuer = jwt.getJWTClaimsSet().getIssuer();
         } catch (ParseException e) {
-            throw authenticationFailure("Invalid JWT (parse error)");
+            throw authenticationFailure("Invalid JWT (parse error). " + e.getMessage());
         }
 
         var publicKey = didPublicKeyResolver.resolvePublicKey(issuer);
