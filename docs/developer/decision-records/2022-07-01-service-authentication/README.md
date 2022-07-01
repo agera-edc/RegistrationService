@@ -20,7 +20,9 @@ Authentication is implemented as follows:
 
 - On the server side, a `ContainerRequestFilter` intercepts incoming requests, retrieves the DID Document corresponding to the issuer, verifies token signature and claims, and inserts a new request header containing the Issuer claim. This allows controllers to use the claim for application logic (for example, to register a new participant by its DID).
   The filter leverages the services provided in the EDC `identity-did-core` and `identity-did-crypto` modules to verify tokens and to resolve and parse DID documents.
+  The server must be configured with a `jwt.audience` setting (e.g. as the `JWT_AUDIENCE` environment variable) containing the expected audience, i.e. the URL used by the client to access the API.
 - On the CLI client side, a Request Interceptor modifies outgoing requests, to add the required JWS header. This requires the CLI to have access to a file containing the private key, and to be configured with the correct DID.
+- For local testing with Docker Compose, an `nginx` container is deployed to serve a DID Document. The `EDC_IAM_DID_WEB_USE_HTTPS`variable is used to use `http://` instead of the `https://` scheme for resolving DID URLs, to avoid having to set up SSL.
 
 ## Rationale
 
