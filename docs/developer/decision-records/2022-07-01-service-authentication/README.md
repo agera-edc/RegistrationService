@@ -29,4 +29,4 @@ For local testing with Docker Compose, an `nginx` container is deployed to serve
 
 Authentication ensures that only actors who can assert their control of a did:web identifier can register that identifier as a dataspace participant. Authentication and retrieval of DID document will also serve as the basic block for retrieving verifiable credentials and building an authorization system.
 
-The choice of authentication scheme and key type is driven by the current schemes [currently supported in EDC](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector/blob/89ffb983dbdebce02e1447d2f2f5f65843f46041/docs/developer/decision-records/2022-06-19-json-web-token/README.md), and can be extended as needed in the future.
+The choice of authentication scheme and key type is driven by the schemes [currently supported in EDC](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector/blob/89ffb983dbdebce02e1447d2f2f5f65843f46041/docs/developer/decision-records/2022-06-19-json-web-token/README.md), and can be extended as needed in the future.
