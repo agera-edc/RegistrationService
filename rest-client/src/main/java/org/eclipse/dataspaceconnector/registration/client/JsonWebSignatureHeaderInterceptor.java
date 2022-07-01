@@ -14,32 +14,32 @@
 
 package org.eclipse.dataspaceconnector.registration.client;
 
-import org.eclipse.dataspaceconnector.iam.did.crypto.credentials.VerifiableCredentialFactory;
-import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
+import org.eclipse.dataspaceconnector.spi.iam.TokenParameters;
+import org.eclipse.dataspaceconnector.spi.iam.TokenRepresentation;
+import org.eclipse.dataspaceconnector.spi.result.Result;
 
 import java.net.http.HttpRequest;
-import java.time.Clock;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class JsonWebSignatureHeaderInterceptor implements Consumer<HttpRequest.Builder> {
 
-    private final String issuer;
+    private final Function<TokenParameters, Result<TokenRepresentation>> credentialsProvider;
     private final String audience;
-    private final PrivateKeyWrapper privateKey;
 
-    public JsonWebSignatureHeaderInterceptor(String issuer, String audience, PrivateKeyWrapper privateKey) {
-        this.issuer = issuer;
+    public JsonWebSignatureHeaderInterceptor(Function<TokenParameters, Result<TokenRepresentation>> credentialsProvider, String audience) {
+        this.credentialsProvider = credentialsProvider;
         this.audience = audience;
-        this.privateKey = privateKey;
     }
 
     @Override
     public void accept(HttpRequest.Builder b) {
-        var token = VerifiableCredentialFactory.create(
-                privateKey,
-                issuer,
-                audience,
-                Clock.systemUTC()).serialize();
-        b.header("Authorization", String.format("Bearer %s", token));
+        var credentialResult = credentialsProvider.apply(TokenParameters.Builder.newInstance()
+                .audience(audience)
+                .build());
+        if (credentialResult.failed()) {
+            throw new RuntimeException("Error creating client credentials: " + credentialResult.getFailureMessages());
+        }
+        b.header("Authorization", String.format("Bearer %s", credentialResult.getContent().getToken()));
     }
 }

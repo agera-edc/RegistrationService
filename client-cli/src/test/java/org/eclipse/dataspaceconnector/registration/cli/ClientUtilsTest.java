@@ -16,12 +16,10 @@ package org.eclipse.dataspaceconnector.registration.cli;
 
 import com.github.javafaker.Faker;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jwt.SignedJWT;
+import org.eclipse.dataspaceconnector.iam.did.crypto.credentials.VerifiableCredentialFactory;
 import org.eclipse.dataspaceconnector.iam.did.crypto.key.EcPublicKeyWrapper;
-import org.eclipse.dataspaceconnector.registration.client.JsonWebSignatureHeaderInterceptor;
 import org.eclipse.dataspaceconnector.registration.client.TestKeyData;
-import org.eclipse.dataspaceconnector.spi.iam.TokenRepresentation;
-import org.eclipse.dataspaceconnector.spi.result.Result;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -29,28 +27,23 @@ import java.net.http.HttpRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class JsonWebSignatureHeaderInterceptorTest {
-
+class ClientUtilsTest {
     static final Faker FAKER = new Faker();
     static final String AUTHORIZATION = "Authorization";
     static final String BEARER = "Bearer";
 
-    String token = FAKER.lorem().sentence();
-    String targetUrl = FAKER.internet().url();
-    JsonWebSignatureHeaderInterceptor interceptor;
-    EcPublicKeyWrapper publicKey;
-
-    @BeforeEach
-    void setUp() throws Exception {
-        publicKey = new EcPublicKeyWrapper(JWK.parseFromPEMEncodedObjects(TestKeyData.PUBLIC_KEY_P256).toECKey());
-        interceptor = new JsonWebSignatureHeaderInterceptor(parameters -> Result.success(TokenRepresentation.Builder.newInstance().token(token).build()), targetUrl);
-    }
-
     @Test
-    void accept() {
+    void createApiClient() throws Exception {
+        var apiUrl = FAKER.internet().url();
+        var issuer = FAKER.internet().url();
+        var privateKeyData = TestKeyData.PRIVATE_KEY_P256;
+        var publicKey = new EcPublicKeyWrapper(JWK.parseFromPEMEncodedObjects(TestKeyData.PUBLIC_KEY_P256).toECKey());
+
         var requestBuilder = HttpRequest.newBuilder().uri(URI.create(randomUrl()));
 
-        interceptor.accept(requestBuilder);
+        var apiClient = ClientUtils.createApiClient(apiUrl, issuer, privateKeyData);
+
+        apiClient.getRequestInterceptor().accept(requestBuilder);
 
         var httpHeaders = requestBuilder.build().headers();
         assertThat(httpHeaders.map())
@@ -60,7 +53,10 @@ class JsonWebSignatureHeaderInterceptorTest {
         var authorizationHeader = authorizationHeaders.get(0);
         var authHeaderParts = authorizationHeader.split(" ", 2);
         assertThat(authHeaderParts[0]).isEqualTo(BEARER);
-        assertThat(authHeaderParts[1]).isEqualTo(token);
+        var jwt = SignedJWT.parse(authHeaderParts[1]);
+        var verificationResult = VerifiableCredentialFactory.verify(jwt, publicKey, apiUrl);
+        assertThat(verificationResult.succeeded()).isTrue();
+        assertThat(jwt.getJWTClaimsSet().getIssuer()).isEqualTo(issuer);
     }
 
     static String randomUrl() {

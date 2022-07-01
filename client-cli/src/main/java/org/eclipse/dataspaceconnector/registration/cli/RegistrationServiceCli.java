@@ -14,7 +14,6 @@
 
 package org.eclipse.dataspaceconnector.registration.cli;
 
-import org.eclipse.dataspaceconnector.registration.client.ApiClientFactory;
 import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -64,8 +63,7 @@ public class RegistrationServiceCli {
         } catch (IOException e) {
             throw new RuntimeException("Error reading file " + privateKeyFile, e);
         }
-        var privateKeyWrapper = CryptoUtils.parseFromPemEncodedObjects(privateKeyData);
-        var apiClient = ApiClientFactory.createApiClient(service, clientDid, privateKeyWrapper);
-        registryApiClient = new RegistryApi(apiClient);
+        var apiClient = ClientUtils.createApiClient(service, clientDid, privateKeyData);
+        this.registryApiClient = new RegistryApi(apiClient);
     }
 }

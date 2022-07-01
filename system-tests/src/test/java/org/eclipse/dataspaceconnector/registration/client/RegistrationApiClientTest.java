@@ -15,7 +15,7 @@
 package org.eclipse.dataspaceconnector.registration.client;
 
 import com.github.javafaker.Faker;
-import org.eclipse.dataspaceconnector.registration.cli.CryptoUtils;
+import org.eclipse.dataspaceconnector.registration.cli.ClientUtils;
 import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -33,8 +33,7 @@ public class RegistrationApiClientTest {
 
     @BeforeAll
     static void setUpClass() {
-        var privateKeyWrapper = CryptoUtils.parseFromPemEncodedObjects(TestKeyData.PRIVATE_KEY_P256);
-        var apiClient = ApiClientFactory.createApiClient(API_URL, DID_WEB, privateKeyWrapper);
+        var apiClient = ClientUtils.createApiClient(API_URL, DID_WEB, TestKeyData.PRIVATE_KEY_P256);
         api = new RegistryApi(apiClient);
     }
 
