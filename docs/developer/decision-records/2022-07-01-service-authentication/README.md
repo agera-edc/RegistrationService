@@ -12,7 +12,7 @@ Tokens contain the following claims:
 | --------------- | ------------------------------------------------------------ |
 | Issuer          | The participant [did:web](https://w3c-ccg.github.io/did-method-web/) identifier (example: `did:web:example.com`). The Issuer Claim must resolve to a DID Document containing the public key of the key pair used to sign the JWS. This allows the server to verify the token signature against the source's public key. |
 | Subject         | The fixed string `verifiable-credential`.                    |
-| Audience        | The Registration Service API base endpoint (example: `http://dataspace.example.com:8182/authority`). This allows the server to verify the intended audience. |
+| Audience        | The Registration Service API base endpoint (example: `http://dataspace.example.com:8182/authority`). This allows the server to verify the intended [audience](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3). |
 | JWT ID          | A random UUID.                                               |
 | Expiration Time | A time set in the near future.                               |
 
