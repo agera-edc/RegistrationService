@@ -51,7 +51,7 @@ class DidJwtAuthenticationFilterTest {
     DidJwtAuthenticationFilter filter = new DidJwtAuthenticationFilter(monitor, didPublicKeyResolver, audience);
 
     ContainerRequestContext request = mock(ContainerRequestContext.class);
-    MultivaluedHashMap headers = new MultivaluedHashMap();
+    MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
     EcPrivateKeyWrapper privateKey;
 
     private String authHeader;

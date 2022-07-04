@@ -69,9 +69,9 @@ public class RegistrationServiceExtension implements ServiceExtension {
 
     @Override
     public void initialize(ServiceExtensionContext context) {
-        var didUrl = Objects.requireNonNull(context.getSetting(JWT_AUDIENCE_SETTING, null),
+        var audience = Objects.requireNonNull(context.getSetting(JWT_AUDIENCE_SETTING, null),
                 () -> format("Missing setting %s", JWT_AUDIENCE_SETTING));
-        var authenticationService = new DidJwtAuthenticationFilter(monitor, didPublicKeyResolver, didUrl);
+        var authenticationService = new DidJwtAuthenticationFilter(monitor, didPublicKeyResolver, audience);
 
         participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation);
 
