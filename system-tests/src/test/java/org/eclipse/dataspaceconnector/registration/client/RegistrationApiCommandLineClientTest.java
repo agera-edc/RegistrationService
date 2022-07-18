@@ -38,7 +38,7 @@ public class RegistrationApiCommandLineClientTest {
 
     @Test
     void listParticipants() throws Exception {
-        CommandLine cmd = RegistrationServiceCli.getCommandLine();
+        CommandLine cmd = new RegistrationServiceCli().getCommandLine();
 
         assertThat(getParticipants(cmd)).doesNotContain(participant);
 

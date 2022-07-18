@@ -1,0 +1,2 @@
+org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli
+org.eclipse.dataspaceconnector.registration.cli.DidResolverRegistryExtension
