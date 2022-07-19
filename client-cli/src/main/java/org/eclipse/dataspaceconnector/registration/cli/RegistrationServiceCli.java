@@ -16,26 +16,19 @@ package org.eclipse.dataspaceconnector.registration.cli;
 
 import java.util.Optional;
 
-import static java.util.Objects.requireNonNull;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import okhttp3.dnsoverhttps.DnsOverHttps;
-import org.eclipse.dataspaceconnector.boot.system.runtime.BaseRuntime;
-import org.eclipse.dataspaceconnector.iam.did.resolution.DidResolverRegistryImpl;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.Service;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolver;
-import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
 import org.eclipse.dataspaceconnector.iam.did.web.resolution.WebDidResolver;
+import org.eclipse.dataspaceconnector.registration.client.ApiClient;
 import org.eclipse.dataspaceconnector.registration.client.ApiClientFactory;
 import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import org.eclipse.dataspaceconnector.spi.monitor.ConsoleMonitor;
 import org.eclipse.dataspaceconnector.spi.result.Result;
-import org.eclipse.dataspaceconnector.spi.system.Inject;
-import org.eclipse.dataspaceconnector.spi.system.ServiceExtension;
-import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
+import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -46,16 +39,17 @@ import picocli.CommandLine.Command;
         })
 public class RegistrationServiceCli {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    @CommandLine.Option(names = "-s", required = true, description = "Registration service URL", defaultValue = "http://localhost:8181/api")
+    @CommandLine.Option(names = "-s", description = "Registration service URL", defaultValue = "http://localhost:8181/api")
     String service;
 
-    @CommandLine.Option(names = "-d", required = true, description = "DID document URI", defaultValue = "")
+    @CommandLine.Option(names = "-did", required = true, description = "DID document URI", defaultValue = "")
     String didURI;
 
     RegistryApi registryApiClient;
 
-    DidResolver resolver;
+    EnrollmentUrlResolver resolver;
 
     public static void main(String... args) {
         CommandLine commandLine = getCommandLine();
@@ -70,25 +64,33 @@ public class RegistrationServiceCli {
     }
 
     private int executionStrategy(CommandLine.ParseResult parseResult) {
-        init(); // custom initialization to be done before executing any command or subcommand
-        return new CommandLine.RunLast().execute(parseResult);
+        if (init()) // custom initialization to be done before executing any command or subcommand
+            return new CommandLine.RunLast().execute(parseResult);
+        return 1;
     }
 
-    private void init() {
-        OkHttpClient httpClient = new OkHttpClient();
-        resolver = new WebDidResolver(httpClient, new ObjectMapper(), new ConsoleMonitor());
-        if (didURI.isEmpty()) return;
-        Result<DidDocument> didDocument = resolver.resolve(didURI);
-        Optional<String> enrollmentUrl = didDocument.getContent().getService().stream().filter(service -> service.getType().equals("EnrollmentUrl")).map(Service::getServiceEndpoint).findFirst();
-        if (enrollmentUrl.isEmpty()) {
-            throw new RuntimeException("No enrollment API in the did document.");
+    private boolean init() {
+
+        // temporary to preserve the backwarts compatibility
+        if (didURI.isEmpty()) {
+            var apiClient = ApiClientFactory.createApiClient(service);
+            registryApiClient = new RegistryApi(apiClient);
+            return true;
         }
 
-        String url = enrollmentUrl.get();
-        System.out.println(url);
-//        var apiClient = ApiClientFactory.createApiClient(url);
-//        registryApiClient = new RegistryApi(apiClient);
+        var webResolver = new WebDidResolver(new OkHttpClient(), MAPPER, new ConsoleMonitor());
+        resolver = new EnrollmentUrlResolver(webResolver);
+        Optional<String> enrollmentUrl = resolver.resolveUrl(didURI);
+        Optional<RegistryApi> registryApi = enrollmentUrl.map(ApiClientFactory::createApiClient).map(RegistryApi::new);
+        if (registryApi.isEmpty()) {
+            return false;
+        }
+        registryApiClient = registryApi.get();
+        return true;
+
     }
+
+
 }
 
 /*

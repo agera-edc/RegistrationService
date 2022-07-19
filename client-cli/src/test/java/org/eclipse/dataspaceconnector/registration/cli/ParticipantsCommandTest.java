@@ -19,9 +19,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import org.eclipse.dataspaceconnector.registration.client.models.Participant;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import org.mockserver.model.MediaType;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
@@ -29,12 +35,17 @@ import java.io.StringWriter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.dataspaceconnector.junit.testfixtures.TestUtils.getFreePort;
 import static org.eclipse.dataspaceconnector.registration.cli.TestUtils.createParticipant;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.matchers.Times.once;
+import static org.mockserver.stop.Stop.stopQuietly;
 
 class ParticipantsCommandTest {
 
@@ -88,7 +99,7 @@ class ParticipantsCommandTest {
     }
 
     @Test
-    void invalidRequest_Add_Failure() throws Exception {
+    void invalidRequest_Add_Failure() {
         var request = "Invalid json";
 
         var exitCode = cmd.execute("-s", serverUrl, "participants", "add", "--request", request);

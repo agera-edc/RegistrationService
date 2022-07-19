@@ -3,6 +3,7 @@ plugins {
     id("application")
     id("com.github.johnrengelman.shadow") version "7.0.0"
     `maven-publish`
+    `java-test-fixtures`
 }
 
 val jacksonVersion: String by project
@@ -20,7 +21,6 @@ dependencies {
     api(project(":rest-client"))
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("${edcGroup}:identity-did-web:${edcVersion}")
-    implementation("${edcGroup}:identity-did-core:${edcVersion}")
     implementation("${edcGroup}:core-boot:${edcVersion}")
     testImplementation("org.assertj:assertj-core:${assertj}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
@@ -29,6 +29,11 @@ dependencies {
     testImplementation("com.github.javafaker:javafaker:${faker}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
+    testImplementation("org.mock-server:mockserver-netty:5.12.0:shaded")
+    testImplementation("org.mock-server:mockserver-client-java:5.12.0:shaded")
+    testImplementation(testFixtures("${edcGroup}:junit:${edcVersion}"))
+    testImplementation("io.rest-assured:rest-assured:4.5.0")
+
 }
 
 application {

@@ -35,7 +35,7 @@ class AddParticipantCommand implements Callable<Integer> {
     private String requestJson;
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         Participant participant = null;
         try {
             participant = MAPPER.readValue(requestJson, Participant.class);
