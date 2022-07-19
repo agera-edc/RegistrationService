@@ -32,10 +32,9 @@ import java.util.Objects;
 /**
  * Intercepts all requests sent to this resource and authenticates them using DID Web.
  *
- * The resolved DID URL is injected as HTTP Header for use by the controller. The name of the header is defined by {@link #CALLER_DID_HEADER}.
+ * The resulting SecurityContext can be injected into REST Controllers as {@code @Context SecurityContext sec} parameter.
  */
 public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
-    public static final String CALLER_DID_HEADER = "CallerDid";
 
     private final Monitor monitor;
     private final DidPublicKeyResolver didPublicKeyResolver;
@@ -59,7 +58,7 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
 
         monitor.debug("Valid JWT");
 
-        headers.putSingle(CALLER_DID_HEADER, issuer);
+        requestContext.setSecurityContext(new DidSecurityContext(issuer));
     }
 
 
