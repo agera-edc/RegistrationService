@@ -20,6 +20,8 @@ dependencies {
 
     api(project(":rest-client"))
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+
+    testImplementation(testFixtures(project(":rest-client")))
     implementation("${edcGroup}:identity-did-web:${edcVersion}")
     implementation("${edcGroup}:core-boot:${edcVersion}")
     testImplementation("org.assertj:assertj-core:${assertj}")
@@ -29,10 +31,6 @@ dependencies {
     testImplementation("com.github.javafaker:javafaker:${faker}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
-    testImplementation("org.mock-server:mockserver-netty:5.12.0:shaded")
-    testImplementation("org.mock-server:mockserver-client-java:5.12.0:shaded")
-    testImplementation(testFixtures("${edcGroup}:junit:${edcVersion}"))
-    testImplementation("io.rest-assured:rest-assured:4.5.0")
 
 }
 
