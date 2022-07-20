@@ -43,10 +43,10 @@ public class RegistrationServiceCli {
     @CommandLine.Option(names = "-s", description = "Registration service URL. Deprecated. Use -dd instead.", defaultValue = "http://localhost:8182/authority")
     String service;
 
-    @CommandLine.Option(names = "-dd", required = false, description = "Dataspace Authority DID. Example: https://w3c-ccg.github.io/did-method-web/#example-example-web-method-dids", defaultValue = "")
+    @CommandLine.Option(names = "-dd", required = false, description = "Dataspace Authority DID.", defaultValue = "")
     String dataspaceDid;
 
-    @CommandLine.Option(names = "-cd", required = true, description = "Client DID")
+    @CommandLine.Option(names = "-cd", required = true, description = "Client DID.")
     String clientDid;
 
     @CommandLine.Option(names = "-k", required = true, description = "File containing the private key in PEM format")

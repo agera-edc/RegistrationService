@@ -22,6 +22,7 @@ dependencies {
     api(project(":rest-client"))
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
 
+    testImplementation(testFixtures(project(":rest-client")))
     implementation("${edcGroup}:identity-did-web:${edcVersion}")
     implementation("${edcGroup}:common-util:${edcVersion}")
     implementation("com.squareup.okhttp3:okhttp:${okHttp}")
@@ -30,8 +31,6 @@ dependencies {
     testImplementation("com.github.javafaker:javafaker:${faker}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
-    testImplementation(testFixtures(project(":rest-client")))
-
 }
 
 application {

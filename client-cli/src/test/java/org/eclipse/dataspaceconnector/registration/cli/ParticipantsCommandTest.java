@@ -78,6 +78,13 @@ class ParticipantsCommandTest {
     }
 
     @Test
+    void add() {
+        var exitCode = executeParticipantsAdd("-dd", dataspaceDid);
+        assertAddParticipants(exitCode, dataspaceDid, app.dataspaceDid);
+    }
+
+    @Deprecated
+    @Test
     void list_using_serviceUrl() throws Exception {
         var participants = List.of(this.participant1, participant2);
         when(app.registryApiClient.listParticipants())
@@ -87,24 +94,14 @@ class ParticipantsCommandTest {
         assertListParticipants(participants, exitCode, app.service, serverUrl);
     }
 
-    @Test
-    void add() {
-        var exitCode = executeParticipantsAdd("-dd", dataspaceDid);
-        assertAddParticipants(exitCode, dataspaceDid, app.dataspaceDid);
-    }
-
+    @Deprecated
     @Test
     void add_using_serviceUrl() {
         var exitCode = executeParticipantsAdd("-s", serverUrl);
         assertAddParticipants(exitCode, serverUrl, app.service);
     }
 
-    private void assertAddParticipants(int exitCode, String serverUrl, String service) {
-        assertThat(exitCode).isEqualTo(0);
-        assertThat(serverUrl).isEqualTo(service);
-        verify(app.registryApiClient).addParticipant(idsUrl);
-    }
-
+    @Deprecated
     @Test
     void add_both_inputs() {
         var exitCode = cmd.execute(
@@ -118,6 +115,12 @@ class ParticipantsCommandTest {
         assertThat(exitCode).isEqualTo(0);
         assertThat(dataspaceDid).isEqualTo(app.dataspaceDid);
         assertThat(serverUrl).isEqualTo(app.service);
+        verify(app.registryApiClient).addParticipant(idsUrl);
+    }
+
+    private void assertAddParticipants(int exitCode, String serverUrl, String service) {
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(serverUrl).isEqualTo(service);
         verify(app.registryApiClient).addParticipant(idsUrl);
     }
 

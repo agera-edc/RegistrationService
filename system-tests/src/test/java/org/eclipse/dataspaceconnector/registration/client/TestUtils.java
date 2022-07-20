@@ -21,7 +21,7 @@ class TestUtils {
     /**
      * The DID that resolves to the sample DID Document for a participant in docker compose (served by the nginx container)
      */
-    static final String PARTICIPANT_DID_WEB = "did:web:did-server:test-participant";
+    static final String CLIENT_DID_WEB = "did:web:did-server:test-client";
 
     /**
      * The DID that resolves to the sample DID Document fpr the Dataspace Authority in docker compose (served by the nginx container).

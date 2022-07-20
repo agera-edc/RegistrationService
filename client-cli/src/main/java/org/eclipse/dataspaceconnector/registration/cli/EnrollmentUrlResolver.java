@@ -18,6 +18,9 @@ public class EnrollmentUrlResolver {
 
     public static final String ENROLLMENT_URL = "EnrollmentUrl";
 
+    /**
+     * Resolves the DID document from did:web.
+     */
     private final DidResolver resolver;
 
     public EnrollmentUrlResolver(DidResolver resolver) {

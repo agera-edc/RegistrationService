@@ -31,7 +31,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PARTICIPANT_DID_WEB;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.CLIENT_DID_WEB;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DATASPACE_DID_WEB;
 
 @IntegrationTest
@@ -56,7 +56,7 @@ public class RegistrationApiCommandLineClientTest {
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
         var addCmdExitCode = cmd.execute(
-                "-cd", PARTICIPANT_DID_WEB,
+                "-cd", CLIENT_DID_WEB,
                 "-dd", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "participants", "add",
@@ -73,7 +73,7 @@ public class RegistrationApiCommandLineClientTest {
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
         var addCmdExitCode = cmd.execute(
-                "-cd", PARTICIPANT_DID_WEB,
+                "-cd", CLIENT_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "participants", "add",
                 "--ids-url", idsUrl);
@@ -85,7 +85,7 @@ public class RegistrationApiCommandLineClientTest {
         var writer = new StringWriter();
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
-                "-cd", PARTICIPANT_DID_WEB,
+                "-cd", CLIENT_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);
