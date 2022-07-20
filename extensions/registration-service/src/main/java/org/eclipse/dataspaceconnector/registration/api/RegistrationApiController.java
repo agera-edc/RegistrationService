@@ -26,11 +26,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
-import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.dto.ParticipantDto;
+import org.eclipse.dataspaceconnector.spi.result.Result;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter.CALLER_DID_HEADER;
 
@@ -39,8 +40,8 @@ import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticat
  * Registration Service API controller to manage dataspace participants.
  */
 @Tag(name = "Registry")
-@Produces({ "application/json" })
-@Consumes({ "application/json" })
+@Produces({"application/json"})
+@Consumes({"application/json"})
 @Path("/registry")
 public class RegistrationApiController {
 
@@ -67,7 +68,12 @@ public class RegistrationApiController {
     @Operation(description = "Gets all dataspace participants.")
     @ApiResponse(description = "Dataspace participants.")
     public List<ParticipantDto> listParticipants() {
-        return service.listParticipants();
+
+        return service.listParticipants().stream()
+                .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
+                .filter(Result::succeeded)
+                .map(Result::getContent)
+                .collect(Collectors.toList());
     }
 
     @Path("/participant")

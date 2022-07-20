@@ -14,9 +14,96 @@
 
 package org.eclipse.dataspaceconnector.registration.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Dataspace participant Dto.
- *
  */
 public class ParticipantDto {
+    private String did;
+    private String name;
+    private String url;
+    private List<String> supportedProtocols = new ArrayList<>();
+    private ParticipantStatusDto status;
+
+    private ParticipantDto() {
+    }
+
+    @Deprecated
+    public String getName() {
+        return name;
+    }
+
+    @Deprecated
+    public String getUrl() {
+        return url;
+    }
+
+    public String getDid() {
+        return did;
+    }
+
+    @Deprecated
+    public List<String> getSupportedProtocols() {
+        return Collections.unmodifiableList(supportedProtocols);
+    }
+
+    public ParticipantStatusDto getStatus() {
+        return status;
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class Builder {
+        private final ParticipantDto participantDto;
+
+        private Builder() {
+            participantDto = new ParticipantDto();
+        }
+
+        public static Builder newInstance() {
+            return new Builder();
+        }
+
+        public Builder supportedProtocol(String supportedProtocol) {
+            participantDto.supportedProtocols.add(supportedProtocol);
+            return this;
+        }
+
+        public Builder supportedProtocols(List<String> supportedProtocols) {
+            participantDto.supportedProtocols.addAll(supportedProtocols);
+            return this;
+        }
+
+        public Builder url(String url) {
+            participantDto.url = url;
+            return this;
+        }
+
+        public Builder did(String did) {
+            participantDto.did = did;
+            return this;
+        }
+
+
+        public Builder name(String name) {
+            participantDto.name = name;
+            return this;
+        }
+
+        public Builder status(ParticipantStatusDto status) {
+            participantDto.status = status;
+            return this;
+        }
+
+        public ParticipantDto build() {
+            Objects.requireNonNull(participantDto.did, "did");
+            return participantDto;
+        }
+    }
+
 }

@@ -83,7 +83,7 @@ public class AuthorityExtension implements ServiceExtension {
         participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation);
 
         var registrationService = new RegistrationService(monitor, participantStore);
-        webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
+        webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService, transformerRegistry));
 
         webService.registerResource(CONTEXT_ALIAS, authenticationService);
         webService.registerResource(CONTEXT_ALIAS, new EdcApiExceptionMapper(errorResponseVerbose));
