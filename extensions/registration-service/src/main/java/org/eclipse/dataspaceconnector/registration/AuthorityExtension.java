@@ -25,6 +25,7 @@ import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVeri
 import org.eclipse.dataspaceconnector.registration.manager.ParticipantManager;
 import org.eclipse.dataspaceconnector.registration.store.InMemoryParticipantStore;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
+import org.eclipse.dataspaceconnector.registration.transform.ParticipantToParticipantDtoTransformer;
 import org.eclipse.dataspaceconnector.spi.EdcSetting;
 import org.eclipse.dataspaceconnector.spi.WebService;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
@@ -81,6 +82,7 @@ public class AuthorityExtension implements ServiceExtension {
         var authenticationService = new DidJwtAuthenticationFilter(monitor, didPublicKeyResolver, audience);
 
         participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation);
+        transformerRegistry.register(new ParticipantToParticipantDtoTransformer());
 
         var registrationService = new RegistrationService(monitor, participantStore);
         webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService, transformerRegistry));
