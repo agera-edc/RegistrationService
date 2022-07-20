@@ -67,6 +67,9 @@ public class AuthorityExtension implements ServiceExtension {
     @Inject
     private ExecutorInstrumentation executorInstrumentation;
 
+    @Inject
+    private DtoTransformerRegistry transformerRegistry;
+
     private ParticipantManager participantManager;
 
     @Override

@@ -14,6 +14,7 @@ dependencies {
     implementation("${edcGroup}:http:${edcVersion}")
     implementation("${edcGroup}:state-machine-lib:${edcVersion}")
     implementation("${edcGroup}:identity-did-crypto:${edcVersion}")
+    implementation("${edcGroup}:api-core:${edcVersion}")
 
     implementation(project(":extensions:participant-store-spi"))
     implementation(project(":extensions:dataspace-authority-spi"))
