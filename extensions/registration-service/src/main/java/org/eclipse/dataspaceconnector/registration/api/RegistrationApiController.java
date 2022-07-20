@@ -15,7 +15,11 @@
 package org.eclipse.dataspaceconnector.registration.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -70,7 +74,22 @@ public class RegistrationApiController {
     @GET
     @Path("{did}")
     @Operation(description = "Gets a participant by DID.")
-    @ApiResponse(description = "Dataspace participant.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Dataspace participant.",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ParticipantDto.class)
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Dataspace participant not found."
+            )
+    })
     public ParticipantDto getParticipant(@PathParam("did") String did) {
 
         return Optional.of(did)
@@ -85,6 +104,18 @@ public class RegistrationApiController {
     @GET
     @Operation(description = "Gets all dataspace participants.")
     @ApiResponse(description = "Dataspace participants.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Dataspace participants.",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = ParticipantDto.class))
+                            )
+                    }
+            )
+    })
     public List<ParticipantDto> listParticipants() {
 
         return service.listParticipants().stream()
