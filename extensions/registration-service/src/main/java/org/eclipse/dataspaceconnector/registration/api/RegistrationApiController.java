@@ -25,7 +25,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
+import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
+import org.eclipse.dataspaceconnector.registration.dto.ParticipantDto;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,21 +50,23 @@ public class RegistrationApiController {
     private static final String TEMPORARY_IDS_URL_HEADER = "IdsUrl";
 
     private final RegistrationService service;
+    private final DtoTransformerRegistry transformerRegistry;
 
     /**
      * Constructs an instance of {@link RegistrationApiController}
      *
      * @param service service handling the registration service logic.
      */
-    public RegistrationApiController(RegistrationService service) {
+    public RegistrationApiController(RegistrationService service, DtoTransformerRegistry transformerRegistry) {
         this.service = service;
+        this.transformerRegistry = transformerRegistry;
     }
 
     @Path("/participants")
     @GET
     @Operation(description = "Gets all dataspace participants.")
     @ApiResponse(description = "Dataspace participants.")
-    public List<Participant> listParticipants() {
+    public List<ParticipantDto> listParticipants() {
         return service.listParticipants();
     }
 
