@@ -1,19 +1,12 @@
 package org.eclipse.dataspaceconnector.registration.cli;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspaceconnector.junit.testfixtures.TestUtils.getFreePort;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.Service;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolver;
@@ -28,16 +21,16 @@ class EnrollmentUrlResolverTest {
     DidResolver didResolver = mock(WebDidResolver.class);
     EnrollmentUrlResolver enrollmentUrlResolver = new EnrollmentUrlResolver(didResolver);
 
-    String didURI = "did:web:didserver";
+    String did = "did:web:didserver";
 
     @Test
-    void resolve_url_success() throws IOException {
+    void resolveUrl_success() {
 
         String apiUrl = "http://enrollmentUrl/api";
         DidDocument didDocument = didDocument(apiUrl);
-        when(didResolver.resolve(didURI)).thenReturn(Result.success(didDocument));
+        when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
 
-        Optional<String> resultApiUrl = enrollmentUrlResolver.resolveUrl(didURI);
+        Optional<String> resultApiUrl = enrollmentUrlResolver.resolveUrl(did);
 
         assertThat(resultApiUrl).isNotEmpty();
         assertThat(resultApiUrl.get()).isEqualTo(apiUrl);
@@ -45,15 +38,23 @@ class EnrollmentUrlResolverTest {
     }
 
     @Test
-    void resolve_url_failure() {
+    void resolveUrl_noEnrollmentUrl() {
 
         DidDocument didDocument = DidDocument.Builder.newInstance().build();
-        when(didResolver.resolve(didURI)).thenReturn(Result.success(didDocument));
+        when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
 
-        Optional<String> resultApiUrl = enrollmentUrlResolver.resolveUrl(didURI);
+        Optional<String> resultApiUrl = enrollmentUrlResolver.resolveUrl(did);
 
         assertThat(resultApiUrl).isEmpty();
 
+    }
+
+    @Test
+    void resolveUrl_failureToGetDid() {
+
+        when(didResolver.resolve(did)).thenReturn(Result.failure("Failure"));
+
+        assertThatThrownBy(() -> enrollmentUrlResolver.resolveUrl(did)).isInstanceOf(CliException.class);
     }
 
     private DidDocument didDocument(String apiUrl) {

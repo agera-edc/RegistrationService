@@ -31,7 +31,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DID_WEB;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.PARTICIPANT_DID_WEB;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DATASPACE_DID_WEB;
 
 @IntegrationTest
 public class RegistrationApiCommandLineClientTest {
@@ -42,6 +43,7 @@ public class RegistrationApiCommandLineClientTest {
 
     @BeforeAll
     static void setUpClass() throws Exception {
+        System.setProperty("did.web.use.https", "false");
         privateKeyFile = Files.createTempFile("test", ".pem");
         privateKeyFile.toFile().deleteOnExit();
         Files.writeString(privateKeyFile, TestKeyData.PRIVATE_KEY_P256);
@@ -54,7 +56,24 @@ public class RegistrationApiCommandLineClientTest {
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
         var addCmdExitCode = cmd.execute(
-                "-d", DID_WEB,
+                "-cd", PARTICIPANT_DID_WEB,
+                "-dd", DATASPACE_DID_WEB,
+                "-k", privateKeyFile.toString(),
+                "participants", "add",
+                "--ids-url", idsUrl);
+        assertThat(addCmdExitCode).isEqualTo(0);
+        assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+    }
+
+    @Deprecated
+    @Test
+    void listParticipants_usingServiceUrl() throws Exception {
+        CommandLine cmd = new RegistrationServiceCli().getCommandLine();
+
+        assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+
+        var addCmdExitCode = cmd.execute(
+                "-cd", PARTICIPANT_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "participants", "add",
                 "--ids-url", idsUrl);
@@ -66,7 +85,7 @@ public class RegistrationApiCommandLineClientTest {
         var writer = new StringWriter();
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
-                "-d", DID_WEB,
+                "-cd", PARTICIPANT_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);

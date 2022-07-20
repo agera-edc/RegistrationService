@@ -11,8 +11,12 @@ import org.eclipse.dataspaceconnector.iam.did.web.resolution.WebDidResolver;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Resolves the enrollment url from the DID.
+ */
 public class EnrollmentUrlResolver {
 
+    public static final String ENROLLMENT_URL = "EnrollmentUrl";
 
     private final DidResolver resolver;
 
@@ -21,10 +25,15 @@ public class EnrollmentUrlResolver {
     }
 
     @NotNull
-    public Optional<String> resolveUrl(String didURI) {
-        Result<DidDocument> didDocument = resolver.resolve(didURI);
-        Optional<String> enrollmentUrl = didDocument.getContent().getService().stream().filter(service -> service.getType().equals("EnrollmentUrl")).map(Service::getServiceEndpoint).findFirst();
-        return enrollmentUrl;
+    public Optional<String> resolveUrl(String did) {
+        Result<DidDocument> didDocument = resolver.resolve(did);
+        if (didDocument.failed()) {
+            throw new CliException("Error resolving the DID " + did);
+        }
+        return didDocument.getContent().getService()
+                .stream()
+                .filter(service -> service.getType().equals(ENROLLMENT_URL))
+                .map(Service::getServiceEndpoint).findFirst();
     }
 
 }

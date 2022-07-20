@@ -1,0 +1,33 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    {
+      "@base": "did:web:mvd215dataspacedid.z16.web.core.windows.net"
+    }
+  ],
+  "authentication": [
+    "#identity-key-authority"
+  ],
+  "id": "did:web:mvd215dataspacedid.z16.web.core.windows.net",
+  "service": [
+    {
+      "id": "#enrollment-url",
+      "serviceEndpoint": "http://localhost:8182/authority",
+      "type": "EnrollmentUrl"
+    }
+  ],
+  "verificationMethod": [
+    {
+      "controller": "",
+      "id": "#identity-key-authority",
+      "publicKeyJwk": {
+        "crv": "P-256",
+        "kid": "43W7BLEhKmasrJYqax399SY3tbAWZ9gbE2Em1pIQIds",
+        "kty": "EC",
+        "x": "wwP_-TypFsR1k41KDoxYelM5nlMDWkW1xI3dfD_JSIE",
+        "y": "iqDGWy1rbemhYrN4NCtn5dCeElIO8KLqXDT2RuzQWH0"
+      },
+      "type": "JsonWebKey2020"
+    }
+  ]
+}

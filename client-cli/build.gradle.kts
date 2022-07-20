@@ -13,6 +13,7 @@ val mockitoVersion: String by project
 val faker: String by project
 val edcGroup: String by project
 val edcVersion: String by project
+val okHttp: String by project
 
 dependencies {
     api("info.picocli:picocli:4.6.3")
@@ -21,16 +22,15 @@ dependencies {
     api(project(":rest-client"))
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
 
-    testImplementation(testFixtures(project(":rest-client")))
     implementation("${edcGroup}:identity-did-web:${edcVersion}")
-    implementation("${edcGroup}:core-boot:${edcVersion}")
+    implementation("${edcGroup}:common-util:${edcVersion}")
+    implementation("com.squareup.okhttp3:okhttp:${okHttp}")
     testImplementation("org.assertj:assertj-core:${assertj}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.3")
     testImplementation("com.github.javafaker:javafaker:${faker}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
+    testImplementation(testFixtures(project(":rest-client")))
 
 }
 
