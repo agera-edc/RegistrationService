@@ -22,15 +22,19 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
+import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.dto.ParticipantDto;
+import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter.CALLER_DID_HEADER;
@@ -61,6 +65,20 @@ public class RegistrationApiController {
     public RegistrationApiController(RegistrationService service, DtoTransformerRegistry transformerRegistry) {
         this.service = service;
         this.transformerRegistry = transformerRegistry;
+    }
+
+    @GET
+    @Path("{did}")
+    @Operation(description = "Gets a participant by DID.")
+    @ApiResponse(description = "Dataspace participant.")
+    public ParticipantDto getParticipant(@PathParam("did") String did) {
+
+        return Optional.of(did)
+                .map(s -> service.findByDid(did))
+                .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
+                .filter(Result::succeeded)
+                .map(Result::getContent)
+                .orElseThrow(() -> new ObjectNotFoundException(Participant.class, did));
     }
 
     @Path("/participants")

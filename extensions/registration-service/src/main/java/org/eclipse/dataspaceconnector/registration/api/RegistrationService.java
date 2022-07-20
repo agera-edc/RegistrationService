@@ -17,10 +17,12 @@ package org.eclipse.dataspaceconnector.registration.api;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 
 /**
@@ -34,6 +36,11 @@ public class RegistrationService {
     public RegistrationService(Monitor monitor, ParticipantStore participantStore) {
         this.monitor = monitor;
         this.participantStore = participantStore;
+    }
+
+    public @Nullable Participant findByDid(String did) {
+        monitor.info(format("Find a participant by DID %s", did));
+        return participantStore.findByDid(did);
     }
 
     /**

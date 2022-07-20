@@ -9,8 +9,11 @@ val jupiterVersion: String by project
 val assertj: String by project
 val mockitoVersion: String by project
 val faker: String by project
+val jetBrainsAnnotationsVersion: String by project
 
 dependencies {
+    api("org.jetbrains:annotations:${jetBrainsAnnotationsVersion}")
+
     implementation("${edcGroup}:http:${edcVersion}")
     implementation("${edcGroup}:state-machine-lib:${edcVersion}")
     implementation("${edcGroup}:identity-did-crypto:${edcVersion}")
