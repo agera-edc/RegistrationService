@@ -7,12 +7,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
-import org.eclipse.dataspaceconnector.iam.did.spi.document.Service;
-import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolver;
-import org.eclipse.dataspaceconnector.iam.did.web.resolution.WebDidResolver;
+
 import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.junit.jupiter.api.Test;
+import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolver;
+import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
+import org.eclipse.dataspaceconnector.iam.did.spi.document.Service;
+import org.eclipse.dataspaceconnector.iam.did.web.resolution.WebDidResolver;
 
 class EnrollmentUrlResolverTest {
 
