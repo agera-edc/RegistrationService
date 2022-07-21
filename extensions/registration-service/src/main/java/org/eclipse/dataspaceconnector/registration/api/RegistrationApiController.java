@@ -15,6 +15,7 @@
 package org.eclipse.dataspaceconnector.registration.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +27,6 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -41,6 +41,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER;
 import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter.CALLER_DID_HEADER;
 
 
@@ -72,8 +73,19 @@ public class RegistrationApiController {
     }
 
     @GET
-    @Path("{did}")
-    @Operation(description = "Gets a participant by DID.")
+    @Path("/participant")
+    @Operation(
+            description = "Gets a participant by DID.",
+            parameters = {
+                    @Parameter(
+                            in = HEADER,
+                            name = CALLER_DID_HEADER,
+                            description = "DID of caller",
+                            required = true,
+                            schema = @Schema(implementation = String.class)
+                    )
+            }
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -90,14 +102,15 @@ public class RegistrationApiController {
                     description = "Dataspace participant not found."
             )
     })
-    public ParticipantDto getParticipant(@PathParam("did") String did) {
+    public ParticipantDto getParticipant(@Context HttpHeaders headers) {
+        var issuer = Objects.requireNonNull(headers.getHeaderString(CALLER_DID_HEADER));
 
-        return Optional.of(did)
-                .map(s -> service.findByDid(did))
+        return Optional.of(issuer)
+                .map(s -> service.findByDid(issuer))
                 .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
                 .filter(Result::succeeded)
                 .map(Result::getContent)
-                .orElseThrow(() -> new ObjectNotFoundException(Participant.class, did));
+                .orElseThrow(() -> new ObjectNotFoundException(Participant.class, issuer));
     }
 
     @Path("/participants")
