@@ -23,18 +23,18 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 /**
- * Resolves the enrollment url from the DID.
+ * Resolves the registration url from the DID.
  */
-public class EnrollmentUrlResolver {
+public class RegistrationUrlResolver {
 
-    public static final String ENROLLMENT_URL = "EnrollmentUrl";
+    public static final String REGISTRATION_URL = "RegistrationUrl";
 
     /**
      * Resolves the DID document from did:web.
      */
     private final DidResolver resolver;
 
-    public EnrollmentUrlResolver(DidResolver resolver) {
+    public RegistrationUrlResolver(DidResolver resolver) {
         this.resolver = resolver;
     }
 
@@ -46,7 +46,7 @@ public class EnrollmentUrlResolver {
         }
         return didDocument.getContent().getService()
                 .stream()
-                .filter(service -> service.getType().equals(ENROLLMENT_URL))
+                .filter(service -> service.getType().equals(REGISTRATION_URL))
                 .map(Service::getServiceEndpoint).findFirst();
     }
 

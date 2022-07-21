@@ -11,9 +11,9 @@
   "id": "did:web:mvd215dataspacedid.z16.web.core.windows.net",
   "service": [
     {
-      "id": "#enrollment-url",
+      "id": "#registration-url",
       "serviceEndpoint": "http://localhost:8182/authority",
-      "type": "EnrollmentUrl"
+      "type": "RegistrationUrl"
     }
   ],
   "verificationMethod": [

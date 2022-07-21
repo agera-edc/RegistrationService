@@ -29,23 +29,23 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class EnrollmentUrlResolverTest {
+class RegistrationUrlResolverTest {
 
-    public static final String SERVICE_TYPE = "EnrollmentUrl";
+    public static final String SERVICE_TYPE = "RegistrationUrl";
 
     DidResolver didResolver = mock(WebDidResolver.class);
-    EnrollmentUrlResolver enrollmentUrlResolver = new EnrollmentUrlResolver(didResolver);
+    RegistrationUrlResolver urlResolver = new RegistrationUrlResolver(didResolver);
 
     String did = "did:web:didserver";
 
     @Test
     void resolveUrl_success() {
 
-        String apiUrl = "http://enrollmentUrl/api";
+        String apiUrl = "http://registrationUrl/api";
         DidDocument didDocument = didDocument(apiUrl);
         when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
 
-        Optional<String> resultApiUrl = enrollmentUrlResolver.resolveUrl(did);
+        Optional<String> resultApiUrl = urlResolver.resolveUrl(did);
 
         assertThat(resultApiUrl).isNotEmpty();
         assertThat(resultApiUrl.get()).isEqualTo(apiUrl);
@@ -53,12 +53,12 @@ class EnrollmentUrlResolverTest {
     }
 
     @Test
-    void resolveUrl_noEnrollmentUrl() {
+    void resolveUrl_noRegistrationUrl() {
 
         DidDocument didDocument = DidDocument.Builder.newInstance().build();
         when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
 
-        Optional<String> resultApiUrl = enrollmentUrlResolver.resolveUrl(did);
+        Optional<String> resultApiUrl = urlResolver.resolveUrl(did);
 
         assertThat(resultApiUrl).isEmpty();
 
@@ -69,7 +69,7 @@ class EnrollmentUrlResolverTest {
 
         when(didResolver.resolve(did)).thenReturn(Result.failure("Failure"));
 
-        assertThatThrownBy(() -> enrollmentUrlResolver.resolveUrl(did)).isInstanceOf(CliException.class);
+        assertThatThrownBy(() -> urlResolver.resolveUrl(did)).isInstanceOf(CliException.class);
     }
 
     private DidDocument didDocument(String apiUrl) {

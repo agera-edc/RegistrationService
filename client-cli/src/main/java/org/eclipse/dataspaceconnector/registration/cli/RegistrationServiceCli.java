@@ -86,10 +86,10 @@ public class RegistrationServiceCli {
             return;
         }
         var didWebResolver = new WebDidResolver(new OkHttpClient(), useHttpsScheme(), MAPPER, new ConsoleMonitor());
-        var urlResolver = new EnrollmentUrlResolver(didWebResolver);
-        String enrollmentUrl = urlResolver.resolveUrl(dataspaceDid).orElseThrow(() -> new RuntimeException("Error resolving the enrollment url."));
+        var urlResolver = new RegistrationUrlResolver(didWebResolver);
+        String registrationUrl = urlResolver.resolveUrl(dataspaceDid).orElseThrow(() -> new RuntimeException("Error resolving the registration url."));
 
-        registryApiClient = new RegistryApi(ClientUtils.createApiClient(enrollmentUrl, clientDid, privateKeyData));
+        registryApiClient = new RegistryApi(ClientUtils.createApiClient(registrationUrl, clientDid, privateKeyData));
     }
 
     private boolean useHttpsScheme() {
