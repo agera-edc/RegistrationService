@@ -14,6 +14,7 @@
 
 package org.eclipse.dataspaceconnector.registration.cli;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
@@ -124,7 +125,7 @@ class ParticipantsCommandTest {
         verify(app.registryApiClient).addParticipant(idsUrl);
     }
 
-    private void assertListParticipants(List<Participant> participants, int exitCode, String value, String expectedValue) throws com.fasterxml.jackson.core.JsonProcessingException {
+    private void assertListParticipants(List<Participant> participants, int exitCode, String value, String expectedValue) throws JsonProcessingException {
         assertThat(exitCode).isEqualTo(0);
         assertThat(expectedValue).isEqualTo(value);
 
