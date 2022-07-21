@@ -1,14 +1,11 @@
 {
+  "id": "did:web:did-server:test-dataspace-authority",
   "@context": [
     "https://www.w3.org/ns/did/v1",
     {
-      "@base": "did:web:mvd215dataspacedid.z16.web.core.windows.net"
+      "@base": "did:web:did-server:test-dataspace-authority"
     }
   ],
-  "authentication": [
-    "#identity-key-authority"
-  ],
-  "id": "did:web:mvd215dataspacedid.z16.web.core.windows.net",
   "service": [
     {
       "id": "#registration-url",
@@ -19,7 +16,7 @@
   "verificationMethod": [
     {
       "controller": "",
-      "id": "#identity-key-authority",
+      "id": "#dataspace-authority",
       "publicKeyJwk": {
         "crv": "P-256",
         "kid": "43W7BLEhKmasrJYqax399SY3tbAWZ9gbE2Em1pIQIds",
@@ -29,5 +26,8 @@
       },
       "type": "JsonWebKey2020"
     }
+  ],
+  "authentication": [
+    "#dataspace-authority"
   ]
 }

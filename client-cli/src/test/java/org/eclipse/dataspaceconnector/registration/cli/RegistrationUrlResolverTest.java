@@ -14,6 +14,7 @@
 
 package org.eclipse.dataspaceconnector.registration.cli;
 
+import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.Service;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolver;
@@ -31,18 +32,19 @@ import static org.mockito.Mockito.when;
 
 class RegistrationUrlResolverTest {
 
-    public static final String SERVICE_TYPE = "RegistrationUrl";
+    private static final String REGISTRATION_URL_TYPE = "RegistrationUrl";
+    private static final Faker FAKER = new Faker();
 
     DidResolver didResolver = mock(WebDidResolver.class);
     RegistrationUrlResolver urlResolver = new RegistrationUrlResolver(didResolver);
 
-    String did = "did:web:didserver";
+    String did = "did:web:" + FAKER.internet().domainName();
+    String apiUrl = "http://registrationUrl/api";
 
     @Test
     void resolveUrl_success() {
 
-        String apiUrl = "http://registrationUrl/api";
-        DidDocument didDocument = didDocument(apiUrl);
+        DidDocument didDocument = didDocument(List.of(new Service("some-id", REGISTRATION_URL_TYPE, apiUrl), new Service("some-id", "some-other-type", apiUrl)));
         when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
 
         Optional<String> resultApiUrl = urlResolver.resolveUrl(did);
@@ -53,9 +55,20 @@ class RegistrationUrlResolverTest {
     }
 
     @Test
+    void resolveUrl_noRegistrationUrlType() {
+
+        DidDocument didDocument = didDocument(List.of(new Service("some-id", "some-other-type", apiUrl)));
+        when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
+
+        Optional<String> resultApiUrl = urlResolver.resolveUrl(did);
+
+        assertThat(resultApiUrl).isEmpty();
+    }
+
+    @Test
     void resolveUrl_noRegistrationUrl() {
 
-        DidDocument didDocument = DidDocument.Builder.newInstance().build();
+        DidDocument didDocument = didDocument(List.of());
         when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
 
         Optional<String> resultApiUrl = urlResolver.resolveUrl(did);
@@ -72,8 +85,8 @@ class RegistrationUrlResolverTest {
         assertThatThrownBy(() -> urlResolver.resolveUrl(did)).isInstanceOf(CliException.class);
     }
 
-    private DidDocument didDocument(String apiUrl) {
-        return DidDocument.Builder.newInstance().service(List.of(new Service("some-id", SERVICE_TYPE, apiUrl))).build();
+    private DidDocument didDocument(List<Service> services) {
+        return DidDocument.Builder.newInstance().service(services).build();
     }
 
 }

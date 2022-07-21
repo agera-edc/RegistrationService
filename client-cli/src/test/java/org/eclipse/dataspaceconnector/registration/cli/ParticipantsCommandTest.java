@@ -48,7 +48,7 @@ class ParticipantsCommandTest {
     String serverUrl = FAKER.internet().url();
     String idsUrl = FAKER.internet().url();
     String clientDid = FAKER.internet().url();
-    String dataspaceDid = "did:web:" + FAKER.internet().url();
+    String dataspaceDid = "did:web:" + FAKER.internet().domainName();
 
     RegistrationServiceCli app = new RegistrationServiceCli();
     CommandLine cmd = new CommandLine(app);

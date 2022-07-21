@@ -20,14 +20,18 @@ import okhttp3.OkHttpClient;
 import org.eclipse.dataspaceconnector.iam.did.web.resolution.WebDidResolver;
 import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import org.eclipse.dataspaceconnector.spi.monitor.ConsoleMonitor;
+import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.eclipse.dataspaceconnector.common.configuration.ConfigurationFunctions.propOrEnv;
+import static org.eclipse.dataspaceconnector.registration.cli.ClientUtils.createApiClient;
 
 @Command(name = "registration-service-cli", mixinStandardHelpOptions = true,
         description = "Client utility for MVD registration service.",
@@ -81,18 +85,29 @@ public class RegistrationServiceCli {
 
         // temporary to preserve the backwards compatibility
         if (dataspaceDid.isEmpty()) {
-            var apiClient = ClientUtils.createApiClient(service, clientDid, privateKeyData);
+            var apiClient = createApiClient(service, clientDid, privateKeyData);
             this.registryApiClient = new RegistryApi(apiClient);
             return;
         }
-        var didWebResolver = new WebDidResolver(new OkHttpClient(), useHttpsScheme(), MAPPER, new ConsoleMonitor());
-        var urlResolver = new RegistrationUrlResolver(didWebResolver);
-        String registrationUrl = urlResolver.resolveUrl(dataspaceDid).orElseThrow(() -> new RuntimeException("Error resolving the registration url."));
 
-        registryApiClient = new RegistryApi(ClientUtils.createApiClient(registrationUrl, clientDid, privateKeyData));
+        registryApiClient = new RegistryApi(createApiClient(registrationUrl(), clientDid, privateKeyData));
+    }
+
+    private String registrationUrl() {
+        var didWebResolver = new WebDidResolver(httpClient(), useHttpsScheme(), MAPPER, new ConsoleMonitor());
+        var urlResolver = new RegistrationUrlResolver(didWebResolver);
+        return urlResolver.resolveUrl(dataspaceDid).orElseThrow(() -> new CliException("Error resolving the registration url."));
+    }
+
+    @NotNull
+    private OkHttpClient httpClient() {
+        return new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
     }
 
     private boolean useHttpsScheme() {
-        return propOrEnv(USE_HTTPS_SCHEME, "true").equals("true");
+        return parseBoolean(propOrEnv(USE_HTTPS_SCHEME, "true"));
     }
 }
