@@ -16,8 +16,8 @@ For example, to list dataspace participants:
 
 ```
 java -jar client-cli/build/libs/registration-service-cli.jar \
-  -dd=did:web:dataspaceauthoritydid \
-  -cd=did:web:clientdid
+  -d=did:web:dataspaceauthoritydid \
+  -c=did:web:clientdid
   -k=file.pem
   participants list
 ```

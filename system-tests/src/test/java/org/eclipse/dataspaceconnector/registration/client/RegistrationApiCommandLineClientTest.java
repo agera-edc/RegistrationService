@@ -56,8 +56,8 @@ public class RegistrationApiCommandLineClientTest {
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
         var addCmdExitCode = cmd.execute(
-                "-cd", CLIENT_DID_WEB,
-                "-dd", DATASPACE_DID_WEB,
+                "-c", CLIENT_DID_WEB,
+                "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "participants", "add",
                 "--ids-url", idsUrl);
@@ -73,7 +73,7 @@ public class RegistrationApiCommandLineClientTest {
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
         var addCmdExitCode = cmd.execute(
-                "-cd", CLIENT_DID_WEB,
+                "-c", CLIENT_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "participants", "add",
                 "--ids-url", idsUrl);
@@ -85,7 +85,7 @@ public class RegistrationApiCommandLineClientTest {
         var writer = new StringWriter();
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
-                "-cd", CLIENT_DID_WEB,
+                "-c", CLIENT_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);

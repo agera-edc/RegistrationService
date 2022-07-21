@@ -73,13 +73,13 @@ class ParticipantsCommandTest {
         when(app.registryApiClient.listParticipants())
                 .thenReturn(participants);
 
-        var exitCode = executeParticipantsList("-dd", dataspaceDid);
+        var exitCode = executeParticipantsList("-d", dataspaceDid);
         assertListParticipants(participants, exitCode, app.dataspaceDid, dataspaceDid);
     }
 
     @Test
     void add() {
-        var exitCode = executeParticipantsAdd("-dd", dataspaceDid);
+        var exitCode = executeParticipantsAdd("-d", dataspaceDid);
         assertAddParticipants(exitCode, dataspaceDid, app.dataspaceDid);
     }
 
@@ -105,10 +105,10 @@ class ParticipantsCommandTest {
     @Test
     void add_both_inputs() {
         var exitCode = cmd.execute(
-                "-cd", clientDid,
+                "-c", clientDid,
                 "-k", privateKeyFile.toString(),
                 "-s", serverUrl,
-                "-dd", dataspaceDid,
+                "-d", dataspaceDid,
                 "participants", "add",
                 "--ids-url", idsUrl);
 
@@ -137,7 +137,7 @@ class ParticipantsCommandTest {
 
     private int executeParticipantsAdd(String inputCmd, String inputValue) {
         return cmd.execute(
-                "-cd", clientDid,
+                "-c", clientDid,
                 "-k", privateKeyFile.toString(),
                 inputCmd, inputValue,
                 "participants", "add",
@@ -146,7 +146,7 @@ class ParticipantsCommandTest {
 
     private int executeParticipantsList(String inputCmd, String inputValue) {
         return cmd.execute(
-                "-cd", clientDid,
+                "-c", clientDid,
                 "-k", privateKeyFile.toString(),
                 inputCmd, inputValue,
                 "participants", "list");
