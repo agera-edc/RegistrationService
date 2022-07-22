@@ -29,10 +29,6 @@ public class TestUtils {
     public static Participant.Builder createParticipant() {
         return Participant.Builder.newInstance()
                 .did(FAKER.internet().url())
-                .status(FAKER.options().option(ParticipantStatus.class))
-                .name(FAKER.lorem().characters())
-                .url(FAKER.internet().url())
-                .supportedProtocols(List.of(FAKER.lorem().word(), FAKER.lorem().word()))
-                .supportedProtocol(FAKER.lorem().word());
+                .status(FAKER.options().option(ParticipantStatus.class));
     }
 }
