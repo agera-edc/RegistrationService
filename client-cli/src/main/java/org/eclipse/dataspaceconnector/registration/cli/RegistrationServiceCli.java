@@ -47,13 +47,13 @@ public class RegistrationServiceCli {
     @CommandLine.Option(names = "-s", description = "Registration service URL. Deprecated. Use -d instead.", defaultValue = "http://localhost:8182/authority")
     String service;
 
-    @CommandLine.Option(names = { "-d", "--dataspace-did"}, required = false, description = "Dataspace Authority DID.", defaultValue = "")
+    @CommandLine.Option(names = { "-d", "--dataspace-did" }, required = false, description = "Dataspace Authority DID.", defaultValue = "")
     String dataspaceDid;
 
-    @CommandLine.Option(names = { "-c", "--client-did"}, required = true, description = "Client DID.")
+    @CommandLine.Option(names = { "-c", "--client-did" }, required = true, description = "Client DID.")
     String clientDid;
 
-    @CommandLine.Option(names = "-k", required = true, description = "File containing the private key in PEM format")
+    @CommandLine.Option(names = { "-k", "--private-key" }, required = true, description = "File containing the private key in PEM format")
     Path privateKeyFile;
 
     RegistryApi registryApiClient;
