@@ -29,7 +29,7 @@ public class RegistrationApiClientTest {
     static final Faker FAKER = new Faker();
     static RegistryApi api;
 
-    String participantUrl = FAKER.internet().url();
+    String did = "web:did" + FAKER.internet().url();
 
     @BeforeAll
     static void setUpClass() {
@@ -41,11 +41,11 @@ public class RegistrationApiClientTest {
     void listParticipants() {
 
         assertThat(api.listParticipants())
-                .noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
+                .noneSatisfy(p -> assertThat(p.getDid()).isEqualTo(did));
 
-        api.addParticipant(participantUrl);
+        api.addParticipant(did);
 
         assertThat(api.listParticipants())
-                .anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
+                .anySatisfy(p -> assertThat(p.getDid()).isEqualTo(did));
     }
 }
