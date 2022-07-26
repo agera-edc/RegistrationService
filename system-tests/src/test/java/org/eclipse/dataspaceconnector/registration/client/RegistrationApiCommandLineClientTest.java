@@ -51,7 +51,7 @@ public class RegistrationApiCommandLineClientTest {
 
     @Test
     void listParticipants() throws Exception {
-        CommandLine cmd = new RegistrationServiceCli().getCommandLine();
+        CommandLine cmd = RegistrationServiceCli.getCommandLine();
 
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
@@ -68,7 +68,7 @@ public class RegistrationApiCommandLineClientTest {
     @Deprecated
     @Test
     void listParticipants_usingServiceUrl() throws Exception {
-        CommandLine cmd = new RegistrationServiceCli().getCommandLine();
+        CommandLine cmd = RegistrationServiceCli.getCommandLine();
 
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
