@@ -15,7 +15,8 @@
 package org.eclipse.dataspaceconnector.registration.cli;
 
 import com.github.javafaker.Faker;
-import org.eclipse.dataspaceconnector.registration.client.models.Participant;
+import org.eclipse.dataspaceconnector.registration.client.models.ParticipantDto;
+import org.eclipse.dataspaceconnector.registration.client.models.ParticipantDto.StatusEnum;
 
 public class TestUtils {
     static final Faker FAKER = new Faker();
@@ -23,10 +24,11 @@ public class TestUtils {
     private TestUtils() {
     }
 
-    public static Participant createParticipant() {
-        return new Participant()
+    public static ParticipantDto createParticipant() {
+        return new ParticipantDto()
                 .name(FAKER.lorem().characters())
                 .url(FAKER.internet().url())
+                .status(FAKER.options().option(StatusEnum.class))
                 .addSupportedProtocolsItem(FAKER.lorem().word())
                 .addSupportedProtocolsItem(FAKER.lorem().word());
     }

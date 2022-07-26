@@ -72,7 +72,7 @@ public class RegistrationApiController {
 
     @GET
     @Path("/participant/status")
-    @Operation(description = "Gets status of a participant by DID.")
+    @Operation(description = "Get status of a participant.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",

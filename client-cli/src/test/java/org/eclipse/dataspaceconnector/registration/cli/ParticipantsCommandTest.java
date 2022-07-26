@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.registration.client.TestKeyData;
 import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
-import org.eclipse.dataspaceconnector.registration.client.models.Participant;
+import org.eclipse.dataspaceconnector.registration.client.models.ParticipantDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,8 +44,8 @@ class ParticipantsCommandTest {
     static final ObjectMapper MAPPER = new ObjectMapper();
     static Path privateKeyFile;
 
-    Participant participant1 = createParticipant();
-    Participant participant2 = createParticipant();
+    ParticipantDto participant1 = createParticipant();
+    ParticipantDto participant2 = createParticipant();
     String serverUrl = FAKER.internet().url();
     String idsUrl = FAKER.internet().url();
     String clientDid = FAKER.internet().url();
@@ -129,7 +129,7 @@ class ParticipantsCommandTest {
         assertThat(exitCode).isEqualTo(0);
         assertThat(expectedValue).isEqualTo(value);
 
-        var parsedResult = MAPPER.readValue(sw.toString(), new TypeReference<List<Participant>>() {
+        var parsedResult = MAPPER.readValue(sw.toString(), new TypeReference<List<ParticipantDto>>() {
         });
         assertThat(parsedResult)
                 .usingRecursiveFieldByFieldElementComparator()
@@ -137,6 +137,33 @@ class ParticipantsCommandTest {
     }
 
     private int executeParticipantsAdd(String inputCmd, String inputValue) {
+    @Test
+    void add() {
+        var exitCode = executeParticipantsAdd(idsUrl);
+
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(serverUrl).isEqualTo(app.service);
+        verify(app.registryApiClient).addParticipant(idsUrl);
+    }
+
+    @Test
+    void status() throws Exception {
+        when(app.registryApiClient.getParticipantStatus())
+                .thenReturn(participant1);
+
+        var exitCode = executeParticipantStatus();
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(serverUrl).isEqualTo(app.service);
+
+        var parsedResult = MAPPER.readValue(sw.toString(), new TypeReference<ParticipantDto>() {
+        });
+
+        assertThat(parsedResult)
+                .usingRecursiveComparison()
+                .isEqualTo(participant1);
+    }
+
+    private int executeParticipantsAdd(String idsUrl) {
         return cmd.execute(
                 "-c", clientDid,
                 "-k", privateKeyFile.toString(),
@@ -151,5 +178,13 @@ class ParticipantsCommandTest {
                 "-k", privateKeyFile.toString(),
                 inputCmd, inputValue,
                 "participants", "list");
+    }
+
+    private int executeParticipantStatus() {
+        return cmd.execute(
+                "-d", did,
+                "-k", privateKeyFile.toString(),
+                "-s", serverUrl,
+                "participants", "status");
     }
 }
