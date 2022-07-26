@@ -15,7 +15,6 @@
 package org.eclipse.dataspaceconnector.registration.api;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -41,7 +40,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER;
 import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter.CALLER_DID_HEADER;
 
 
@@ -73,19 +71,8 @@ public class RegistrationApiController {
     }
 
     @GET
-    @Path("/participant")
-    @Operation(
-            description = "Gets a participant by DID.",
-            parameters = {
-                    @Parameter(
-                            in = HEADER,
-                            name = CALLER_DID_HEADER,
-                            description = "DID of caller",
-                            required = true,
-                            schema = @Schema(implementation = String.class)
-                    )
-            }
-    )
+    @Path("/participant/status")
+    @Operation(description = "Gets status of a participant by DID.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -102,7 +89,7 @@ public class RegistrationApiController {
                     description = "Dataspace participant not found."
             )
     })
-    public ParticipantDto getParticipant(@Context HttpHeaders headers) {
+    public ParticipantDto getParticipantStatus(@Context HttpHeaders headers) {
         var issuer = Objects.requireNonNull(headers.getHeaderString(CALLER_DID_HEADER));
 
         return Optional.of(issuer)
@@ -116,7 +103,6 @@ public class RegistrationApiController {
     @Path("/participants")
     @GET
     @Operation(description = "Gets all dataspace participants.")
-    @ApiResponse(description = "Dataspace participants.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",

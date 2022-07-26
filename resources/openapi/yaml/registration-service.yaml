@@ -17,24 +17,39 @@ paths:
           description: No content
       tags:
       - Registry
+  /registry/participant/status:
+    get:
+      description: Gets status of a participant by DID.
+      operationId: getParticipantStatus
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticipantDto'
+          description: Dataspace participant.
+        "404":
+          description: Dataspace participant not found.
+      tags:
+      - Registry
   /registry/participants:
     get:
       description: Gets all dataspace participants.
       operationId: listParticipants
       responses:
-        default:
+        "200":
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Participant'
+                  $ref: '#/components/schemas/ParticipantDto'
           description: Dataspace participants.
       tags:
       - Registry
 components:
   schemas:
-    Participant:
+    ParticipantDto:
       type: object
       properties:
         did:
@@ -44,7 +59,6 @@ components:
         status:
           type: string
           enum:
-          - ONBOARDING_INITIATED
           - AUTHORIZING
           - AUTHORIZED
           - DENIED
