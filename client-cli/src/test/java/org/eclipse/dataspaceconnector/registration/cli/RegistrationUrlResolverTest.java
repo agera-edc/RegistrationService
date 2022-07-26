@@ -39,7 +39,7 @@ class RegistrationUrlResolverTest {
     RegistrationUrlResolver urlResolver = new RegistrationUrlResolver(didResolver);
 
     String did = "did:web:" + FAKER.internet().domainName();
-    String apiUrl = "http://registrationUrl/api";
+    String apiUrl = FAKER.internet().url();
 
     @Test
     void resolveUrl_success() {

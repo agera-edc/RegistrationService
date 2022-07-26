@@ -41,6 +41,13 @@ import static org.eclipse.dataspaceconnector.registration.cli.ClientUtils.create
 public class RegistrationServiceCli {
 
     private static final ObjectMapper MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+    /**
+     * Set to {@code false} to create DID URLs with {@code http} instead of {@code https} scheme.
+     * Defaults to {@code true}.
+     * <p>
+     * This setting is used for testing purposes.
+     */
     private static final String USE_HTTPS_SCHEME = "did.web.use.https";
 
     @Deprecated
@@ -57,6 +64,8 @@ public class RegistrationServiceCli {
     Path privateKeyFile;
 
     RegistryApi registryApiClient;
+
+    private final ConsoleMonitor monitor = new ConsoleMonitor();
 
     public static void main(String... args) {
         CommandLine commandLine = getCommandLine();
@@ -83,7 +92,7 @@ public class RegistrationServiceCli {
             throw new RuntimeException("Error reading file " + privateKeyFile, e);
         }
 
-        // temporary to preserve the backwards compatibility
+        // TODO: temporary to preserve the backwards compatibility (https://github.com/agera-edc/MinimumViableDataspace/issues/174)
         if (dataspaceDid.isEmpty()) {
             var apiClient = createApiClient(service, clientDid, privateKeyData);
             this.registryApiClient = new RegistryApi(apiClient);
@@ -94,7 +103,7 @@ public class RegistrationServiceCli {
     }
 
     private String registrationUrl() {
-        var didWebResolver = new WebDidResolver(httpClient(), useHttpsScheme(), MAPPER, new ConsoleMonitor());
+        var didWebResolver = new WebDidResolver(httpClient(), useHttpsScheme(), MAPPER, monitor);
         var urlResolver = new RegistrationUrlResolver(didWebResolver);
         return urlResolver.resolveUrl(dataspaceDid).orElseThrow(() -> new CliException("Error resolving the registration url."));
     }
