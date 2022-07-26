@@ -21,9 +21,13 @@ import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolver;
 import org.eclipse.dataspaceconnector.iam.did.web.resolution.WebDidResolver;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,7 +43,7 @@ class RegistrationUrlResolverTest {
     RegistrationUrlResolver urlResolver = new RegistrationUrlResolver(didResolver);
 
     String did = "did:web:" + FAKER.internet().domainName();
-    String apiUrl = FAKER.internet().url();
+    static String apiUrl = FAKER.internet().url();
 
     @Test
     void resolveUrl_success() {
@@ -54,27 +58,16 @@ class RegistrationUrlResolverTest {
 
     }
 
-    @Test
-    void resolveUrl_noRegistrationUrlType() {
+    @ParameterizedTest
+    @MethodSource("listsOfServices")
+    void resolveUrl_incorrectServices(List<Service> services) {
 
-        DidDocument didDocument = didDocument(List.of(new Service("some-id", "some-other-type", apiUrl)));
+        DidDocument didDocument = didDocument(services);
         when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
 
         Optional<String> resultApiUrl = urlResolver.resolveUrl(did);
 
         assertThat(resultApiUrl).isEmpty();
-    }
-
-    @Test
-    void resolveUrl_noRegistrationUrl() {
-
-        DidDocument didDocument = didDocument(List.of());
-        when(didResolver.resolve(did)).thenReturn(Result.success(didDocument));
-
-        Optional<String> resultApiUrl = urlResolver.resolveUrl(did);
-
-        assertThat(resultApiUrl).isEmpty();
-
     }
 
     @Test
@@ -87,6 +80,13 @@ class RegistrationUrlResolverTest {
 
     private DidDocument didDocument(List<Service> services) {
         return DidDocument.Builder.newInstance().service(services).build();
+    }
+
+    private static Stream<Arguments> listsOfServices() {
+        return Stream.of(
+                Arguments.of(List.of(new Service("some-id", "some-other-type", apiUrl))),
+                Arguments.of(List.of())
+        );
     }
 
 }
