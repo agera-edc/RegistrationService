@@ -104,7 +104,7 @@ public class RegistrationServiceCli {
     }
 
     private String registrationUrl() {
-        var didWebResolver = new WebDidResolver(httpClient(), useHttpScheme, MAPPER, monitor);
+        var didWebResolver = new WebDidResolver(httpClient(), !useHttpScheme, MAPPER, monitor);
         var urlResolver = new RegistrationUrlResolver(didWebResolver);
         return urlResolver.resolveUrl(dataspaceDid).orElseThrow(() -> new CliException("Error resolving the registration url."));
     }
