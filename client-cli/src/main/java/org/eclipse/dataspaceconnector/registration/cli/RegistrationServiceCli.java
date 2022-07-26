@@ -29,8 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Boolean.parseBoolean;
-import static org.eclipse.dataspaceconnector.common.configuration.ConfigurationFunctions.propOrEnv;
 import static org.eclipse.dataspaceconnector.registration.cli.ClientUtils.createApiClient;
 
 @Command(name = "registration-service-cli", mixinStandardHelpOptions = true,
@@ -62,6 +60,9 @@ public class RegistrationServiceCli {
 
     @CommandLine.Option(names = { "-k", "--private-key" }, required = true, description = "File containing the private key in PEM format")
     Path privateKeyFile;
+
+    @CommandLine.Option(names = "--http-scheme", description = "Flag to create o create DID URLs with http instead of https scheme. Used for testing purposes.")
+    boolean useHttpScheme;
 
     RegistryApi registryApiClient;
 
@@ -103,7 +104,7 @@ public class RegistrationServiceCli {
     }
 
     private String registrationUrl() {
-        var didWebResolver = new WebDidResolver(httpClient(), useHttpsScheme(), MAPPER, monitor);
+        var didWebResolver = new WebDidResolver(httpClient(), useHttpScheme, MAPPER, monitor);
         var urlResolver = new RegistrationUrlResolver(didWebResolver);
         return urlResolver.resolveUrl(dataspaceDid).orElseThrow(() -> new CliException("Error resolving the registration url."));
     }
@@ -114,9 +115,5 @@ public class RegistrationServiceCli {
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
-    }
-
-    private boolean useHttpsScheme() {
-        return parseBoolean(propOrEnv(USE_HTTPS_SCHEME, "true"));
     }
 }

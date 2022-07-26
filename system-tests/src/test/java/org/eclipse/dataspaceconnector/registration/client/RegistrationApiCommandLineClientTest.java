@@ -43,7 +43,7 @@ public class RegistrationApiCommandLineClientTest {
 
     @BeforeAll
     static void setUpClass() throws Exception {
-        System.setProperty("did.web.use.https", "false");
+        //System.setProperty("did.web.use.https", "false");
         privateKeyFile = Files.createTempFile("test", ".pem");
         privateKeyFile.toFile().deleteOnExit();
         Files.writeString(privateKeyFile, TestKeyData.PRIVATE_KEY_P256);
@@ -59,6 +59,7 @@ public class RegistrationApiCommandLineClientTest {
                 "-c", CLIENT_DID_WEB,
                 "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
+                "--http-scheme",
                 "participants", "add",
                 "--ids-url", idsUrl);
         assertThat(addCmdExitCode).isEqualTo(0);
@@ -75,6 +76,7 @@ public class RegistrationApiCommandLineClientTest {
         var addCmdExitCode = cmd.execute(
                 "-c", CLIENT_DID_WEB,
                 "-k", privateKeyFile.toString(),
+                "--http-scheme",
                 "participants", "add",
                 "--ids-url", idsUrl);
         assertThat(addCmdExitCode).isEqualTo(0);
