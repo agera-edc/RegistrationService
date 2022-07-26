@@ -20,7 +20,7 @@ import picocli.CommandLine.ParentCommand;
 @Command(name = "participants", mixinStandardHelpOptions = true,
         description = "Manage dataspace participants.",
         subcommands = {
-                GetParticipantCommand.class,
+                ListParticipantsCommand.class,
                 AddParticipantCommand.class
         })
 class ParticipantsCommand {

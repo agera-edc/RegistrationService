@@ -38,15 +38,14 @@ public class RegistrationApiClientTest {
     }
 
     @Test
-    void getParticipant() {
-        // Arrange
+    void listParticipants() {
+
+        assertThat(api.listParticipants())
+                .noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
+
         api.addParticipant(participantUrl);
 
-        // Act
-        var participant = api.getParticipant();
-
-        // Assert
-        assertThat(participant).isNotNull();
-        assertThat(participant.getDid()).isEqualTo(DID_WEB);
+        assertThat(api.listParticipants())
+                .anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
     }
 }

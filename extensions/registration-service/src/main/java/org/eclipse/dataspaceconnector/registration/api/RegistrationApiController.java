@@ -15,6 +15,8 @@
 package org.eclipse.dataspaceconnector.registration.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,9 +36,12 @@ import org.eclipse.dataspaceconnector.registration.dto.ParticipantDto;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER;
 import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter.CALLER_DID_HEADER;
 
 
@@ -69,7 +74,18 @@ public class RegistrationApiController {
 
     @GET
     @Path("/participant")
-    @Operation(description = "Gets a participant by DID.")
+    @Operation(
+            description = "Gets a participant by DID.",
+            parameters = {
+                    @Parameter(
+                            in = HEADER,
+                            name = CALLER_DID_HEADER,
+                            description = "DID of caller",
+                            required = true,
+                            schema = @Schema(implementation = String.class)
+                    )
+            }
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -95,6 +111,31 @@ public class RegistrationApiController {
                 .filter(Result::succeeded)
                 .map(Result::getContent)
                 .orElseThrow(() -> new ObjectNotFoundException(Participant.class, issuer));
+    }
+
+    @Path("/participants")
+    @GET
+    @Operation(description = "Gets all dataspace participants.")
+    @ApiResponse(description = "Dataspace participants.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Dataspace participants.",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = ParticipantDto.class))
+                            )
+                    }
+            )
+    })
+    public List<ParticipantDto> listParticipants() {
+
+        return service.listParticipants().stream()
+                .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
+                .filter(Result::succeeded)
+                .map(Result::getContent)
+                .collect(Collectors.toList());
     }
 
     @Path("/participant")

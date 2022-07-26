@@ -23,8 +23,8 @@ import picocli.CommandLine.Spec;
 
 import java.util.concurrent.Callable;
 
-@Command(name = "get", description = "Get details of a dataspace participants")
-class GetParticipantCommand implements Callable<Integer> {
+@Command(name = "list", description = "List dataspace participants")
+class ListParticipantsCommand implements Callable<Integer> {
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
@@ -38,7 +38,7 @@ class GetParticipantCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         var out = spec.commandLine().getOut();
-        MAPPER.writeValue(out, command.cli.registryApiClient.getParticipant());
+        MAPPER.writeValue(out, command.cli.registryApiClient.listParticipants());
         out.println();
         return 0;
     }
