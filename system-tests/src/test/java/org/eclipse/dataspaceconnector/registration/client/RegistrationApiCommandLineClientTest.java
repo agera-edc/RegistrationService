@@ -43,7 +43,6 @@ public class RegistrationApiCommandLineClientTest {
 
     @BeforeAll
     static void setUpClass() throws Exception {
-        //System.setProperty("did.web.use.https", "false");
         privateKeyFile = Files.createTempFile("test", ".pem");
         privateKeyFile.toFile().deleteOnExit();
         Files.writeString(privateKeyFile, TestKeyData.PRIVATE_KEY_P256);
