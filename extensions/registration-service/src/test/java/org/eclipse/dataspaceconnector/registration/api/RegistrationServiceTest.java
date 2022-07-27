@@ -20,6 +20,7 @@ import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.dto.ParticipantDto;
 import org.eclipse.dataspaceconnector.registration.authority.dto.ParticipantStatusDto;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
+import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,9 +30,13 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipant;
+import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipantDto;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 import static org.eclipse.dataspaceconnector.spi.result.Result.success;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,6 +50,7 @@ class RegistrationServiceTest {
     RegistrationService service = new RegistrationService(monitor, participantStore, registry);
 
     Participant.Builder participantBuilder = createParticipant();
+    ParticipantDto.Builder participantDtoBuilder = createParticipantDto();
     String did = FAKER.internet().url();
     String idsUrl = FAKER.internet().url();
 
@@ -56,7 +62,7 @@ class RegistrationServiceTest {
     @Test
     void listParticipants() {
         var participant = participantBuilder.build();
-        var participantDto = participantDto();
+        var participantDto = participantDtoBuilder.build();
         when(participantStore.listParticipants()).thenReturn(List.of(participant));
         when(registry.transform(participant, ParticipantDto.class))
                 .thenReturn(success(participantDto));
@@ -65,7 +71,8 @@ class RegistrationServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result).containsExactly(participantDto);
-
+        verify(participantStore).listParticipants();
+        verify(registry).transform(eq(participant), eq(ParticipantDto.class));
     }
 
     @Test
@@ -91,18 +98,11 @@ class RegistrationServiceTest {
         when(participantStore.findByDid(participant.getDid()))
                 .thenReturn(Optional.empty());
 
-        assertThat(service.findByDid(participant.getDid())).isNull();
+        assertThatThrownBy(() ->
+                service.findByDid(participant.getDid())
+        ).isInstanceOf(ObjectNotFoundException.class);
+
         verify(participantStore).findByDid(participant.getDid());
     }
 
-    private ParticipantDto participantDto() {
-        return ParticipantDto.Builder.newInstance()
-                .name(FAKER.lorem().characters())
-                .url(FAKER.internet().url())
-                .did(format("did:web:%s", FAKER.internet().domainName()))
-                .status(FAKER.options().option(ParticipantStatusDto.class))
-                .supportedProtocol(FAKER.lorem().word())
-                .build();
-
-    }
 }
