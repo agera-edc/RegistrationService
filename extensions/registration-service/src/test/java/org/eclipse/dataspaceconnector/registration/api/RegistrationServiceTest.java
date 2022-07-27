@@ -133,6 +133,22 @@ class RegistrationServiceTest {
     }
 
     @Test
+    void findByDid_dtoTransformerFailure_notFound() {
+        var participant = participantBuilder.build();
+        when(participantStore.findByDid(participant.getDid()))
+                .thenReturn(Optional.of(participant));
+        when(dtoTransformerRegistry.transform(participant, ParticipantDto.class))
+                .thenReturn(failure("dummy-failure-from-test"));
+
+        assertThatThrownBy(() ->
+                service.findByDid(participant.getDid())
+        ).isInstanceOf(ObjectNotFoundException.class);
+
+        verify(participantStore).findByDid(participant.getDid());
+        verify(dtoTransformerRegistry).transform(participant, ParticipantDto.class);
+    }
+
+    @Test
     void findByDid_notFound() {
         var participant = participantBuilder.build();
         when(participantStore.findByDid(participant.getDid()))
