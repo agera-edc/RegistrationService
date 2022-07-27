@@ -61,4 +61,15 @@ class InMemoryParticipantStoreTest {
         store.save(participant03);
         assertThat(store.listParticipantsWithStatus(AUTHORIZED)).containsOnly(participant01, participant03);
     }
+
+    @Test
+    void saveAndFindByDID() {
+        assertThat(store.findByDid(participant1.getDid())).isEmpty();
+
+        store.save(participant1);
+
+        var participantOptional = store.findByDid(participant1.getDid());
+        assertThat(participantOptional).isNotEmpty();
+        assertThat(participantOptional.get()).isEqualTo(participant1);
+    }
 }

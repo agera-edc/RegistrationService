@@ -14,13 +14,16 @@
 
 package org.eclipse.dataspaceconnector.registration.api;
 
+import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
+import org.eclipse.dataspaceconnector.registration.dto.ParticipantDto;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
+import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.dataspaceconnector.spi.result.Result;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
@@ -32,25 +35,43 @@ public class RegistrationService {
 
     private final Monitor monitor;
     private final ParticipantStore participantStore;
+    private final DtoTransformerRegistry transformerRegistry;
 
-    public RegistrationService(Monitor monitor, ParticipantStore participantStore) {
+    public RegistrationService(Monitor monitor, ParticipantStore participantStore, DtoTransformerRegistry transformerRegistry) {
         this.monitor = monitor;
         this.participantStore = participantStore;
+        this.transformerRegistry = transformerRegistry;
     }
 
-    public @Nullable Participant findByDid(String did) {
+    /**
+     * Find a participant by DID.
+     *
+     * @param did DID of participant.
+     * @return Participant DTO.
+     */
+    public ParticipantDto findByDid(String did) {
         monitor.info(format("Find a participant by DID %s", did));
-        return participantStore.findByDid(did);
+
+        return participantStore.findByDid(did)
+                .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
+                .filter(Result::succeeded)
+                .map(Result::getContent)
+                .orElseThrow(() -> new ObjectNotFoundException(Participant.class, did));
     }
 
     /**
      * Lists all dataspace participants.
      *
-     * @return list of dataspace participants.
+     * @return list of dataspace participants as DTOs.
      */
-    public List<Participant> listParticipants() {
+    public List<ParticipantDto> listParticipants() {
         monitor.info("List all participants of the dataspace.");
-        return new ArrayList<>(participantStore.listParticipants());
+
+        return participantStore.listParticipants().stream()
+                .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
+                .filter(Result::succeeded)
+                .map(Result::getContent)
+                .collect(Collectors.toList());
     }
 
     /**

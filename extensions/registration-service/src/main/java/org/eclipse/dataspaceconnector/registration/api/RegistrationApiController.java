@@ -29,16 +29,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
-import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
-import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.dto.ParticipantDto;
-import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
-import org.eclipse.dataspaceconnector.spi.result.Result;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter.CALLER_DID_HEADER;
 
@@ -58,16 +52,14 @@ public class RegistrationApiController {
     private static final String TEMPORARY_IDS_URL_HEADER = "IdsUrl";
 
     private final RegistrationService service;
-    private final DtoTransformerRegistry transformerRegistry;
 
     /**
      * Constructs an instance of {@link RegistrationApiController}
      *
      * @param service service handling the registration service logic.
      */
-    public RegistrationApiController(RegistrationService service, DtoTransformerRegistry transformerRegistry) {
+    public RegistrationApiController(RegistrationService service) {
         this.service = service;
-        this.transformerRegistry = transformerRegistry;
     }
 
     @GET
@@ -92,12 +84,7 @@ public class RegistrationApiController {
     public ParticipantDto getParticipantStatus(@Context HttpHeaders headers) {
         var issuer = Objects.requireNonNull(headers.getHeaderString(CALLER_DID_HEADER));
 
-        return Optional.of(issuer)
-                .map(s -> service.findByDid(issuer))
-                .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
-                .filter(Result::succeeded)
-                .map(Result::getContent)
-                .orElseThrow(() -> new ObjectNotFoundException(Participant.class, issuer));
+        return service.findByDid(issuer);
     }
 
     @Path("/participants")
@@ -116,12 +103,7 @@ public class RegistrationApiController {
             )
     })
     public List<ParticipantDto> listParticipants() {
-
-        return service.listParticipants().stream()
-                .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
-                .filter(Result::succeeded)
-                .map(Result::getContent)
-                .collect(Collectors.toList());
+        return service.listParticipants();
     }
 
     @Path("/participant")

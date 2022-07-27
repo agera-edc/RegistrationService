@@ -18,6 +18,8 @@ import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.registration.client.models.ParticipantDto;
 import org.eclipse.dataspaceconnector.registration.client.models.ParticipantDto.StatusEnum;
 
+import static java.lang.String.format;
+
 public class TestUtils {
     static final Faker FAKER = new Faker();
 
@@ -28,6 +30,7 @@ public class TestUtils {
         return new ParticipantDto()
                 .name(FAKER.lorem().characters())
                 .url(FAKER.internet().url())
+                .did(format("did:web:%s", FAKER.internet().domainName()))
                 .status(FAKER.options().option(StatusEnum.class))
                 .addSupportedProtocolsItem(FAKER.lorem().word())
                 .addSupportedProtocolsItem(FAKER.lorem().word());
