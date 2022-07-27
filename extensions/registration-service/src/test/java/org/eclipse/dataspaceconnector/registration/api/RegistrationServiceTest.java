@@ -63,27 +63,6 @@ class RegistrationServiceTest {
     }
 
     @Test
-    void listParticipants_verifyResultFilter() {
-        var participant1 = participantBuilder.build();
-        var participant2 = createParticipant().build();
-        var participantDto1 = participantDtoBuilder.build();
-
-        when(participantStore.listParticipants()).thenReturn(List.of(participant1, participant2));
-        when(registry.transform(participant1, ParticipantDto.class))
-                .thenReturn(success(participantDto1));
-        when(registry.transform(participant2, ParticipantDto.class))
-                .thenReturn(failure("dummy-failure-from-test"));
-
-        var result = service.listParticipants();
-
-        assertThat(result).hasSize(1);
-        assertThat(result).containsExactly(participantDto1);
-        verify(participantStore).listParticipants();
-        verify(registry).transform(eq(participant1), eq(ParticipantDto.class));
-        verify(registry).transform(eq(participant2), eq(ParticipantDto.class));
-    }
-
-    @Test
     void listParticipants() {
         var participant = participantBuilder.build();
         var participantDto = participantDtoBuilder.build();
@@ -97,6 +76,29 @@ class RegistrationServiceTest {
         assertThat(result).containsExactly(participantDto);
         verify(participantStore).listParticipants();
         verify(registry).transform(eq(participant), eq(ParticipantDto.class));
+    }
+
+    @Test
+    void listParticipants_verifyResultFilter() {
+        var participant1 = participantBuilder.build();
+        var participant2 = createParticipant().build();
+        var participantDto1 = participantDtoBuilder.build();
+
+        when(participantStore.listParticipants()).thenReturn(List.of(participant1, participant2));
+        // Transform for participant1 returns success.
+        when(registry.transform(participant1, ParticipantDto.class))
+                .thenReturn(success(participantDto1));
+        // Transform for participant2 returns failure.
+        when(registry.transform(participant2, ParticipantDto.class))
+                .thenReturn(failure("dummy-failure-from-test"));
+
+        var result = service.listParticipants();
+
+        assertThat(result).hasSize(1);
+        assertThat(result).containsExactly(participantDto1);
+        verify(participantStore).listParticipants();
+        verify(registry).transform(eq(participant1), eq(ParticipantDto.class));
+        verify(registry).transform(eq(participant2), eq(ParticipantDto.class));
     }
 
     @Test
