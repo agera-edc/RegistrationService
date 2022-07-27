@@ -61,7 +61,7 @@ public class RegistrationServiceCli {
     @CommandLine.Option(names = { "-k", "--private-key" }, required = true, description = "File containing the private key in PEM format")
     Path privateKeyFile;
 
-    @CommandLine.Option(names = "--http-scheme", description = "Flag to create o create DID URLs with http instead of https scheme. Used for testing purposes.")
+    @CommandLine.Option(names = "--http-scheme", description = "Flag to create DID URLs with http instead of https scheme. Used for testing purposes.")
     boolean useHttpScheme;
 
     RegistryApi registryApiClient;
