@@ -19,7 +19,7 @@ paths:
       - Registry
   /registry/participant/status:
     get:
-      description: Gets status of a participant by DID.
+      description: Get status of a participant.
       operationId: getParticipantStatus
       responses:
         "200":
