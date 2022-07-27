@@ -16,9 +16,8 @@ package org.eclipse.dataspaceconnector.registration.api;
 
 import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
-import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.dto.ParticipantDto;
-import org.eclipse.dataspaceconnector.registration.authority.dto.ParticipantStatusDto;
+import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
@@ -28,17 +27,17 @@ import org.mockito.ArgumentCaptor;
 import java.util.List;
 import java.util.Optional;
 
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipant;
 import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipantDto;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
+import static org.eclipse.dataspaceconnector.spi.result.Result.failure;
 import static org.eclipse.dataspaceconnector.spi.result.Result.success;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class RegistrationServiceTest {
@@ -56,7 +55,32 @@ class RegistrationServiceTest {
 
     @Test
     void listParticipants_empty() {
+        when(participantStore.listParticipants()).thenReturn(List.of());
+
         assertThat(service.listParticipants()).isEmpty();
+        verify(participantStore).listParticipants();
+        verifyNoInteractions(registry);
+    }
+
+    @Test
+    void listParticipants_verifyResultFilter() {
+        var participant1 = participantBuilder.build();
+        var participant2 = createParticipant().build();
+        var participantDto1 = participantDtoBuilder.build();
+
+        when(participantStore.listParticipants()).thenReturn(List.of(participant1, participant2));
+        when(registry.transform(participant1, ParticipantDto.class))
+                .thenReturn(success(participantDto1));
+        when(registry.transform(participant2, ParticipantDto.class))
+                .thenReturn(failure("dummy-failure-from-test"));
+
+        var result = service.listParticipants();
+
+        assertThat(result).hasSize(1);
+        assertThat(result).containsExactly(participantDto1);
+        verify(participantStore).listParticipants();
+        verify(registry).transform(eq(participant1), eq(ParticipantDto.class));
+        verify(registry).transform(eq(participant2), eq(ParticipantDto.class));
     }
 
     @Test
