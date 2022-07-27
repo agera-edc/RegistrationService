@@ -8,11 +8,12 @@ import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantSt
 import org.eclipse.dataspaceconnector.spi.transformer.TransformerContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
-import java.util.stream.Stream;
+import java.util.HashMap;
+import java.util.Map;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipant;
 import static org.mockito.Mockito.mock;
@@ -28,13 +29,17 @@ public class ParticipantToParticipantDtoTransformerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("participantStatus")
-    void transform(ParticipantStatus status, ParticipantStatusDto expectedDtoStatus) {
+    @EnumSource(value = ParticipantStatus.class)
+    void transform(ParticipantStatus status) {
         var context = mock(TransformerContext.class);
 
         var participant = createParticipant().status(status).build();
         var participantDto = transformer.transform(participant, context);
+        var expectedDtoStatus = modelToDtoStatusMap().get(status);
 
+        assertThat(expectedDtoStatus)
+                .withFailMessage(format("Status %s not found in modelToDtoStatusMap", status))
+                .isNotNull();
         assertThat(participantDto).isNotNull();
         // ignoring status field as it is mapped to specific status in DTO.
         assertThat(participantDto)
@@ -45,13 +50,18 @@ public class ParticipantToParticipantDtoTransformerTest {
         // comparing dto status
         assertThat(participantDto.getStatus()).isEqualTo(expectedDtoStatus);
     }
-    
-    private static Stream<Arguments> participantStatus() {
-        return Stream.of(
-                Arguments.of(ParticipantStatus.ONBOARDING_INITIATED, ParticipantStatusDto.AUTHORIZING),
-                Arguments.of(ParticipantStatus.AUTHORIZING, ParticipantStatusDto.AUTHORIZING),
-                Arguments.of(ParticipantStatus.AUTHORIZED, ParticipantStatusDto.AUTHORIZED),
-                Arguments.of(ParticipantStatus.DENIED, ParticipantStatusDto.DENIED)
-        );
+
+    /**
+     * Map of ParticipantStatus & ParticipantStatusDto.
+     * It describes what should be DTO status in respect of domain model status.
+     */
+    private Map<ParticipantStatus, ParticipantStatusDto> modelToDtoStatusMap() {
+        var map = new HashMap<ParticipantStatus, ParticipantStatusDto>();
+        map.put(ParticipantStatus.ONBOARDING_INITIATED, ParticipantStatusDto.AUTHORIZING);
+        map.put(ParticipantStatus.AUTHORIZING, ParticipantStatusDto.AUTHORIZING);
+        map.put(ParticipantStatus.AUTHORIZED, ParticipantStatusDto.AUTHORIZED);
+        map.put(ParticipantStatus.DENIED, ParticipantStatusDto.DENIED);
+
+        return map;
     }
 }
