@@ -11,7 +11,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,29 +29,29 @@ public class ParticipantToParticipantDtoTransformerTest {
 
     @ParameterizedTest
     @MethodSource("participantStatus")
-    void transform(ParticipantStatus status) {
+    void transform(ParticipantStatus status, ParticipantStatusDto expectedDtoStatus) {
         var context = mock(TransformerContext.class);
 
         var participant = createParticipant().status(status).build();
         var participantDto = transformer.transform(participant, context);
 
-        // ignoring status filed as it mapped to specific statuses in DTO.
+        assertThat(participantDto).isNotNull();
+        // ignoring status field as it is mapped to specific status in DTO.
         assertThat(participantDto)
                 .usingRecursiveComparison(RecursiveComparisonConfiguration.builder()
                         .withIgnoredFields("status")
                         .build())
                 .isEqualTo(participant);
-
-        assertThat(participantDto.getStatus())
-                .matches(statusDto -> (
-                                Arrays.stream(ParticipantStatusDto.values())
-                                        .filter(val -> val.equals(statusDto)).count() == 1
-                        )
-                );
+        // comparing dto status
+        assertThat(participantDto.getStatus()).isEqualTo(expectedDtoStatus);
     }
-
+    
     private static Stream<Arguments> participantStatus() {
-        return Arrays.stream(ParticipantStatus.values())
-                .map(Arguments::of);
+        return Stream.of(
+                Arguments.of(ParticipantStatus.ONBOARDING_INITIATED, ParticipantStatusDto.AUTHORIZING),
+                Arguments.of(ParticipantStatus.AUTHORIZING, ParticipantStatusDto.AUTHORIZING),
+                Arguments.of(ParticipantStatus.AUTHORIZED, ParticipantStatusDto.AUTHORIZED),
+                Arguments.of(ParticipantStatus.DENIED, ParticipantStatusDto.DENIED)
+        );
     }
 }
