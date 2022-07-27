@@ -34,7 +34,6 @@ import static org.eclipse.dataspaceconnector.registration.TestUtils.createPartic
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 import static org.eclipse.dataspaceconnector.spi.result.Result.failure;
 import static org.eclipse.dataspaceconnector.spi.result.Result.success;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -45,8 +44,8 @@ class RegistrationServiceTest {
 
     Monitor monitor = mock(Monitor.class);
     ParticipantStore participantStore = mock(ParticipantStore.class);
-    DtoTransformerRegistry registry = mock(DtoTransformerRegistry.class);
-    RegistrationService service = new RegistrationService(monitor, participantStore, registry);
+    DtoTransformerRegistry dtoTransformerRegistry = mock(DtoTransformerRegistry.class);
+    RegistrationService service = new RegistrationService(monitor, participantStore, dtoTransformerRegistry);
 
     Participant.Builder participantBuilder = createParticipant();
     ParticipantDto.Builder participantDtoBuilder = createParticipantDto();
@@ -59,7 +58,7 @@ class RegistrationServiceTest {
 
         assertThat(service.listParticipants()).isEmpty();
         verify(participantStore).listParticipants();
-        verifyNoInteractions(registry);
+        verifyNoInteractions(dtoTransformerRegistry);
     }
 
     @Test
@@ -67,7 +66,7 @@ class RegistrationServiceTest {
         var participant = participantBuilder.build();
         var participantDto = participantDtoBuilder.build();
         when(participantStore.listParticipants()).thenReturn(List.of(participant));
-        when(registry.transform(participant, ParticipantDto.class))
+        when(dtoTransformerRegistry.transform(participant, ParticipantDto.class))
                 .thenReturn(success(participantDto));
 
         var result = service.listParticipants();
@@ -75,7 +74,7 @@ class RegistrationServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result).containsExactly(participantDto);
         verify(participantStore).listParticipants();
-        verify(registry).transform(eq(participant), eq(ParticipantDto.class));
+        verify(dtoTransformerRegistry).transform(participant, ParticipantDto.class);
     }
 
     @Test
@@ -86,10 +85,10 @@ class RegistrationServiceTest {
 
         when(participantStore.listParticipants()).thenReturn(List.of(participant1, participant2));
         // Transform for participant1 returns success.
-        when(registry.transform(participant1, ParticipantDto.class))
+        when(dtoTransformerRegistry.transform(participant1, ParticipantDto.class))
                 .thenReturn(success(participantDto1));
         // Transform for participant2 returns failure.
-        when(registry.transform(participant2, ParticipantDto.class))
+        when(dtoTransformerRegistry.transform(participant2, ParticipantDto.class))
                 .thenReturn(failure("dummy-failure-from-test"));
 
         var result = service.listParticipants();
@@ -97,8 +96,8 @@ class RegistrationServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result).containsExactly(participantDto1);
         verify(participantStore).listParticipants();
-        verify(registry).transform(eq(participant1), eq(ParticipantDto.class));
-        verify(registry).transform(eq(participant2), eq(ParticipantDto.class));
+        verify(dtoTransformerRegistry).transform(participant1, ParticipantDto.class);
+        verify(dtoTransformerRegistry).transform(participant2, ParticipantDto.class);
     }
 
     @Test
@@ -119,7 +118,22 @@ class RegistrationServiceTest {
     }
 
     @Test
-    void findByDid_nullResponse() {
+    void findByDid() {
+        var participant = participantBuilder.build();
+        var participantDto = participantDtoBuilder.build();
+        when(participantStore.findByDid(participant.getDid()))
+                .thenReturn(Optional.of(participant));
+        when(dtoTransformerRegistry.transform(participant, ParticipantDto.class))
+                .thenReturn(success(participantDto));
+
+        assertThat(service.findByDid(participant.getDid())).isEqualTo(participantDto);
+
+        verify(participantStore).findByDid(participant.getDid());
+        verify(dtoTransformerRegistry).transform(participant, ParticipantDto.class);
+    }
+
+    @Test
+    void findByDid_notFound() {
         var participant = participantBuilder.build();
         when(participantStore.findByDid(participant.getDid()))
                 .thenReturn(Optional.empty());
@@ -129,6 +143,7 @@ class RegistrationServiceTest {
         ).isInstanceOf(ObjectNotFoundException.class);
 
         verify(participantStore).findByDid(participant.getDid());
+        verifyNoInteractions(dtoTransformerRegistry);
     }
 
 }
