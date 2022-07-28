@@ -63,7 +63,7 @@ class InMemoryParticipantStoreTest {
     }
 
     @Test
-    void saveAndFindByDID() {
+    void saveAndFindByDid() {
         assertThat(store.findByDid(participant1.getDid())).isNull();
 
         store.save(participant1);
