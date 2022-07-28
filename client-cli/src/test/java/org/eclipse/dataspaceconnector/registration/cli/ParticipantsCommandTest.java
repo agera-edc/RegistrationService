@@ -154,8 +154,6 @@ class ParticipantsCommandTest {
     }
 
     private int executeParticipantsAdd(String inputCmd, String inputValue) {
-    void status() throws Exception {
-        when(app.registryApiClient.getParticipantStatus())
         return cmd.execute(
                 "-c", clientDid,
                 "-k", privateKeyFile.toString(),
