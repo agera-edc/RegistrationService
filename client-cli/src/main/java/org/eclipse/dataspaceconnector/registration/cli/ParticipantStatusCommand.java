@@ -16,6 +16,7 @@ package org.eclipse.dataspaceconnector.registration.cli;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.eclipse.dataspaceconnector.registration.client.ApiException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParentCommand;
@@ -37,9 +38,14 @@ class ParticipantStatusCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        var out = spec.commandLine().getOut();
-        MAPPER.writeValue(out, command.cli.registryApiClient.getParticipantStatus());
-        out.println();
-        return 0;
+        try {
+            var out = spec.commandLine().getOut();
+            var response = command.cli.registryApiClient.getParticipantStatus();
+            MAPPER.writeValue(out, response);
+            out.println();
+            return 0;
+        } catch (ApiException ex) {
+            throw new CliException("Participant Not Found.", ex);
+        }
     }
 }

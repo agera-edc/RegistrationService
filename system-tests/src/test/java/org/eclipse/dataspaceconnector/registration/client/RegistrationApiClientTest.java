@@ -20,8 +20,11 @@ import org.eclipse.dataspaceconnector.registration.client.api.RegistryApi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.CLIENT_DID_WEB;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.UNREGISTERED_CLIENT_DID_WEB;
 
 @IntegrationTest
 public class RegistrationApiClientTest {
@@ -56,7 +59,25 @@ public class RegistrationApiClientTest {
         var response = api.getParticipantStatus();
 
         assertThat(response.getDid()).isEqualTo(CLIENT_DID_WEB);
+        assertThat(response.getUrl()).isEqualTo(participantUrl);
         assertThat(response.getStatus()).isNotNull();
+    }
+
+    @Test
+    void participantStatus_notFound() {
+        //Arrange - Fresh api client with unregistered client DID.
+        var apiClient = ClientUtils.createApiClient(API_URL, UNREGISTERED_CLIENT_DID_WEB, TestKeyData.PRIVATE_KEY_P256);
+        var api = new RegistryApi(apiClient);
+
+        // look for participant which is not yet registered.
+        assertThatThrownBy(api::getParticipantStatus)
+                .isInstanceOf(ApiException.class)
+                .extracting("code", "responseBody")
+                .containsExactly
+                        (
+                                404,
+                                format("[{\"message\":\"Object of type Participant with ID=%s was not found\"}]", UNREGISTERED_CLIENT_DID_WEB)
+                        );
     }
 
 }

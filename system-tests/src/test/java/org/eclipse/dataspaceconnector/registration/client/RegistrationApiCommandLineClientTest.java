@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli;
-import org.eclipse.dataspaceconnector.registration.client.models.Participant;
+import org.eclipse.dataspaceconnector.registration.client.models.ParticipantDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
@@ -33,6 +33,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.CLIENT_DID_WEB;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.DATASPACE_DID_WEB;
+import static org.eclipse.dataspaceconnector.registration.client.TestUtils.UNREGISTERED_CLIENT_DID_WEB;
 
 @IntegrationTest
 public class RegistrationApiCommandLineClientTest {
@@ -54,15 +55,33 @@ public class RegistrationApiCommandLineClientTest {
 
         assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
-        var addCmdExitCode = cmd.execute(
-                "-c", CLIENT_DID_WEB,
-                "-d", DATASPACE_DID_WEB,
-                "-k", privateKeyFile.toString(),
-                "--http-scheme",
-                "participants", "add",
-                "--ids-url", idsUrl);
-        assertThat(addCmdExitCode).isEqualTo(0);
+        addParticipant(cmd);
         assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+    }
+
+    @Test
+    void participantStatus() throws Exception {
+        CommandLine cmd = RegistrationServiceCli.getCommandLine();
+
+        addParticipant(cmd);
+
+        var result = getParticipantStatus(cmd);
+        assertThat(result).isNotNull();
+        assertThat(result.getDid()).isEqualTo(CLIENT_DID_WEB);
+        assertThat(result.getUrl()).isEqualTo(idsUrl);
+        assertThat(result.getStatus()).isNotNull();
+    }
+
+    @Test
+    void participantStatus_notFound() {
+        CommandLine cmd = RegistrationServiceCli.getCommandLine();
+
+        var statusCmdExitCode = cmd.execute(
+                "-c", UNREGISTERED_CLIENT_DID_WEB,
+                "-k", privateKeyFile.toString(),
+                "participants", "status");
+
+        assertThat(statusCmdExitCode).isEqualTo(1);
     }
 
     @Deprecated
@@ -82,7 +101,19 @@ public class RegistrationApiCommandLineClientTest {
         assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
     }
 
-    private List<Participant> getParticipants(CommandLine cmd) throws JsonProcessingException {
+    private void addParticipant(CommandLine cmd) {
+        var addCmdExitCode = cmd.execute(
+                "-c", CLIENT_DID_WEB,
+                "-d", DATASPACE_DID_WEB,
+                "-k", privateKeyFile.toString(),
+                "--http-scheme",
+                "participants", "add",
+                "--ids-url", idsUrl);
+
+        assertThat(addCmdExitCode).isEqualTo(0);
+    }
+
+    private List<ParticipantDto> getParticipants(CommandLine cmd) throws JsonProcessingException {
         var writer = new StringWriter();
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
@@ -94,6 +125,19 @@ public class RegistrationApiCommandLineClientTest {
         var output = writer.toString();
         return MAPPER.readValue(output, new TypeReference<>() {
         });
+    }
 
+    private ParticipantDto getParticipantStatus(CommandLine cmd) throws JsonProcessingException {
+        var writer = new StringWriter();
+        cmd.setOut(new PrintWriter(writer));
+        var statusCmdExitCode = cmd.execute(
+                "-c", CLIENT_DID_WEB,
+                "-k", privateKeyFile.toString(),
+                "participants", "status");
+        assertThat(statusCmdExitCode).isEqualTo(0);
+
+        var output = writer.toString();
+        return MAPPER.readValue(output, new TypeReference<>() {
+        });
     }
 }
