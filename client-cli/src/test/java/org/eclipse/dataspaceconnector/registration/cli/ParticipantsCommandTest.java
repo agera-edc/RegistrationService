@@ -33,7 +33,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspaceconnector.registration.cli.TestUtils.createParticipant;
+import static org.eclipse.dataspaceconnector.registration.cli.TestUtils.createParticipantDto;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,8 +44,8 @@ class ParticipantsCommandTest {
     static final ObjectMapper MAPPER = new ObjectMapper();
     static Path privateKeyFile;
 
-    ParticipantDto participant1 = createParticipant();
-    ParticipantDto participant2 = createParticipant();
+    ParticipantDto participant1 = createParticipantDto();
+    ParticipantDto participant2 = createParticipantDto();
     String serverUrl = FAKER.internet().url();
     String idsUrl = FAKER.internet().url();
     String clientDid = FAKER.internet().url();
@@ -82,6 +82,23 @@ class ParticipantsCommandTest {
     void add() {
         var exitCode = executeParticipantsAdd("-d", dataspaceDid);
         assertAddParticipants(exitCode, dataspaceDid, app.dataspaceDid);
+    }
+
+    @Test
+    void status() throws Exception {
+        when(app.registryApiClient.getParticipantStatus())
+                .thenReturn(participant1);
+
+        var exitCode = executeParticipantStatus();
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(serverUrl).isEqualTo(app.service);
+
+        var parsedResult = MAPPER.readValue(sw.toString(), new TypeReference<ParticipantDto>() {
+        });
+
+        assertThat(parsedResult)
+                .usingRecursiveComparison()
+                .isEqualTo(participant1);
     }
 
     @Deprecated
@@ -125,7 +142,7 @@ class ParticipantsCommandTest {
         verify(app.registryApiClient).addParticipant(idsUrl);
     }
 
-    private void assertListParticipants(List<Participant> participants, int exitCode, String value, String expectedValue) throws JsonProcessingException {
+    private void assertListParticipants(List<ParticipantDto> participants, int exitCode, String value, String expectedValue) throws JsonProcessingException {
         assertThat(exitCode).isEqualTo(0);
         assertThat(expectedValue).isEqualTo(value);
 
@@ -137,33 +154,8 @@ class ParticipantsCommandTest {
     }
 
     private int executeParticipantsAdd(String inputCmd, String inputValue) {
-    @Test
-    void add() {
-        var exitCode = executeParticipantsAdd(idsUrl);
-
-        assertThat(exitCode).isEqualTo(0);
-        assertThat(serverUrl).isEqualTo(app.service);
-        verify(app.registryApiClient).addParticipant(idsUrl);
-    }
-
-    @Test
     void status() throws Exception {
         when(app.registryApiClient.getParticipantStatus())
-                .thenReturn(participant1);
-
-        var exitCode = executeParticipantStatus();
-        assertThat(exitCode).isEqualTo(0);
-        assertThat(serverUrl).isEqualTo(app.service);
-
-        var parsedResult = MAPPER.readValue(sw.toString(), new TypeReference<ParticipantDto>() {
-        });
-
-        assertThat(parsedResult)
-                .usingRecursiveComparison()
-                .isEqualTo(participant1);
-    }
-
-    private int executeParticipantsAdd(String idsUrl) {
         return cmd.execute(
                 "-c", clientDid,
                 "-k", privateKeyFile.toString(),
@@ -182,7 +174,7 @@ class ParticipantsCommandTest {
 
     private int executeParticipantStatus() {
         return cmd.execute(
-                "-d", did,
+                "-c", clientDid,
                 "-k", privateKeyFile.toString(),
                 "-s", serverUrl,
                 "participants", "status");

@@ -26,7 +26,7 @@ public class TestUtils {
     private TestUtils() {
     }
 
-    public static ParticipantDto createParticipant() {
+    public static ParticipantDto createParticipantDto() {
         return new ParticipantDto()
                 .name(FAKER.lorem().characters())
                 .url(FAKER.internet().url())
