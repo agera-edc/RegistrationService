@@ -59,6 +59,24 @@ public class RegistrationApiCommandLineClientTest {
                 "-c", CLIENT_DID_WEB,
                 "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
+                "--http-scheme",
+                "participants", "add",
+                "--ids-url", idsUrl);
+        assertThat(addCmdExitCode).isEqualTo(0);
+        assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+    }
+
+    @Deprecated
+    @Test
+    void listParticipants_usingServiceUrl() throws Exception {
+        CommandLine cmd = RegistrationServiceCli.getCommandLine();
+
+        assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+
+        var addCmdExitCode = cmd.execute(
+                "-c", CLIENT_DID_WEB,
+                "-k", privateKeyFile.toString(),
+                "--http-scheme",
                 "participants", "add",
                 "--ids-url", idsUrl);
         assertThat(addCmdExitCode).isEqualTo(0);

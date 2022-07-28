@@ -29,8 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Boolean.parseBoolean;
-import static org.eclipse.dataspaceconnector.common.configuration.ConfigurationFunctions.propOrEnv;
 import static org.eclipse.dataspaceconnector.registration.cli.ClientUtils.createApiClient;
 
 @Command(name = "registration-service-cli", mixinStandardHelpOptions = true,
@@ -41,22 +39,26 @@ import static org.eclipse.dataspaceconnector.registration.cli.ClientUtils.create
 public class RegistrationServiceCli {
 
     private static final ObjectMapper MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    private static final String USE_HTTPS_SCHEME = "did.web.use.https";
 
     @Deprecated
     @CommandLine.Option(names = "-s", description = "Registration service URL. Deprecated. Use -d instead.", defaultValue = "http://localhost:8182/authority")
     String service;
 
-    @CommandLine.Option(names = { "-d", "--dataspace-did"}, required = false, description = "Dataspace Authority DID.", defaultValue = "")
+    @CommandLine.Option(names = { "-d", "--dataspace-did" }, description = "Dataspace Authority DID.", defaultValue = "")
     String dataspaceDid;
 
-    @CommandLine.Option(names = { "-c", "--client-did"}, required = true, description = "Client DID.")
+    @CommandLine.Option(names = { "-c", "--client-did" }, required = true, description = "Client DID.")
     String clientDid;
 
-    @CommandLine.Option(names = "-k", required = true, description = "File containing the private key in PEM format")
+    @CommandLine.Option(names = { "-k", "--private-key" }, required = true, description = "File containing the private key in PEM format")
     Path privateKeyFile;
 
+    @CommandLine.Option(names = "--http-scheme", description = "Flag to create DID URLs with http instead of https scheme. Used for testing purposes.")
+    boolean useHttpScheme;
+
     RegistryApi registryApiClient;
+
+    private final ConsoleMonitor monitor = new ConsoleMonitor();
 
     public static void main(String... args) {
         CommandLine commandLine = getCommandLine();
@@ -83,7 +85,7 @@ public class RegistrationServiceCli {
             throw new RuntimeException("Error reading file " + privateKeyFile, e);
         }
 
-        // temporary to preserve the backwards compatibility
+        // TODO: temporary to preserve the backwards compatibility (https://github.com/agera-edc/MinimumViableDataspace/issues/174)
         if (dataspaceDid.isEmpty()) {
             var apiClient = createApiClient(service, clientDid, privateKeyData);
             this.registryApiClient = new RegistryApi(apiClient);
@@ -94,9 +96,13 @@ public class RegistrationServiceCli {
     }
 
     private String registrationUrl() {
-        var didWebResolver = new WebDidResolver(httpClient(), useHttpsScheme(), MAPPER, new ConsoleMonitor());
+        var didWebResolver = new WebDidResolver(httpClient(), !useHttpScheme, MAPPER, monitor);
         var urlResolver = new RegistrationUrlResolver(didWebResolver);
-        return urlResolver.resolveUrl(dataspaceDid).orElseThrow(() -> new CliException("Error resolving the registration url."));
+        var url = urlResolver.resolveUrl(dataspaceDid);
+        if (url.failed()) {
+            throw new CliException("Error resolving the registration url.");
+        }
+        return url.getContent();
     }
 
     @NotNull
@@ -105,9 +111,5 @@ public class RegistrationServiceCli {
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
-    }
-
-    private boolean useHttpsScheme() {
-        return parseBoolean(propOrEnv(USE_HTTPS_SCHEME, "true"));
     }
 }
