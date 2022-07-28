@@ -64,12 +64,11 @@ class InMemoryParticipantStoreTest {
 
     @Test
     void saveAndFindByDID() {
-        assertThat(store.findByDid(participant1.getDid())).isEmpty();
+        assertThat(store.findByDid(participant1.getDid())).isNull();
 
         store.save(participant1);
 
         var participantOptional = store.findByDid(participant1.getDid());
-        assertThat(participantOptional).isNotEmpty();
-        assertThat(participantOptional.get()).isEqualTo(participant1);
+        assertThat(participantOptional).isEqualTo(participant1);
     }
 }

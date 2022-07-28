@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -122,7 +121,7 @@ class RegistrationServiceTest {
         var participant = participantBuilder.build();
         var participantDto = participantDtoBuilder.build();
         when(participantStore.findByDid(participant.getDid()))
-                .thenReturn(Optional.of(participant));
+                .thenReturn(participant);
         when(dtoTransformerRegistry.transform(participant, ParticipantDto.class))
                 .thenReturn(success(participantDto));
 
@@ -136,7 +135,7 @@ class RegistrationServiceTest {
     void findByDid_dtoTransformerFailure_notFound() {
         var participant = participantBuilder.build();
         when(participantStore.findByDid(participant.getDid()))
-                .thenReturn(Optional.of(participant));
+                .thenReturn(participant);
         when(dtoTransformerRegistry.transform(participant, ParticipantDto.class))
                 .thenReturn(failure("dummy-failure-from-test"));
 
@@ -152,7 +151,7 @@ class RegistrationServiceTest {
     void findByDid_notFound() {
         var participant = participantBuilder.build();
         when(participantStore.findByDid(participant.getDid()))
-                .thenReturn(Optional.empty());
+                .thenReturn(null);
 
         assertThatThrownBy(() ->
                 service.findByDid(participant.getDid())

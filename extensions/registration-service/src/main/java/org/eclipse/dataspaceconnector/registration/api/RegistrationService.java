@@ -23,6 +23,7 @@ import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -52,7 +53,7 @@ public class RegistrationService {
     public ParticipantDto findByDid(String did) {
         monitor.info(format("Find a participant by DID %s", did));
 
-        return participantStore.findByDid(did)
+        return Optional.ofNullable(participantStore.findByDid(did))
                 .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
                 .filter(Result::succeeded)
                 .map(Result::getContent)
