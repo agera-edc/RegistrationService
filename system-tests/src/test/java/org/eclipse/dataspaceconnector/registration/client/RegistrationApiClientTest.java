@@ -48,4 +48,15 @@ public class RegistrationApiClientTest {
         assertThat(api.listParticipants())
                 .anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
     }
+
+    @Test
+    void participantStatus() {
+        api.addParticipant(participantUrl);
+
+        var response = api.getParticipantStatus();
+
+        assertThat(response.getDid()).isEqualTo(CLIENT_DID_WEB);
+        assertThat(response.getStatus()).isNotNull();
+    }
+
 }
