@@ -73,11 +73,10 @@ public class RegistrationApiClientTest {
         assertThatThrownBy(api::getParticipantStatus)
                 .isInstanceOf(ApiException.class)
                 .extracting("code", "responseBody")
-                .containsExactly
-                        (
-                                404,
-                                format("[{\"message\":\"Object of type Participant with ID=%s was not found\"}]", UNREGISTERED_CLIENT_DID_WEB)
-                        );
+                .containsExactly(
+                        404,
+                        format("[{\"message\":\"Object of type Participant with ID=%s was not found\"}]", UNREGISTERED_CLIENT_DID_WEB)
+                );
     }
 
 }
