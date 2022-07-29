@@ -31,7 +31,7 @@ class AddParticipantCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        command.cli.registryApiClient.addParticipant(idsUrl);
+        command.cli.registryApiClient.addParticipant(command.cli.clientDid);
 
         return 0;
     }

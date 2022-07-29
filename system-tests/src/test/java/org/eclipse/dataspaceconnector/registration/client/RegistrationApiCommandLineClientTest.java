@@ -43,12 +43,14 @@ public class RegistrationApiCommandLineClientTest {
 
     @BeforeAll
     static void setUpClass() throws Exception {
-        System.setProperty("did.web.use.https", "false");
         privateKeyFile = Files.createTempFile("test", ".pem");
         privateKeyFile.toFile().deleteOnExit();
         Files.writeString(privateKeyFile, TestKeyData.PRIVATE_KEY_P256);
     }
 
+    /*
+    Until there's no way to remove the data from the store this test will be successful only in the first run.
+     */
     @Test
     void listParticipants() throws Exception {
         CommandLine cmd = new RegistrationServiceCli().getCommandLine();
@@ -60,39 +62,6 @@ public class RegistrationApiCommandLineClientTest {
                 "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "--http-scheme",
-                "participants", "add",
-                "--ids-url", idsUrl);
-        assertThat(addCmdExitCode).isEqualTo(0);
-        assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
-    }
-
-    @Deprecated
-    @Test
-    void listParticipants_usingServiceUrl() throws Exception {
-        CommandLine cmd = RegistrationServiceCli.getCommandLine();
-
-        assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
-
-        var addCmdExitCode = cmd.execute(
-                "-c", CLIENT_DID_WEB,
-                "-k", privateKeyFile.toString(),
-                "--http-scheme",
-                "participants", "add",
-                "--ids-url", idsUrl);
-        assertThat(addCmdExitCode).isEqualTo(0);
-        assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getDid()).isEqualTo(CLIENT_DID_WEB));
-    }
-
-    @Deprecated
-    @Test
-    void listParticipants_usingServiceUrl() throws Exception {
-        CommandLine cmd = new RegistrationServiceCli().getCommandLine();
-
-        assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getDid()).isEqualTo(CLIENT_DID_WEB));
-
-        var addCmdExitCode = cmd.execute(
-                "-c", CLIENT_DID_WEB,
-                "-k", privateKeyFile.toString(),
                 "participants", "add",
                 "--ids-url", idsUrl);
         assertThat(addCmdExitCode).isEqualTo(0);
