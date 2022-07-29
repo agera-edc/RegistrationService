@@ -14,8 +14,6 @@
 
 package org.eclipse.dataspaceconnector.registration.cli;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.eclipse.dataspaceconnector.registration.client.ApiException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -24,11 +22,10 @@ import picocli.CommandLine.Spec;
 
 import java.util.concurrent.Callable;
 
+import static org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli.MAPPER;
+
 @Command(name = "status", description = "Get participant status")
 class ParticipantStatusCommand implements Callable<Integer> {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT);
 
     @ParentCommand
     private ParticipantsCommand command;

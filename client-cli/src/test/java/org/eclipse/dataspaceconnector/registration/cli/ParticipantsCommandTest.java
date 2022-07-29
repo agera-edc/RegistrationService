@@ -174,7 +174,7 @@ class ParticipantsCommandTest {
         return cmd.execute(
                 "-c", clientDid,
                 "-k", privateKeyFile.toString(),
-                "-s", serverUrl,
+                "-d", dataspaceDid,
                 "participants", "status");
     }
 }
