@@ -51,7 +51,8 @@ public class ParticipantToParticipantDtoTransformer implements DtoTransformer<Pa
 
     /**
      * Map domain model ParticipantStatus to DTO. This mapping is done to prevent leak of internal status.
-     * DTO only exposes AUTHORIZING, AUTHORIZED and DENIED statues.
+     * DTO only exposes {@link ParticipantStatusDto#AUTHORIZING}, {@link ParticipantStatusDto#AUTHORIZED}
+     * and {@link ParticipantStatusDto#DENIED} statues.
      *
      * @param status {@link ParticipantStatus}
      * @return {@link ParticipantStatusDto}
