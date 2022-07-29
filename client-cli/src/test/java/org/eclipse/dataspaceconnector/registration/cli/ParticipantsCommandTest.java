@@ -91,7 +91,6 @@ class ParticipantsCommandTest {
 
         var exitCode = executeParticipantStatus();
         assertThat(exitCode).isEqualTo(0);
-        assertThat(serverUrl).isEqualTo(app.service);
 
         var parsedResult = MAPPER.readValue(sw.toString(), new TypeReference<ParticipantDto>() {
         });

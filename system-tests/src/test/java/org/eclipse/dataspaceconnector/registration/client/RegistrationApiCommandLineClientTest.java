@@ -78,7 +78,9 @@ public class RegistrationApiCommandLineClientTest {
 
         var statusCmdExitCode = cmd.execute(
                 "-c", UNREGISTERED_CLIENT_DID_WEB,
+                "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
+                "--http-scheme",
                 "participants", "status");
 
         assertThat(statusCmdExitCode).isEqualTo(1);
@@ -118,7 +120,9 @@ public class RegistrationApiCommandLineClientTest {
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
                 "-c", CLIENT_DID_WEB,
+                "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
+                "--http-scheme",
                 "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);
 
@@ -132,7 +136,9 @@ public class RegistrationApiCommandLineClientTest {
         cmd.setOut(new PrintWriter(writer));
         var statusCmdExitCode = cmd.execute(
                 "-c", CLIENT_DID_WEB,
+                "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
+                "--http-scheme",
                 "participants", "status");
         assertThat(statusCmdExitCode).isEqualTo(0);
 
