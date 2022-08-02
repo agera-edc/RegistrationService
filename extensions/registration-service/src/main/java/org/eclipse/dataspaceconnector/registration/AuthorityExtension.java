@@ -21,6 +21,8 @@ import org.eclipse.dataspaceconnector.registration.api.RegistrationService;
 import org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter;
 import org.eclipse.dataspaceconnector.registration.authority.DummyCredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
+import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
+import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialServiceImpl;
 import org.eclipse.dataspaceconnector.registration.manager.ParticipantManager;
 import org.eclipse.dataspaceconnector.registration.store.InMemoryParticipantStore;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
@@ -67,6 +69,9 @@ public class AuthorityExtension implements ServiceExtension {
     @Inject
     private ExecutorInstrumentation executorInstrumentation;
 
+    @Inject
+    private VerifiableCredentialService verifiableCredentialService;
+
     private ParticipantManager participantManager;
 
     @Override
@@ -76,7 +81,7 @@ public class AuthorityExtension implements ServiceExtension {
         var errorResponseVerbose = context.getSetting(ERROR_RESPONSE_VERBOSE_SETTING, false);
         var authenticationService = new DidJwtAuthenticationFilter(monitor, didPublicKeyResolver, audience);
 
-        participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation);
+        participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation, verifiableCredentialService);
 
         var registrationService = new RegistrationService(monitor, participantStore);
         webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
@@ -103,5 +108,10 @@ public class AuthorityExtension implements ServiceExtension {
     @Provider(isDefault = true)
     public CredentialsVerifier credentialsVerifier() {
         return new DummyCredentialsVerifier();
+    }
+
+    @Provider(isDefault = true)
+    public VerifiableCredentialService verifiableCredentialService() {
+        return new VerifiableCredentialServiceImpl();
     }
 }

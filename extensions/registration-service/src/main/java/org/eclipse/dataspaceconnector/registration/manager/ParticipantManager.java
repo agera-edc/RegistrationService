@@ -19,6 +19,7 @@ import org.eclipse.dataspaceconnector.common.statemachine.StateProcessorImpl;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
+import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.retry.WaitStrategy;
@@ -35,15 +36,15 @@ import static org.eclipse.dataspaceconnector.registration.authority.model.Partic
  */
 public class ParticipantManager {
 
-    private final Monitor monitor;
     private final ParticipantStore participantStore;
     private final CredentialsVerifier credentialsVerifier;
     private final StateMachineManager stateMachineManager;
+    private final VerifiableCredentialService verifiableCredentialService;
 
-    public ParticipantManager(Monitor monitor, ParticipantStore participantStore, CredentialsVerifier credentialsVerifier, ExecutorInstrumentation executorInstrumentation) {
-        this.monitor = monitor;
+    public ParticipantManager(Monitor monitor, ParticipantStore participantStore, CredentialsVerifier credentialsVerifier, ExecutorInstrumentation executorInstrumentation, VerifiableCredentialService verifiableCredentialService) {
         this.participantStore = participantStore;
         this.credentialsVerifier = credentialsVerifier;
+        this.verifiableCredentialService = verifiableCredentialService;
 
         // default wait five seconds
         WaitStrategy waitStrategy = () -> 5000L;
@@ -89,6 +90,7 @@ public class ParticipantManager {
 
     private Boolean processAuthorized(Participant participant) {
         participant.transitionOnboarded();
+        verifiableCredentialService.generateVerifiableCredential(participant);
         participantStore.save(participant);
         return true;
     }
