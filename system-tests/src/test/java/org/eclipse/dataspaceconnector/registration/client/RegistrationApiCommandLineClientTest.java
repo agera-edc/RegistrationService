@@ -81,7 +81,7 @@ public class RegistrationApiCommandLineClientTest {
                 "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "--http-scheme",
-                "participants", "status");
+                "participants", "get");
 
         assertThat(statusCmdExitCode).isEqualTo(1);
     }
@@ -143,7 +143,6 @@ public class RegistrationApiCommandLineClientTest {
         assertThat(statusCmdExitCode).isEqualTo(0);
 
         var output = writer.toString();
-        return MAPPER.readValue(output, new TypeReference<>() {
-        });
+        return MAPPER.readValue(output, ParticipantDto.class);
     }
 }
