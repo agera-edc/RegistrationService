@@ -45,10 +45,10 @@ public class ParticipantToParticipantDtoTransformerTest {
     @EnumSource(value = ParticipantStatus.class)
     void transform(ParticipantStatus status) {
         var context = mock(TransformerContext.class);
-
         var participant = createParticipant().status(status).build();
-        var participantDto = transformer.transform(participant, context);
         var expectedDtoStatus = modelToDtoStatusMap().get(status);
+        
+        var participantDto = transformer.transform(participant, context);
 
         assertThat(expectedDtoStatus)
                 .withFailMessage(format("Status %s not found in modelToDtoStatusMap", status))
