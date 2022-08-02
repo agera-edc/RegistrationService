@@ -15,7 +15,7 @@
 package org.eclipse.dataspaceconnector.registration.authority.dto;
 
 /**
- * Participant onboarding status. Only expose a handful of statuses to avoid leaking internal model state.
+ * Participant onboarding status. Some internal statuses are mapping to more general statuses, to avoid leaking details about the registration process.
  */
 public enum ParticipantStatusDto {
     AUTHORIZING, // verifying participants credentials
