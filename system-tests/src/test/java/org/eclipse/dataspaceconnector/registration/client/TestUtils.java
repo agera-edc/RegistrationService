@@ -19,13 +19,13 @@ class TestUtils {
     }
 
     /**
-     * The DID that resolves to the sample DID Document for a client in docker compose (served by the nginx container)
+     * The DID that resolves to the sample DID Document for a client in docker compose (served by the nginx container).
      */
     static final String CLIENT_DID_WEB = "did:web:did-server:test-client";
 
     /**
-     * The DID that resolves to the sample DID Document for a client in docker compose (served by the nginx container)
-     * It represents a client which is not registered in registration service
+     * The DID that resolves to the sample DID Document for a client in docker compose (served by the nginx container).
+     * It represents a client which is not registered in registration service.
      */
     static final String UNREGISTERED_CLIENT_DID_WEB = "did:web:did-server:test-client-unregistered";
 
