@@ -69,16 +69,19 @@ public class ParticipantDto {
             return new Builder();
         }
 
+        @Deprecated
         public Builder supportedProtocol(String supportedProtocol) {
             participantDto.supportedProtocols.add(supportedProtocol);
             return this;
         }
 
+        @Deprecated
         public Builder supportedProtocols(List<String> supportedProtocols) {
             participantDto.supportedProtocols.addAll(supportedProtocols);
             return this;
         }
 
+        @Deprecated
         public Builder url(String url) {
             participantDto.url = url;
             return this;
@@ -89,7 +92,7 @@ public class ParticipantDto {
             return this;
         }
 
-
+        @Deprecated
         public Builder name(String name) {
             participantDto.name = name;
             return this;
@@ -102,6 +105,7 @@ public class ParticipantDto {
 
         public ParticipantDto build() {
             Objects.requireNonNull(participantDto.did, "did");
+            Objects.requireNonNull(participantDto.status, "status");
             return participantDto;
         }
     }

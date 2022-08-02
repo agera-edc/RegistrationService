@@ -141,6 +141,7 @@ public class Participant {
 
         public Participant build() {
             Objects.requireNonNull(participant.did, "did");
+            Objects.requireNonNull(participant.status, "status");
             return participant;
         }
     }

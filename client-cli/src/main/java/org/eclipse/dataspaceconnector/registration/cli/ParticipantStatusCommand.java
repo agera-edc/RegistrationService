@@ -42,7 +42,7 @@ class ParticipantStatusCommand implements Callable<Integer> {
             out.println();
             return 0;
         } catch (ApiException ex) {
-            throw new CliException("Participant Not Found.", ex);
+            throw new CliException("Error occurred.", ex);
         }
     }
 }

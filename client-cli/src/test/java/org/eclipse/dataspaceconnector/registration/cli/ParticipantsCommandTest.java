@@ -92,8 +92,7 @@ class ParticipantsCommandTest {
         var exitCode = executeParticipantStatus();
         assertThat(exitCode).isEqualTo(0);
 
-        var parsedResult = MAPPER.readValue(sw.toString(), new TypeReference<ParticipantDto>() {
-        });
+        var parsedResult = MAPPER.readValue(sw.toString(), ParticipantDto.class);
 
         assertThat(parsedResult)
                 .usingRecursiveComparison()
