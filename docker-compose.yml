@@ -8,10 +8,16 @@ services:
         JVM_ARGS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     environment:
       JWT_AUDIENCE: http://localhost:8182/authority
+      EDC_CONNECTOR_NAME: registration-service
+      EDC_VAULT: /resources/vault/registration-service-vault.properties
+      EDC_KEYSTORE: /resources/vault/registration-service-keystore.jks
+      EDC_KEYSTORE_PASSWORD: test123
       EDC_IAM_DID_WEB_USE_HTTPS: "false"
       EDC_ERROR_RESPONSE_VERBOSE: "true"
       WEB_HTTP_AUTHORITY_PORT: 8182
       WEB_HTTP_AUTHORITY_PATH: /authority
+    volumes:
+      - ./resources/vault:/resources/vault
     ports:
       - "8182:8182"
       - "5005:5005"
