@@ -67,7 +67,7 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
         var did = participant.getDid();
         var didDocument = resolverRegistry.resolve(did);
         if (didDocument.failed()) {
-            throw new EdcException("Failed to resolve DID " + did);
+            throw new EdcException("Failed to resolve DID " + did + ". " + didDocument.getFailureDetail());
         }
         var hubBaseUrl = getIdentityHubBaseUrl(didDocument.getContent());
         if (hubBaseUrl.failed()) {
@@ -76,8 +76,10 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
 
         var addVcResult = identityHubClient.addVerifiableCredential(hubBaseUrl.getContent(), jwt);
         if (addVcResult.failed()) {
-            throw new EdcException("Failed to resolve DID");
+            throw new EdcException("Failed to send VC. " + addVcResult.getFailureDetail());
         }
+
+        monitor.info("Sent dataspace membership VC for " + subject);
     }
 
     private Result<String> getIdentityHubBaseUrl(DidDocument didDocument) {

@@ -22,6 +22,7 @@ services:
     ports:
       - "8182:8182"
       - "5005:5005"
+
   did-server:
     container_name: did-server
     image: nginx
@@ -29,3 +30,14 @@ services:
      - ./resources/webdid:/usr/share/nginx/html
     ports:
      - "8080:80"
+
+  # Dataspace participant with identity-hub
+  participant:
+    container_name: participant
+    build:
+      context: system-tests/launcher
+      args:
+        JVM_ARGS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007"
+    ports:
+      - "8181:8181"
+      - "5007:5007"
