@@ -108,16 +108,19 @@ public class Participant {
             return new Builder();
         }
 
+        @Deprecated
         public Builder supportedProtocol(String supportedProtocol) {
             participant.supportedProtocols.add(supportedProtocol);
             return this;
         }
 
+        @Deprecated
         public Builder supportedProtocols(List<String> supportedProtocols) {
             participant.supportedProtocols.addAll(supportedProtocols);
             return this;
         }
 
+        @Deprecated
         public Builder url(String url) {
             participant.url = url;
             return this;
@@ -128,7 +131,7 @@ public class Participant {
             return this;
         }
 
-
+        @Deprecated
         public Builder name(String name) {
             participant.name = name;
             return this;
