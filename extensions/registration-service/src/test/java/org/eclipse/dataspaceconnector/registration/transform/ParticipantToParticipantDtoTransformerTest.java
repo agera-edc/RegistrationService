@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.String.format;
@@ -70,12 +69,11 @@ public class ParticipantToParticipantDtoTransformerTest {
      * It describes what should be DTO status in respect of domain model status.
      */
     private Map<ParticipantStatus, ParticipantStatusDto> modelToDtoStatusMap() {
-        var map = new HashMap<ParticipantStatus, ParticipantStatusDto>();
-        map.put(ParticipantStatus.ONBOARDING_INITIATED, ParticipantStatusDto.AUTHORIZING);
-        map.put(ParticipantStatus.AUTHORIZING, ParticipantStatusDto.AUTHORIZING);
-        map.put(ParticipantStatus.AUTHORIZED, ParticipantStatusDto.AUTHORIZED);
-        map.put(ParticipantStatus.DENIED, ParticipantStatusDto.DENIED);
-
-        return map;
+        return Map.of(
+                ParticipantStatus.ONBOARDING_INITIATED, ParticipantStatusDto.AUTHORIZING,
+                ParticipantStatus.AUTHORIZING, ParticipantStatusDto.AUTHORIZING,
+                ParticipantStatus.AUTHORIZED, ParticipantStatusDto.AUTHORIZED,
+                ParticipantStatus.DENIED, ParticipantStatusDto.DENIED
+        );
     }
 }
