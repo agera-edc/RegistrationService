@@ -53,7 +53,6 @@ public class ParticipantToParticipantDtoTransformerTest {
         assertThat(expectedDtoStatus)
                 .withFailMessage(format("Status %s not found in modelToDtoStatusMap", status))
                 .isNotNull();
-        assertThat(participantDto).isNotNull();
         // ignoring status field as it is mapped to specific status in DTO.
         assertThat(participantDto)
                 .usingRecursiveComparison(RecursiveComparisonConfiguration.builder()
