@@ -68,7 +68,7 @@ class InMemoryParticipantStoreTest {
 
         store.save(participant1);
 
-        var participantOptional = store.findByDid(participant1.getDid());
-        assertThat(participantOptional).isEqualTo(participant1);
+        var participant = store.findByDid(participant1.getDid());
+        assertThat(participant).isEqualTo(participant1);
     }
 }
