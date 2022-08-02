@@ -14,7 +14,6 @@
 
 package org.eclipse.dataspaceconnector.registration.store;
 
-import org.eclipse.dataspaceconnector.registration.TestUtils;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +30,12 @@ class InMemoryParticipantStoreTest {
     Participant participant2 = createParticipant().build();
 
     @Test
-    void saveAndListParticipants() {
+    void listParticipants_empty() {
         assertThat(store.listParticipants()).isEmpty();
+    }
 
+    @Test
+    void saveAndListParticipants() {
         store.save(participant1);
         assertThat(store.listParticipants()).containsOnly(participant1);
     }
@@ -64,9 +66,12 @@ class InMemoryParticipantStoreTest {
     }
 
     @Test
-    void saveAndFindByDid() {
+    void findByDid_null() {
         assertThat(store.findByDid(participant1.getDid())).isNull();
+    }
 
+    @Test
+    void saveAndFindByDid() {
         store.save(participant1);
 
         var participant = store.findByDid(participant1.getDid());
