@@ -26,6 +26,7 @@ import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 
 import java.util.function.Function;
 
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZED;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 
@@ -51,6 +52,7 @@ public class ParticipantManager {
         stateMachineManager = StateMachineManager.Builder.newInstance("registration-service", monitor, executorInstrumentation, waitStrategy)
                 .processor(processParticipantsInState(ONBOARDING_INITIATED, this::processOnboardingInitiated))
                 .processor(processParticipantsInState(AUTHORIZING, this::processAuthorizing))
+                .processor(processParticipantsInState(AUTHORIZED, this::processAuthorized))
                 .build();
     }
 
@@ -81,6 +83,12 @@ public class ParticipantManager {
         } else {
             participant.transitionDenied();
         }
+        participantStore.save(participant);
+        return true;
+    }
+
+    private Boolean processAuthorized(Participant participant) {
+        participant.transitionOnboarded();
         participantStore.save(participant);
         return true;
     }
