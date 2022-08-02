@@ -2,6 +2,8 @@ services:
 
   registration-service:
     container_name: registration-service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build:
       context: launcher
       args:

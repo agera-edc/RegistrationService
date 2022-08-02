@@ -26,9 +26,6 @@ class AddParticipantCommand implements Callable<Integer> {
     @ParentCommand
     private ParticipantsCommand command;
 
-    @CommandLine.Option(names = "--ids-url", required = true, description = "Participant IDS URL")
-    private String idsUrl;
-
     @Override
     public Integer call() {
         command.cli.registryApiClient.addParticipant(command.cli.clientDid);
