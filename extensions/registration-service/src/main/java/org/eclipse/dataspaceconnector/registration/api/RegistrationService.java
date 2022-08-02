@@ -15,18 +15,19 @@
 package org.eclipse.dataspaceconnector.registration.api;
 
 import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
-import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantDto;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
+import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantDto;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
+import org.eclipse.dataspaceconnector.spi.EdcException;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.lang.String.join;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 
 /**
@@ -53,11 +54,15 @@ public class RegistrationService {
     public ParticipantDto findByDid(String did) {
         monitor.info(format("Find a participant by DID %s", did));
 
-        return Optional.ofNullable(participantStore.findByDid(did))
-                .map(participant -> transformerRegistry.transform(participant, ParticipantDto.class))
-                .filter(Result::succeeded)
-                .map(Result::getContent)
-                .orElseThrow(() -> new ObjectNotFoundException(Participant.class, did));
+        var participant = participantStore.findByDid(did);
+        if (participant == null) {
+            throw new ObjectNotFoundException(Participant.class, did);
+        }
+        var result = transformerRegistry.transform(participant, ParticipantDto.class);
+        if (result.failed()) {
+            throw new EdcException(join(",", result.getFailure().getMessages()));
+        }
+        return result.getContent();
     }
 
     /**

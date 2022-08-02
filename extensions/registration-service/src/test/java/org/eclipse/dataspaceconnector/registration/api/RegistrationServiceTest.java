@@ -16,9 +16,10 @@ package org.eclipse.dataspaceconnector.registration.api;
 
 import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
-import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantDto;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
+import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantDto;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
+import org.eclipse.dataspaceconnector.spi.EdcException;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.junit.jupiter.api.Test;
@@ -132,7 +133,7 @@ class RegistrationServiceTest {
     }
 
     @Test
-    void findByDid_dtoTransformerFailure_notFound() {
+    void findByDid_dtoTransformerFailure() {
         var participant = participantBuilder.build();
         when(participantStore.findByDid(participant.getDid()))
                 .thenReturn(participant);
@@ -141,7 +142,7 @@ class RegistrationServiceTest {
 
         assertThatThrownBy(() ->
                 service.findByDid(participant.getDid())
-        ).isInstanceOf(ObjectNotFoundException.class);
+        ).isInstanceOf(EdcException.class);
 
         verify(participantStore).findByDid(participant.getDid());
         verify(dtoTransformerRegistry).transform(participant, ParticipantDto.class);
