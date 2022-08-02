@@ -24,8 +24,8 @@ import java.util.concurrent.Callable;
 
 import static org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli.MAPPER;
 
-@Command(name = "status", description = "Get participant status")
-class ParticipantStatusCommand implements Callable<Integer> {
+@Command(name = "get", description = "Get participant by caller did")
+class GetParticipantCommand implements Callable<Integer> {
 
     @ParentCommand
     private ParticipantsCommand command;
@@ -37,7 +37,7 @@ class ParticipantStatusCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         try {
             var out = spec.commandLine().getOut();
-            var response = command.cli.registryApiClient.getParticipantStatus();
+            var response = command.cli.registryApiClient.getParticipant();
             MAPPER.writeValue(out, response);
             out.println();
             return 0;

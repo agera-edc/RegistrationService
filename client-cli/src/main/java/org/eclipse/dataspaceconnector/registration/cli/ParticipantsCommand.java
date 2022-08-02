@@ -22,7 +22,7 @@ import picocli.CommandLine.ParentCommand;
         subcommands = {
                 ListParticipantsCommand.class,
                 AddParticipantCommand.class,
-                ParticipantStatusCommand.class
+                GetParticipantCommand.class
         })
 class ParticipantsCommand {
     @ParentCommand

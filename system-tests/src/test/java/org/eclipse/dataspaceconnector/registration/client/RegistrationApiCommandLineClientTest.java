@@ -60,12 +60,12 @@ public class RegistrationApiCommandLineClientTest {
     }
 
     @Test
-    void participantStatus() throws Exception {
+    void getParticipant() throws Exception {
         CommandLine cmd = RegistrationServiceCli.getCommandLine();
 
         addParticipant(cmd);
 
-        var result = getParticipantStatus(cmd);
+        var result = getParticipant(cmd);
         assertThat(result).isNotNull();
         assertThat(result.getDid()).isEqualTo(CLIENT_DID_WEB);
         assertThat(result.getUrl()).isEqualTo(idsUrl);
@@ -73,7 +73,7 @@ public class RegistrationApiCommandLineClientTest {
     }
 
     @Test
-    void participantStatus_notFound() {
+    void getParticipant_notFound() {
         CommandLine cmd = RegistrationServiceCli.getCommandLine();
 
         var statusCmdExitCode = cmd.execute(
@@ -131,7 +131,7 @@ public class RegistrationApiCommandLineClientTest {
         });
     }
 
-    private ParticipantDto getParticipantStatus(CommandLine cmd) throws JsonProcessingException {
+    private ParticipantDto getParticipant(CommandLine cmd) throws JsonProcessingException {
         var writer = new StringWriter();
         cmd.setOut(new PrintWriter(writer));
         var statusCmdExitCode = cmd.execute(
@@ -139,7 +139,7 @@ public class RegistrationApiCommandLineClientTest {
                 "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "--http-scheme",
-                "participants", "status");
+                "participants", "get");
         assertThat(statusCmdExitCode).isEqualTo(0);
 
         var output = writer.toString();

@@ -53,10 +53,10 @@ public class RegistrationApiClientTest {
     }
 
     @Test
-    void participantStatus() {
+    void getParticipant() {
         api.addParticipant(participantUrl);
 
-        var response = api.getParticipantStatus();
+        var response = api.getParticipant();
 
         assertThat(response.getDid()).isEqualTo(CLIENT_DID_WEB);
         assertThat(response.getUrl()).isEqualTo(participantUrl);
@@ -64,13 +64,13 @@ public class RegistrationApiClientTest {
     }
 
     @Test
-    void participantStatus_notFound() {
+    void getParticipant_notFound() {
         //Arrange - Fresh api client with unregistered client DID.
         var apiClient = ClientUtils.createApiClient(API_URL, UNREGISTERED_CLIENT_DID_WEB, TestKeyData.PRIVATE_KEY_P256);
         var api = new RegistryApi(apiClient);
 
         // look for participant which is not yet registered.
-        assertThatThrownBy(api::getParticipantStatus)
+        assertThatThrownBy(api::getParticipant)
                 .isInstanceOf(ApiException.class)
                 .extracting("code", "responseBody")
                 .containsExactly(

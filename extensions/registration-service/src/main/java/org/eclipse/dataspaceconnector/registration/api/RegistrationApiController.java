@@ -63,8 +63,8 @@ public class RegistrationApiController {
     }
 
     @GET
-    @Path("/participant/status")
-    @Operation(description = "Get status of a participant.")
+    @Path("/participant")
+    @Operation(description = "Get a participant by caller DID.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -81,7 +81,7 @@ public class RegistrationApiController {
                     description = "Dataspace participant not found."
             )
     })
-    public ParticipantDto getParticipantStatus(@Context HttpHeaders headers) {
+    public ParticipantDto getParticipant(@Context HttpHeaders headers) {
         var issuer = Objects.requireNonNull(headers.getHeaderString(CALLER_DID_HEADER));
 
         return service.findByDid(issuer);

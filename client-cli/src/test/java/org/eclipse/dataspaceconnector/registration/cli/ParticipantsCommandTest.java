@@ -85,8 +85,8 @@ class ParticipantsCommandTest {
     }
 
     @Test
-    void status() throws Exception {
-        when(app.registryApiClient.getParticipantStatus())
+    void getParticipant() throws Exception {
+        when(app.registryApiClient.getParticipant())
                 .thenReturn(participant1);
 
         var exitCode = executeParticipantStatus();
