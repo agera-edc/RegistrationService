@@ -18,8 +18,6 @@ import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 
-import java.util.List;
-
 public class TestUtils {
     static final Faker FAKER = new Faker();
 

@@ -21,10 +21,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspaceconnector.registration.client.TestUtils.CLIENT_DID_WEB;
 
 @IntegrationTest
 public class RegistrationApiClientTest {
+    static final String CLIENT_DID_WEB = "did:web:did-server:test-client";
     static final String API_URL = "http://localhost:8182/authority";
     static final Faker FAKER = new Faker();
     static RegistryApi api;
