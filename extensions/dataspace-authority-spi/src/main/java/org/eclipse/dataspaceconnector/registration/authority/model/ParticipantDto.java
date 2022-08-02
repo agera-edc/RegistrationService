@@ -15,15 +15,14 @@
 package org.eclipse.dataspaceconnector.registration.authority.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Dataspace participant Dto.
- */
+@Schema(description = "Dataspace participant Dto")
 public class ParticipantDto {
     private String did;
     private String name;
