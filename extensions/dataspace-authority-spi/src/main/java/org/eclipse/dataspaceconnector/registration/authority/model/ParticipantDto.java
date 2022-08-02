@@ -12,7 +12,7 @@
  *
  */
 
-package org.eclipse.dataspaceconnector.registration.authority.dto;
+package org.eclipse.dataspaceconnector.registration.authority.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 

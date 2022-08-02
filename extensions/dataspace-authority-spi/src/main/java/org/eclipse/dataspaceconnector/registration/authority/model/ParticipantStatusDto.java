@@ -12,7 +12,7 @@
  *
  */
 
-package org.eclipse.dataspaceconnector.registration.authority.dto;
+package org.eclipse.dataspaceconnector.registration.authority.model;
 
 /**
  * Participant onboarding status. Some internal statuses are mapping to more general statuses, to avoid leaking details about the registration process.

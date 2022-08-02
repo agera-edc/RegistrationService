@@ -15,8 +15,8 @@
 package org.eclipse.dataspaceconnector.registration;
 
 import com.github.javafaker.Faker;
-import org.eclipse.dataspaceconnector.registration.authority.dto.ParticipantDto;
-import org.eclipse.dataspaceconnector.registration.authority.dto.ParticipantStatusDto;
+import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantDto;
+import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatusDto;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 
