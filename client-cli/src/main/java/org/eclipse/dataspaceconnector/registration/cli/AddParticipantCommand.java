@@ -14,7 +14,6 @@
 
 package org.eclipse.dataspaceconnector.registration.cli;
 
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
