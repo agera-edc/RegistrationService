@@ -17,6 +17,12 @@ package org.eclipse.dataspaceconnector.registration.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.ECKey;
+import org.eclipse.dataspaceconnector.iam.did.spi.document.DidConstants;
+import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
+import org.eclipse.dataspaceconnector.iam.did.spi.document.EllipticCurvePublicKey;
+import org.eclipse.dataspaceconnector.iam.did.spi.document.VerificationMethod;
 import org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli;
 import org.eclipse.dataspaceconnector.registration.client.models.Participant;
 import org.junit.jupiter.api.AfterAll;
@@ -31,7 +37,6 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.junit.testfixtures.TestUtils.getFreePort;
@@ -56,7 +61,6 @@ public class RegistrationApiCommandLineClientTest {
         privateKeyFile.toFile().deleteOnExit();
         Files.writeString(privateKeyFile, TestKeyData.PRIVATE_KEY_P256);
         httpSourceClientAndServer = startClientAndServer(API_PORT);
-
     }
 
     @AfterAll
@@ -67,11 +71,9 @@ public class RegistrationApiCommandLineClientTest {
     @Test
     void listParticipants() throws Exception {
 
-        var didDocument = new String(Objects.requireNonNull(RegistrationApiCommandLineClientTest.class.getClassLoader().getResourceAsStream("test-client/did.json")).readAllBytes());
-
         httpSourceClientAndServer.when(request().withPath("/.well-known/did.json"))
                 .respond(response()
-                        .withBody(didDocument)
+                        .withBody(didDocument())
                         .withStatusCode(HttpStatusCode.OK_200.code()));
 
         CommandLine cmd = RegistrationServiceCli.getCommandLine();
@@ -86,6 +88,15 @@ public class RegistrationApiCommandLineClientTest {
                 "participants", "add");
         assertThat(addCmdExitCode).isEqualTo(0);
         assertThat(getParticipants(cmd, didWeb)).anySatisfy(p -> assertThat(p.getDid()).isEqualTo(didWeb));
+    }
+
+    private String didDocument() throws JOSEException, JsonProcessingException {
+        var publicKey = (ECKey) ECKey.parseFromPEMEncodedObjects(TestKeyData.PUBLIC_KEY_P256);
+        var vm = VerificationMethod.Builder.create().id("#my-key-1").type(DidConstants.ECDSA_SECP_256_K_1_VERIFICATION_KEY_2019).controller("")
+                .publicKeyJwk(new EllipticCurvePublicKey(publicKey.getCurve().getName(), publicKey.getKeyType().getValue(), publicKey.getX().toString(), publicKey.getY().toString()))
+                .build();
+        var didDocument = DidDocument.Builder.newInstance().verificationMethod(List.of(vm)).build();
+        return MAPPER.writeValueAsString(didDocument);
     }
 
     private List<Participant> getParticipants(CommandLine cmd, String didWeb) throws JsonProcessingException {
