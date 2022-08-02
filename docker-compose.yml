@@ -9,6 +9,7 @@ services:
     environment:
       JWT_AUDIENCE: http://localhost:8182/authority
       EDC_CONNECTOR_NAME: registration-service
+      EDC_IDENTITY_DID_URL: did:web:did-server:test-dataspace-authority
       EDC_VAULT: /resources/vault/registration-service-vault.properties
       EDC_KEYSTORE: /resources/vault/registration-service-keystore.jks
       EDC_KEYSTORE_PASSWORD: test123
