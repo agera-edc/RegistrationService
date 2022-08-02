@@ -50,7 +50,7 @@ components:
   schemas:
     ParticipantDto:
       type: object
-      description: Dataspace participant Dto
+      description: Participant Dto
       properties:
         did:
           type: string
@@ -58,6 +58,7 @@ components:
           type: string
         status:
           type: string
+          description: Participant onboarding status
           enum:
           - AUTHORIZING
           - AUTHORIZED

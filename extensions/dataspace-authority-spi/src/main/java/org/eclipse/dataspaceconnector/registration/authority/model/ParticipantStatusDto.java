@@ -14,9 +14,12 @@
 
 package org.eclipse.dataspaceconnector.registration.authority.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Participant onboarding status. Some internal statuses are mapping to more general statuses, to avoid leaking details about the registration process.
  */
+@Schema(description = "Participant onboarding status")
 public enum ParticipantStatusDto {
     AUTHORIZING, // verifying participants credentials
     AUTHORIZED, // participant is fully onboarded
