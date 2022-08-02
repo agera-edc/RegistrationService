@@ -89,7 +89,7 @@ class ParticipantsCommandTest {
         when(app.registryApiClient.getParticipant())
                 .thenReturn(participant1);
 
-        var exitCode = executeParticipantStatus();
+        var exitCode = executeGetParticipant();
         assertThat(exitCode).isEqualTo(0);
 
         var parsedResult = MAPPER.readValue(sw.toString(), ParticipantDto.class);
@@ -168,11 +168,11 @@ class ParticipantsCommandTest {
                 "participants", "list");
     }
 
-    private int executeParticipantStatus() {
+    private int executeGetParticipant() {
         return cmd.execute(
                 "-c", clientDid,
                 "-k", privateKeyFile.toString(),
                 "-d", dataspaceDid,
-                "participants", "status");
+                "participants", "get");
     }
 }
