@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,22 +52,19 @@ public class RegistrationApiCommandLineClientTest {
 
     @Test
     void listParticipants() throws Exception {
-        CommandLine cmd = RegistrationServiceCli.getCommandLine();
+        assertThat(listParticipantsCmd()).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
 
-        assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+        addParticipantCmd();
 
-        addParticipant(cmd);
-        assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+        assertThat(listParticipantsCmd()).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
     }
 
     @Test
     void getParticipant() throws Exception {
-        CommandLine cmd = RegistrationServiceCli.getCommandLine();
+        addParticipantCmd();
 
-        addParticipant(cmd);
+        var result = getParticipantCmd();
 
-        var result = getParticipant(cmd);
-        assertThat(result).isNotNull();
         assertThat(result.getDid()).isEqualTo(CLIENT_DID_WEB);
         assertThat(result.getUrl()).isEqualTo(idsUrl);
         assertThat(result.getStatus()).isNotNull();
@@ -75,6 +73,8 @@ public class RegistrationApiCommandLineClientTest {
     @Test
     void getParticipant_notFound() {
         CommandLine cmd = RegistrationServiceCli.getCommandLine();
+        var writer = new StringWriter();
+        cmd.setOut(new PrintWriter(writer));
 
         var statusCmdExitCode = cmd.execute(
                 "-c", UNREGISTERED_CLIENT_DID_WEB,
@@ -84,65 +84,98 @@ public class RegistrationApiCommandLineClientTest {
                 "participants", "get");
 
         assertThat(statusCmdExitCode).isEqualTo(1);
+        var output = writer.toString();
+        assertThat(output).isEmpty();
     }
 
     @Deprecated
     @Test
     void listParticipants_usingServiceUrl() throws Exception {
         CommandLine cmd = RegistrationServiceCli.getCommandLine();
-
-        assertThat(getParticipants(cmd)).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
-
-        var addCmdExitCode = cmd.execute(
-                "-c", CLIENT_DID_WEB,
-                "-k", privateKeyFile.toString(),
-                "--http-scheme",
-                "participants", "add",
-                "--ids-url", idsUrl);
-        assertThat(addCmdExitCode).isEqualTo(0);
-        assertThat(getParticipants(cmd)).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
-    }
-
-    private void addParticipant(CommandLine cmd) {
-        var addCmdExitCode = cmd.execute(
-                "-c", CLIENT_DID_WEB,
-                "-d", DATASPACE_DID_WEB,
-                "-k", privateKeyFile.toString(),
-                "--http-scheme",
-                "participants", "add",
-                "--ids-url", idsUrl);
-
-        assertThat(addCmdExitCode).isEqualTo(0);
-    }
-
-    private List<ParticipantDto> getParticipants(CommandLine cmd) throws JsonProcessingException {
         var writer = new StringWriter();
         cmd.setOut(new PrintWriter(writer));
+
+        // list participant should not find any participant with current idsUrl.
         var listCmdExitCode = cmd.execute(
+                "-c", CLIENT_DID_WEB,
+                "-k", privateKeyFile.toString(),
+                "participants", "list");
+
+        assertThat(listCmdExitCode).isEqualTo(0);
+        var output = writer.toString();
+        var allParticipants = MAPPER.readValue(output, new TypeReference<List<ParticipantDto>>() {
+        });
+
+        assertThat(allParticipants).noneSatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+
+        // Add one participant.
+        var addCmdExitCode = cmd.execute(
+                "-c", CLIENT_DID_WEB,
+                "-k", privateKeyFile.toString(),
+                "--http-scheme",
+                "participants", "add",
+                "--ids-url", idsUrl);
+        assertThat(addCmdExitCode).isEqualTo(0);
+
+        // Now at least one participant should exist with current idsUrl.
+        writer = new StringWriter();
+        cmd.setOut(new PrintWriter(writer));
+        listCmdExitCode = cmd.execute(
+                "-c", CLIENT_DID_WEB,
+                "-k", privateKeyFile.toString(),
+                "participants", "list");
+
+        assertThat(listCmdExitCode).isEqualTo(0);
+        output = writer.toString();
+        allParticipants = MAPPER.readValue(output, new TypeReference<>() {
+        });
+        assertThat(allParticipants).anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(idsUrl));
+    }
+
+    private List<String> commonCmdParams() {
+
+        return List.of(
                 "-c", CLIENT_DID_WEB,
                 "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
                 "--http-scheme",
-                "participants", "list");
-        assertThat(listCmdExitCode).isEqualTo(0);
+                "participants"
+        );
+    }
 
+    private String executeCmd(List<String> cmdArgs) {
+        CommandLine cmd = RegistrationServiceCli.getCommandLine();
+        var writer = new StringWriter();
+        cmd.setOut(new PrintWriter(writer));
+
+        var cmdExitCode = cmd.execute(cmdArgs.toArray(new String[0]));
         var output = writer.toString();
+
+        assertThat(cmdExitCode).isEqualTo(0);
+
+        return output;
+    }
+
+    private void addParticipantCmd() {
+        var addParticipantArgs = new ArrayList<>(commonCmdParams());
+        addParticipantArgs.addAll(List.of("add", "--ids-url", idsUrl));
+        executeCmd(addParticipantArgs);
+    }
+
+    private List<ParticipantDto> listParticipantsCmd() throws JsonProcessingException {
+        var listParticipantsArgs = new ArrayList<>(commonCmdParams());
+        listParticipantsArgs.add("list");
+        var output = executeCmd(listParticipantsArgs);
         return MAPPER.readValue(output, new TypeReference<>() {
         });
     }
 
-    private ParticipantDto getParticipant(CommandLine cmd) throws JsonProcessingException {
-        var writer = new StringWriter();
-        cmd.setOut(new PrintWriter(writer));
-        var statusCmdExitCode = cmd.execute(
-                "-c", CLIENT_DID_WEB,
-                "-d", DATASPACE_DID_WEB,
-                "-k", privateKeyFile.toString(),
-                "--http-scheme",
-                "participants", "get");
-        assertThat(statusCmdExitCode).isEqualTo(0);
+    private ParticipantDto getParticipantCmd() throws JsonProcessingException {
+        var getParticipantArgs = new ArrayList<>(commonCmdParams());
+        getParticipantArgs.add("get");
+        var output = executeCmd(getParticipantArgs);
 
-        var output = writer.toString();
         return MAPPER.readValue(output, ParticipantDto.class);
     }
+
 }
