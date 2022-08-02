@@ -25,6 +25,6 @@ public class TestUtils {
 
     public static Participant createParticipant() {
         return new Participant()
-                .did("web:did" + FAKER.internet().domainName());
+                .did("web:did:" + FAKER.internet().domainName());
     }
 }
