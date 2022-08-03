@@ -35,7 +35,7 @@ services:
   participant:
     container_name: participant
     build:
-      context: system-tests/launcher
+      context: system-tests/launchers/identity-hub
       args:
         JVM_ARGS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007"
     ports:
