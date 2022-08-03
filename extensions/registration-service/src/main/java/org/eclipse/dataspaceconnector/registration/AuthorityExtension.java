@@ -14,7 +14,6 @@
 
 package org.eclipse.dataspaceconnector.registration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import org.eclipse.dataspaceconnector.extension.jersey.mapper.EdcApiExceptionMapper;
 import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
