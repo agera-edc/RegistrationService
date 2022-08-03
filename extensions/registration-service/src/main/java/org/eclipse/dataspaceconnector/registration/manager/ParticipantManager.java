@@ -90,7 +90,7 @@ public class ParticipantManager {
 
     private Boolean processAuthorized(Participant participant) {
         participant.transitionOnboarded();
-        verifiableCredentialService.generateVerifiableCredential(participant);
+        verifiableCredentialService.publishVerifiableCredential(participant);
         participantStore.save(participant);
         return true;
     }

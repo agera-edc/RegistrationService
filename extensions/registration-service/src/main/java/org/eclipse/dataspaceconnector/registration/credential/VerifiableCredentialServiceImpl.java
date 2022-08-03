@@ -49,7 +49,7 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
     }
 
     @Override
-    public void generateVerifiableCredential(Participant participant) {
+    public void publishVerifiableCredential(Participant participant) {
         VerifiableCredential vc = VerifiableCredential.Builder.newInstance()
                 .id(UUID.randomUUID().toString())
                 .credentialSubject(Map.of("memberOfDataspace", "true"))

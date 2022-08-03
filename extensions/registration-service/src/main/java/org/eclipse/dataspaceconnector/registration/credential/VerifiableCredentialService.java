@@ -17,5 +17,5 @@ package org.eclipse.dataspaceconnector.registration.credential;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 
 public interface VerifiableCredentialService {
-    void generateVerifiableCredential(Participant participant);
+    void publishVerifiableCredential(Participant participant);
 }
