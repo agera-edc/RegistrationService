@@ -16,6 +16,7 @@ package org.eclipse.dataspaceconnector.registration.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import com.nimbusds.jwt.SignedJWT;
 import okhttp3.OkHttpClient;
 import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClientImpl;
 import org.eclipse.dataspaceconnector.registration.cli.ClientUtils;
@@ -24,7 +25,9 @@ import org.eclipse.dataspaceconnector.spi.monitor.ConsoleMonitor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.text.ParseException;
 import java.time.Instant;
+import java.util.Collection;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,14 +61,28 @@ public class RegistrationApiClientTest {
 
         assertThat(api.listParticipants())
                 .anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
+    }
+
+    @Test
+    void addsVerifiableCredential() {
+        // sanity check
+        // FIXME assertThat(getVerifiableCredentialsFromIdentityHub()).noneSatisfy(this::assertIssuedVerifiableCredential);
+
+        api.addParticipant(participantUrl);
 
         await().atMost(10, SECONDS).untilAsserted(() -> {
-            var r = identityHubClient.getVerifiableCredentials("http://localhost:8181/api/identity-hub");
-            assertThat(r.succeeded()).isTrue();
-            assertThat(r.getContent()).anySatisfy(p -> {
-                assertThat(p.getJWTClaimsSet().getSubject()).isEqualTo(CLIENT_DID_WEB);
-                // FIXME assertThat(p.getJWTClaimsSet().getIssueTime()).isAfter(startTime);
-            });
+            assertThat(getVerifiableCredentialsFromIdentityHub()).anySatisfy(this::assertIssuedVerifiableCredential);
         });
+    }
+
+    private Collection<SignedJWT> getVerifiableCredentialsFromIdentityHub() {
+        var result = identityHubClient.getVerifiableCredentials("http://localhost:8181/api/identity-hub");
+        assertThat(result.succeeded()).isTrue();
+        return result.getContent();
+    }
+
+    private void assertIssuedVerifiableCredential(SignedJWT p) throws ParseException {
+        assertThat(p.getJWTClaimsSet().getSubject()).isEqualTo(CLIENT_DID_WEB);
+        // FIXME assertThat(p.getJWTClaimsSet().getIssueTime()).isAfter(startTime);
     }
 }
