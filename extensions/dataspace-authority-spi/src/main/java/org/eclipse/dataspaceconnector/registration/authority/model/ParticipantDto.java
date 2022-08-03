@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@Schema(description = "Participant Dto")
+@Schema(description = "Dataspace Participant")
 public class ParticipantDto {
     private String did;
     private String name;

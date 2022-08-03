@@ -21,7 +21,7 @@ import picocli.CommandLine.Spec;
 
 import java.util.concurrent.Callable;
 
-import static org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli.MAPPER;
+import static org.eclipse.dataspaceconnector.registration.cli.ClientUtils.writeToOutput;
 
 @Command(name = "list", description = "List dataspace participants")
 class ListParticipantsCommand implements Callable<Integer> {
@@ -34,9 +34,7 @@ class ListParticipantsCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        var out = spec.commandLine().getOut();
-        MAPPER.writeValue(out, command.cli.registryApiClient.listParticipants());
-        out.println();
+        writeToOutput(spec.commandLine(), command.cli.registryApiClient.listParticipants());
         return 0;
     }
 }

@@ -16,13 +16,13 @@ package org.eclipse.dataspaceconnector.registration.cli;
 
 import org.eclipse.dataspaceconnector.registration.client.ApiException;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParentCommand;
-import picocli.CommandLine.Spec;
 
 import java.util.concurrent.Callable;
 
-import static org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli.MAPPER;
+import static org.eclipse.dataspaceconnector.registration.cli.ClientUtils.writeToOutput;
+import static picocli.CommandLine.Model.CommandSpec;
+import static picocli.CommandLine.Spec;
 
 @Command(name = "get", description = "Get participant by caller DID")
 class GetParticipantCommand implements Callable<Integer> {
@@ -36,10 +36,7 @@ class GetParticipantCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         try {
-            var out = spec.commandLine().getOut();
-            var response = command.cli.registryApiClient.getParticipant();
-            MAPPER.writeValue(out, response);
-            out.println();
+            writeToOutput(spec.commandLine(), command.cli.registryApiClient.getParticipant());
             return 0;
         } catch (ApiException ex) {
             throw new CliException("Error occurred.", ex);

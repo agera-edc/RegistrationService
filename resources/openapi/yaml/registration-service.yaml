@@ -50,7 +50,7 @@ components:
   schemas:
     ParticipantDto:
       type: object
-      description: Participant Dto
+      description: Dataspace Participant
       properties:
         did:
           type: string
