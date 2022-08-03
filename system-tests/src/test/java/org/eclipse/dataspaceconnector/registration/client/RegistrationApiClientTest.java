@@ -24,6 +24,8 @@ import org.eclipse.dataspaceconnector.spi.monitor.ConsoleMonitor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -37,6 +39,7 @@ public class RegistrationApiClientTest {
     static IdentityHubClientImpl identityHubClient;
 
     String participantUrl = FAKER.internet().url();
+    Instant startTime = Instant.now();
 
     @BeforeAll
     static void setUpClass() {
@@ -56,14 +59,12 @@ public class RegistrationApiClientTest {
         assertThat(api.listParticipants())
                 .anySatisfy(p -> assertThat(p.getUrl()).isEqualTo(participantUrl));
 
-
         await().atMost(10, SECONDS).untilAsserted(() -> {
             var r = identityHubClient.getVerifiableCredentials("http://localhost:8181/api/identity-hub");
             assertThat(r.succeeded()).isTrue();
             assertThat(r.getContent()).anySatisfy(p -> {
-                System.err.println(p.getJWTClaimsSet());
-                System.err.println(participantUrl);
                 assertThat(p.getJWTClaimsSet().getSubject()).isEqualTo(CLIENT_DID_WEB);
+                // FIXME assertThat(p.getJWTClaimsSet().getIssueTime()).isAfter(startTime);
             });
         });
     }
