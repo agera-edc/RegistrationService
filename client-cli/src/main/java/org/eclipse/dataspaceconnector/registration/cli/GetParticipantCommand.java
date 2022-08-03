@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 
 import static org.eclipse.dataspaceconnector.registration.cli.RegistrationServiceCli.MAPPER;
 
-@Command(name = "get", description = "Get participant by caller did")
+@Command(name = "get", description = "Get participant by caller DID")
 class GetParticipantCommand implements Callable<Integer> {
 
     @ParentCommand
