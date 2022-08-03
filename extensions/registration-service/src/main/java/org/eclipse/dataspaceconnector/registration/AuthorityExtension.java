@@ -126,12 +126,12 @@ public class AuthorityExtension implements ServiceExtension {
 
     @Provider(isDefault = true)
     public VerifiableCredentialService verifiableCredentialService(ServiceExtensionContext context) {
-        String didUrl = context.getSetting(DID_URL_SETTING, null);
+        var didUrl = context.getSetting(DID_URL_SETTING, null);
         if (didUrl == null) {
             throw new EdcException(format("The DID Url setting '(%s)' was null!", DID_URL_SETTING));
         }
 
-        ObjectMapper mapper = context.getTypeManager().getMapper();
+        var mapper = context.getTypeManager().getMapper();
         var jwtService = new VerifiableCredentialsJwtServiceImpl(mapper); // FIXME inject
 
         var identityHubClient = new IdentityHubClientImpl(context.getService(OkHttpClient.class), mapper, monitor);
@@ -140,6 +140,7 @@ public class AuthorityExtension implements ServiceExtension {
 
         var privateKeyWrapper = privateKeyResolver.resolvePrivateKey(context.getConnectorId(), PrivateKeyWrapper.class);
         Objects.requireNonNull(privateKeyWrapper, "Couldn't resolve private key from connector " + context.getConnectorId());
+
         return new VerifiableCredentialServiceImpl(monitor, jwtService, privateKeyWrapper, didUrl, resolverRegistry, identityHubClient);
     }
 }
