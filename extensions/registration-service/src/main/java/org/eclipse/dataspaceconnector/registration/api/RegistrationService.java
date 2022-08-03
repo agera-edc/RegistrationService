@@ -60,7 +60,7 @@ public class RegistrationService {
         }
         var result = transformerRegistry.transform(participant, ParticipantDto.class);
         if (result.failed()) {
-            throw new EdcException(join(",", result.getFailure().getMessages()));
+            throw new EdcException(result.getFailureDetail());
         }
         return result.getContent();
     }
