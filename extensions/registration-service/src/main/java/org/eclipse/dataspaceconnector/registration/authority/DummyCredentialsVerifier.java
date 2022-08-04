@@ -14,11 +14,18 @@
 
 package org.eclipse.dataspaceconnector.registration.authority;
 
+import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClient;
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 
 public class DummyCredentialsVerifier implements CredentialsVerifier {
+    private final IdentityHubClient identityHubClient;
+
+    public DummyCredentialsVerifier(IdentityHubClient identityHubClient) {
+        this.identityHubClient = identityHubClient;
+    }
+
     @Override
-    public boolean verifyCredentials() {
+    public boolean verifyCredentials(String did) {
         return true;
     }
 }

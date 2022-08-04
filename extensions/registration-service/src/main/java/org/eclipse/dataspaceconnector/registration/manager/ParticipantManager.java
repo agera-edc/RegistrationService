@@ -76,7 +76,7 @@ public class ParticipantManager {
     }
 
     private Boolean processAuthorizing(Participant participant) {
-        var credentialsValid = credentialsVerifier.verifyCredentials();
+        var credentialsValid = credentialsVerifier.verifyCredentials(participant.getDid());
         if (credentialsValid) {
             participant.transitionAuthorized();
         } else {

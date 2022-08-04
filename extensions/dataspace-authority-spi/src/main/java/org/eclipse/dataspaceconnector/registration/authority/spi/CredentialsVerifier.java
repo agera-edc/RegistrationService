@@ -19,5 +19,5 @@ package org.eclipse.dataspaceconnector.registration.authority.spi;
  * and fetch and evaluate verifiable presentations.
  */
 public interface CredentialsVerifier {
-    boolean verifyCredentials();
+    boolean verifyCredentials(String did);
 }
