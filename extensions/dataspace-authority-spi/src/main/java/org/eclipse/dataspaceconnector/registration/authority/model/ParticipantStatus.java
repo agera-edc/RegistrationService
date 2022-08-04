@@ -20,4 +20,5 @@ public enum ParticipantStatus {
     AUTHORIZED, // participant is authorized
     ONBOARDED, // participant is fully onboarded
     DENIED, // participant onboarding request denied
+    FAILED, // participant onboarding failed
 }

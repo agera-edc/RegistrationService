@@ -17,6 +17,7 @@ package org.eclipse.dataspaceconnector.registration.credential;
 import com.github.javafaker.Faker;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
+import org.assertj.core.api.AbstractStringAssert;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.Service;
 import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
@@ -25,11 +26,11 @@ import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClient;
 import org.eclipse.dataspaceconnector.identityhub.credentials.VerifiableCredentialsJwtService;
 import org.eclipse.dataspaceconnector.identityhub.credentials.model.VerifiableCredential;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
-import org.eclipse.dataspaceconnector.spi.EdcException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.response.ResponseStatus;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 import org.eclipse.dataspaceconnector.spi.result.Result;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -40,8 +41,9 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipant;
+import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.ERROR_RETRY;
+import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.FATAL_ERROR;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -80,7 +82,8 @@ class VerifiableCredentialServiceImplTest {
 
     @Test
     void publishVerifiableCredential_createsMembershipCredential() throws Exception {
-        service.publishVerifiableCredential(participantBuilder.build());
+        var result = service.publishVerifiableCredential(participantBuilder.build());
+        assertThat(result.succeeded()).isTrue();
 
         verify(jwtService).buildSignedJwt(vc.capture(), eq(dataspaceDid), eq(participantDid), eq(privateKeyWrapper));
         assertThat(vc.getValue().getId()).satisfies(i -> assertThat(UUID.fromString(i)).isNotNull());
@@ -99,9 +102,8 @@ class VerifiableCredentialServiceImplTest {
         when(resolverRegistry.resolve(participantDid))
                 .thenReturn(Result.failure(failure));
 
-        assertThatExceptionOfType(EdcException.class)
-                .isThrownBy(() -> service.publishVerifiableCredential(participantBuilder.build()))
-                .withMessage(format("Failed to resolve DID %s. %s", participantDid, failure));
+        assertThatCallFailsWith(ERROR_RETRY)
+                .isEqualTo(format("Failed to resolve DID %s. %s", participantDid, failure));
     }
 
     @Test
@@ -111,9 +113,8 @@ class VerifiableCredentialServiceImplTest {
                         .service(List.of(new Service(FAKER.lorem().word(), FAKER.lorem().word(), identityHubUrl)))
                         .build()));
 
-        assertThatExceptionOfType(EdcException.class)
-                .isThrownBy(() -> service.publishVerifiableCredential(participantBuilder.build()))
-                .withMessage(format("Failed to resolve Identity Hub URL from DID document for %s", participantDid));
+        assertThatCallFailsWith(FATAL_ERROR)
+                .isEqualTo(format("Failed to resolve Identity Hub URL from DID document for %s", participantDid));
     }
 
     @Test
@@ -121,9 +122,8 @@ class VerifiableCredentialServiceImplTest {
         when(jwtService.buildSignedJwt(any(), eq(dataspaceDid), eq(participantDid), eq(privateKeyWrapper)))
                 .thenThrow(new JOSEException(failure));
 
-        assertThatExceptionOfType(EdcException.class)
-                .isThrownBy(() -> service.publishVerifiableCredential(participantBuilder.build()))
-                .withMessage(format("%s: %s", JOSEException.class.getCanonicalName(), failure));
+        assertThatCallFailsWith(FATAL_ERROR)
+                .isEqualTo(format("%s: %s", JOSEException.class.getCanonicalName(), failure));
     }
 
     @Test
@@ -131,8 +131,15 @@ class VerifiableCredentialServiceImplTest {
         when(identityHubClient.addVerifiableCredential(identityHubUrl, jwt))
                 .thenReturn(StatusResult.failure(FAKER.options().option(ResponseStatus.class), failure));
 
-        assertThatExceptionOfType(EdcException.class)
-                .isThrownBy(() -> service.publishVerifiableCredential(participantBuilder.build()))
-                .withMessage(format("Failed to send VC. %s", failure));
+        assertThatCallFailsWith(ERROR_RETRY)
+                .isEqualTo(format("Failed to send VC. %s", failure));
+    }
+
+    @NotNull
+    private AbstractStringAssert<?> assertThatCallFailsWith(ResponseStatus status) {
+        StatusResult<Void> result = service.publishVerifiableCredential(participantBuilder.build());
+        assertThat(result.failed()).isTrue();
+        assertThat(result.getFailure().status()).isEqualTo(status);
+        return assertThat(result.getFailureDetail());
     }
 }

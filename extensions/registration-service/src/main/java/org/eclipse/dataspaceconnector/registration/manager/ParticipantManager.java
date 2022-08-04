@@ -89,8 +89,13 @@ public class ParticipantManager {
     }
 
     private Boolean processAuthorized(Participant participant) {
-        participant.transitionOnboarded();
-        verifiableCredentialService.publishVerifiableCredential(participant);
+        var result = verifiableCredentialService.publishVerifiableCredential(participant);
+        if (result.succeeded()) {
+            participant.transitionOnboarded();
+        } else {
+            participant.transitionFailed();
+        }
+
         participantStore.save(participant);
         return true;
     }

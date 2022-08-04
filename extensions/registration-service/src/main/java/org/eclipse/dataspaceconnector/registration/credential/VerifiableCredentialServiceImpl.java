@@ -22,12 +22,15 @@ import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClient;
 import org.eclipse.dataspaceconnector.identityhub.credentials.VerifiableCredentialsJwtService;
 import org.eclipse.dataspaceconnector.identityhub.credentials.model.VerifiableCredential;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
-import org.eclipse.dataspaceconnector.spi.EdcException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 
 import java.util.Map;
 import java.util.UUID;
+
+import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.ERROR_RETRY;
+import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.FATAL_ERROR;
 
 public class VerifiableCredentialServiceImpl implements VerifiableCredentialService {
     private static final String IDENTITY_HUB_SERVICE_TYPE = "IdentityHub";
@@ -49,7 +52,7 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
     }
 
     @Override
-    public void publishVerifiableCredential(Participant participant) {
+    public StatusResult<Void> publishVerifiableCredential(Participant participant) {
         var vc = VerifiableCredential.Builder.newInstance()
                 .id(UUID.randomUUID().toString())
                 .credentialSubject(Map.of("memberOfDataspace", dataspaceDid))
@@ -60,26 +63,27 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
         try {
             jwt = jwtService.buildSignedJwt(vc, dataspaceDid, subject, privateKeyWrapper);
         } catch (Exception e) {
-            throw new EdcException(e);
+            return StatusResult.failure(FATAL_ERROR, e.toString());
         }
         monitor.info("Created dataspace membership VC for " + subject);
 
         var did = participant.getDid();
         var didDocument = resolverRegistry.resolve(did);
         if (didDocument.failed()) {
-            throw new EdcException("Failed to resolve DID " + did + ". " + didDocument.getFailureDetail());
+            return StatusResult.failure(ERROR_RETRY, "Failed to resolve DID " + did + ". " + didDocument.getFailureDetail());
         }
         var hubBaseUrl = getIdentityHubBaseUrl(didDocument.getContent());
         if (hubBaseUrl.failed()) {
-            throw new EdcException("Failed to resolve Identity Hub URL from DID document for " + did);
+            return StatusResult.failure(FATAL_ERROR, "Failed to resolve Identity Hub URL from DID document for " + did);
         }
 
         var addVcResult = identityHubClient.addVerifiableCredential(hubBaseUrl.getContent(), jwt);
         if (addVcResult.failed()) {
-            throw new EdcException("Failed to send VC. " + addVcResult.getFailureDetail());
+            return StatusResult.failure(ERROR_RETRY, "Failed to send VC. " + addVcResult.getFailureDetail());
         }
 
         monitor.info("Sent dataspace membership VC for " + subject);
+        return StatusResult.success();
     }
 
     private Result<String> getIdentityHubBaseUrl(DidDocument didDocument) {
