@@ -70,7 +70,7 @@ public class RegistrationApiClientTest {
 
         api.addParticipant(participantUrl);
 
-        await().atMost(10, SECONDS).untilAsserted(() -> {
+        await().atMost(30, SECONDS).untilAsserted(() -> {
             assertThat(getVerifiableCredentialsFromIdentityHub()).anySatisfy(this::assertIssuedVerifiableCredential);
         });
     }
