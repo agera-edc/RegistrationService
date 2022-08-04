@@ -30,7 +30,6 @@ import java.time.Instant;
 import java.util.Collection;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.CLIENT_DID_WEB;
