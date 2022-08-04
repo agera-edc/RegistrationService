@@ -77,7 +77,9 @@ public class ParticipantManager {
 
     private Boolean processAuthorizing(Participant participant) {
         var credentialsValid = credentialsVerifier.verifyCredentials(participant.getDid());
-        if (credentialsValid) {
+        if (credentialsValid.failed()) {
+            participant.transitionFailed(); // FIXME update ADR post https://github.com/agera-edc/RegistrationService/pull/19/files
+        } else if (credentialsValid.getContent()) {
             participant.transitionAuthorized();
         } else {
             participant.transitionDenied();

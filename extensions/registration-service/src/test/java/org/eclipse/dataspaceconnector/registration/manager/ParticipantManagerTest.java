@@ -19,6 +19,7 @@ import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantSt
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.eclipse.dataspaceconnector.spi.response.ResponseStatus;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.junit.jupiter.api.Test;
@@ -59,14 +60,20 @@ class ParticipantManagerTest {
 
     @Test
     void advancesStateFromAuthorizingToAuthorized() throws Exception {
-        when(credentialsVerifier.verifyCredentials()).thenReturn(true);
+        when(credentialsVerifier.verifyCredentials(any())).thenReturn(StatusResult.success(true));
         advancesState(AUTHORIZING, AUTHORIZED);
     }
 
     @Test
     void advancesStateFromAuthorizingToDenied() throws Exception {
-        when(credentialsVerifier.verifyCredentials()).thenReturn(false);
+        when(credentialsVerifier.verifyCredentials(any())).thenReturn(StatusResult.success(false));
         advancesState(AUTHORIZING, DENIED);
+    }
+
+    @Test
+    void advancesStateFromAuthorizingToFailed() throws Exception {
+        when(credentialsVerifier.verifyCredentials(any())).thenReturn(StatusResult.failure(ResponseStatus.ERROR_RETRY));
+        advancesState(AUTHORIZING, FAILED);
     }
 
     @Test

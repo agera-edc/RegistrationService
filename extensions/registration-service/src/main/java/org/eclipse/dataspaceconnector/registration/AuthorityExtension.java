@@ -111,6 +111,6 @@ public class AuthorityExtension implements ServiceExtension {
         var mapper = context.getTypeManager().getMapper();
 
         var identityHubClient = new IdentityHubClientImpl(context.getService(OkHttpClient.class), mapper, monitor);
-        return new DummyCredentialsVerifier(identityHubClient);
+        return new DummyCredentialsVerifier(monitor, context.getService(DidResolverRegistry.class), identityHubClient);
     }
 }
