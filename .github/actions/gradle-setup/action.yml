@@ -14,10 +14,9 @@ runs:
     - name: Checkout Identity Hub
       uses: actions/checkout@v2
       with:
-        # FIXME
-        repository: agera-edc/IdentityHub
+        repository: eclipse-dataspaceconnector/IdentityHub
         path: IdentityHub
-        ref: 2f86aed5c4ab696c69dd4267d09071ba5644de9a
+        ref: 98b27791261e4c2341e13188f9c331fa40a60691
 
     # Install Java and cache MVD Gradle build.
     - uses: actions/setup-java@v2
