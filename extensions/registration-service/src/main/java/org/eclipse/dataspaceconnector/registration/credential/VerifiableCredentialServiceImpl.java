@@ -35,15 +35,15 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
     private final Monitor monitor;
     private final VerifiableCredentialsJwtService jwtService;
     private final PrivateKeyWrapper privateKeyWrapper;
-    private final String issuer;
+    private final String dataspaceDid;
     private final DidResolverRegistry resolverRegistry;
     private final IdentityHubClient identityHubClient;
 
-    public VerifiableCredentialServiceImpl(Monitor monitor, VerifiableCredentialsJwtService jwtService, PrivateKeyWrapper privateKeyWrapper, String issuer, DidResolverRegistry resolverRegistry, IdentityHubClient identityHubClient) {
+    public VerifiableCredentialServiceImpl(Monitor monitor, VerifiableCredentialsJwtService jwtService, PrivateKeyWrapper privateKeyWrapper, String dataspaceDid, DidResolverRegistry resolverRegistry, IdentityHubClient identityHubClient) {
         this.monitor = monitor;
         this.jwtService = jwtService;
         this.privateKeyWrapper = privateKeyWrapper;
-        this.issuer = issuer;
+        this.dataspaceDid = dataspaceDid;
         this.resolverRegistry = resolverRegistry;
         this.identityHubClient = identityHubClient;
     }
@@ -52,13 +52,13 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
     public void publishVerifiableCredential(Participant participant) {
         var vc = VerifiableCredential.Builder.newInstance()
                 .id(UUID.randomUUID().toString())
-                .credentialSubject(Map.of("memberOfDataspace", "true"))
+                .credentialSubject(Map.of("memberOfDataspace", dataspaceDid))
                 .build();
 
         var subject = participant.getDid();
         SignedJWT jwt;
         try {
-            jwt = jwtService.buildSignedJwt(vc, issuer, subject, privateKeyWrapper);
+            jwt = jwtService.buildSignedJwt(vc, dataspaceDid, subject, privateKeyWrapper);
         } catch (Exception e) {
             throw new EdcException(e);
         }
@@ -71,7 +71,7 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
         }
         var hubBaseUrl = getIdentityHubBaseUrl(didDocument.getContent());
         if (hubBaseUrl.failed()) {
-            throw new EdcException("Failed to resolve IH URL from DID document for " + did);
+            throw new EdcException("Failed to resolve Identity Hub URL from DID document for " + did);
         }
 
         var addVcResult = identityHubClient.addVerifiableCredential(hubBaseUrl.getContent(), jwt);
