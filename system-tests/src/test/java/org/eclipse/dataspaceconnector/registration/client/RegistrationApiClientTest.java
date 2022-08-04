@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.util.Collection;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -70,7 +71,7 @@ public class RegistrationApiClientTest {
 
         api.addParticipant(participantUrl);
 
-        await().atMost(30, SECONDS).untilAsserted(() -> {
+        await().atMost(2, MINUTES).untilAsserted(() -> {
             assertThat(getVerifiableCredentialsFromIdentityHub()).anySatisfy(this::assertIssuedVerifiableCredential);
         });
     }
