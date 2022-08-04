@@ -81,8 +81,8 @@ public class RegistrationApiClientTest {
         return result.getContent();
     }
 
-    private void assertIssuedVerifiableCredential(SignedJWT p) throws ParseException {
-        assertThat(p.getJWTClaimsSet().getSubject()).isEqualTo(CLIENT_DID_WEB);
-        assertThat(p.getJWTClaimsSet().getIssueTime()).isAfter(startTime);
+    private void assertIssuedVerifiableCredential(SignedJWT jwt) throws ParseException {
+        assertThat(jwt.getJWTClaimsSet().getSubject()).isEqualTo(CLIENT_DID_WEB);
+        assertThat(jwt.getJWTClaimsSet().getIssueTime()).isAfter(startTime);
     }
 }
