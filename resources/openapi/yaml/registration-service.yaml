@@ -49,6 +49,7 @@ components:
           - AUTHORIZED
           - ONBOARDED
           - DENIED
+          - FAILED
         supportedProtocols:
           type: array
           items:
