@@ -33,6 +33,7 @@ import static org.eclipse.dataspaceconnector.registration.TestUtils.createPartic
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZED;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.DENIED;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDED;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -68,8 +69,14 @@ class ParticipantManagerTest {
         advancesState(AUTHORIZING, DENIED);
     }
 
+    @Test
+    void advancesStateFromAuthorizedToOnboarded() throws Exception {
+        var participant = advancesState(AUTHORIZED, ONBOARDED);
+        verify(verifiableCredentialService).publishVerifiableCredential(participant);
+    }
+
     @SuppressWarnings("unchecked")
-    private void advancesState(ParticipantStatus startState, ParticipantStatus endState) throws Exception {
+    private Participant advancesState(ParticipantStatus startState, ParticipantStatus endState) throws Exception {
         var participant = participantBuilder.status(startState).build();
         when(participantStore.listParticipantsWithStatus(eq(startState)))
                 .thenReturn(List.of(participant), List.of());
@@ -90,5 +97,6 @@ class ParticipantManagerTest {
                 .isEqualTo(participant);
 
         service.stop();
+        return participant;
     }
 }
