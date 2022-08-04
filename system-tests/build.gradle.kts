@@ -29,7 +29,7 @@ dependencies {
     testImplementation(testFixtures(project(":rest-client")))
     testImplementation(project(":rest-client"))
     testImplementation(project(":client-cli"))
-    testImplementation("com.squareup.okhttp3:okhttp:${okHttpVersion}") // FIXME
+    testImplementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
     testImplementation("${identityHubGroup}:identity-hub-client:${identityHubVersion}")
     testRuntimeOnly(project(":launcher"))
     testImplementation("org.assertj:assertj-core:${assertj}")
