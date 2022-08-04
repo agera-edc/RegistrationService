@@ -29,7 +29,7 @@ public class RegistrationApiClientTest {
     static final Faker FAKER = new Faker();
     static RegistryApi api;
 
-    String did = "web:did:" + FAKER.internet().url();
+    String did = "web:did:" + FAKER.internet().domainName();
 
     @BeforeAll
     static void setUpClass() {

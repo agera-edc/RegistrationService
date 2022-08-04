@@ -37,9 +37,6 @@ import java.util.Objects;
 @Path("/registry")
 public class RegistrationApiController {
 
-    /**
-     * A IDS URL (this will be removed in https://github.com/agera-edc/MinimumViableDataspace/issues/174)
-     */
     private static final String DID_HEADER = "Did";
 
     private final RegistrationService service;
