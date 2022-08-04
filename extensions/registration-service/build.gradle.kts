@@ -22,7 +22,7 @@ dependencies {
 
     implementation(project(":extensions:participant-store-spi"))
     implementation(project(":extensions:dataspace-authority-spi"))
-    implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}") //FIXME
+    implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
 
     testImplementation("org.assertj:assertj-core:${assertj}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
