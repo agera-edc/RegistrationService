@@ -19,6 +19,7 @@ import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantSt
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,6 +33,8 @@ import static org.eclipse.dataspaceconnector.registration.TestUtils.createPartic
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZED;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.DENIED;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.FAILED;
+import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDED;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -64,6 +67,11 @@ class ParticipantManagerTest {
     void advancesStateFromAuthorizingToDenied() throws Exception {
         when(credentialsVerifier.verifyCredentials()).thenReturn(false);
         advancesState(AUTHORIZING, DENIED);
+    }
+
+    @Test
+    void advancesStateFromAuthorizedToOnboarded() throws Exception {
+        advancesState(AUTHORIZED, ONBOARDED);
     }
 
     @SuppressWarnings("unchecked")
