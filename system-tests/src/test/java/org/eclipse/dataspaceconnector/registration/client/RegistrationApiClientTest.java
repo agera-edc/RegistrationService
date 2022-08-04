@@ -66,7 +66,7 @@ public class RegistrationApiClientTest {
     @Test
     void addsVerifiableCredential() {
         // sanity check
-        // FIXME assertThat(getVerifiableCredentialsFromIdentityHub()).noneSatisfy(this::assertIssuedVerifiableCredential);
+        assertThat(getVerifiableCredentialsFromIdentityHub()).noneSatisfy(this::assertIssuedVerifiableCredential);
 
         api.addParticipant(participantUrl);
 
@@ -83,6 +83,6 @@ public class RegistrationApiClientTest {
 
     private void assertIssuedVerifiableCredential(SignedJWT p) throws ParseException {
         assertThat(p.getJWTClaimsSet().getSubject()).isEqualTo(CLIENT_DID_WEB);
-        // FIXME assertThat(p.getJWTClaimsSet().getIssueTime()).isAfter(startTime);
+        assertThat(p.getJWTClaimsSet().getIssueTime()).isAfter(startTime);
     }
 }

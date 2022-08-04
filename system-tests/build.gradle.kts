@@ -20,7 +20,7 @@ val identityHubVersion: String by project
 val identityHubGroup: String by project
 val awaitility: String by project
 val jupiterVersion: String by project
-val okHttp: String by project
+val okHttpVersion: String by project
 val assertj: String by project
 val jacksonVersion: String by project
 val faker: String by project
@@ -29,7 +29,7 @@ dependencies {
     testImplementation(testFixtures(project(":rest-client")))
     testImplementation(project(":rest-client"))
     testImplementation(project(":client-cli"))
-    testImplementation("com.squareup.okhttp3:okhttp:${okHttp}") // FIXME
+    testImplementation("com.squareup.okhttp3:okhttp:${okHttpVersion}") // FIXME
     testImplementation("${identityHubGroup}:identity-hub-client:${identityHubVersion}")
     testRuntimeOnly(project(":launcher"))
     testImplementation("org.assertj:assertj-core:${assertj}")

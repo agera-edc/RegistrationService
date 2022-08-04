@@ -14,7 +14,8 @@ runs:
     - name: Checkout Identity Hub
       uses: actions/checkout@v2
       with:
-        repository: eclipse-dataspaceconnector/IdentityHub
+        # FIXME
+        repository: agera-edc/IdentityHub
         path: IdentityHub
         ref: 32ba4b5a62b729dc2c8cd7af6a187042d1e3daa6
 

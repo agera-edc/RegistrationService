@@ -131,7 +131,7 @@ public class AuthorityExtension implements ServiceExtension {
         }
 
         var mapper = context.getTypeManager().getMapper();
-        var jwtService = new VerifiableCredentialsJwtServiceImpl(mapper); // FIXME inject
+        var jwtService = new VerifiableCredentialsJwtServiceImpl(mapper);
 
         var identityHubClient = new IdentityHubClientImpl(context.getService(OkHttpClient.class), mapper, monitor);
 
