@@ -17,7 +17,7 @@ runs:
         # FIXME
         repository: agera-edc/IdentityHub
         path: IdentityHub
-        ref: 32ba4b5a62b729dc2c8cd7af6a187042d1e3daa6
+        ref: 2f86aed5c4ab696c69dd4267d09071ba5644de9a
 
     # Install Java and cache MVD Gradle build.
     - uses: actions/setup-java@v2
