@@ -18,5 +18,5 @@ import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 
 public interface VerifiableCredentialService {
-    StatusResult<Void> publishVerifiableCredential(Participant participant);
+    StatusResult<Void> pushVerifiableCredential(Participant participant);
 }

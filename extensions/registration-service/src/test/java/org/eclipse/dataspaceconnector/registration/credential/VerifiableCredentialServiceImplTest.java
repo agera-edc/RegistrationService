@@ -81,8 +81,8 @@ class VerifiableCredentialServiceImplTest {
     }
 
     @Test
-    void publishVerifiableCredential_createsMembershipCredential() throws Exception {
-        var result = service.publishVerifiableCredential(participantBuilder.build());
+    void pushVerifiableCredential_createsMembershipCredential() throws Exception {
+        var result = service.pushVerifiableCredential(participantBuilder.build());
         assertThat(result.succeeded()).isTrue();
 
         verify(jwtService).buildSignedJwt(vc.capture(), eq(dataspaceDid), eq(participantDid), eq(privateKeyWrapper));
@@ -91,14 +91,14 @@ class VerifiableCredentialServiceImplTest {
     }
 
     @Test
-    void publishVerifiableCredential_pushesCredential() {
-        service.publishVerifiableCredential(participantBuilder.build());
+    void pushVerifiableCredential_pushesCredential() {
+        service.pushVerifiableCredential(participantBuilder.build());
 
         verify(identityHubClient).addVerifiableCredential(identityHubUrl, jwt);
     }
 
     @Test
-    void publishVerifiableCredential_whenDidNotResolved_throws() {
+    void pushVerifiableCredential_whenDidNotResolved_throws() {
         when(resolverRegistry.resolve(participantDid))
                 .thenReturn(Result.failure(failure));
 
@@ -107,7 +107,7 @@ class VerifiableCredentialServiceImplTest {
     }
 
     @Test
-    void publishVerifiableCredential_whenDidDocumentDoesNotContainHubUrl_throws() {
+    void pushVerifiableCredential_whenDidDocumentDoesNotContainHubUrl_throws() {
         when(resolverRegistry.resolve(participantDid))
                 .thenReturn(Result.success(DidDocument.Builder.newInstance()
                         .service(List.of(new Service(FAKER.lorem().word(), FAKER.lorem().word(), identityHubUrl)))
@@ -118,7 +118,7 @@ class VerifiableCredentialServiceImplTest {
     }
 
     @Test
-    void publishVerifiableCredential_whenJwtCannotBeSigned_throws() throws Exception {
+    void pushVerifiableCredential_whenJwtCannotBeSigned_throws() throws Exception {
         when(jwtService.buildSignedJwt(any(), eq(dataspaceDid), eq(participantDid), eq(privateKeyWrapper)))
                 .thenThrow(new JOSEException(failure));
 
@@ -127,7 +127,7 @@ class VerifiableCredentialServiceImplTest {
     }
 
     @Test
-    void publishVerifiableCredential_whenPushToIdentityHubFails_throws() {
+    void pushVerifiableCredential_whenPushToIdentityHubFails_throws() {
         when(identityHubClient.addVerifiableCredential(identityHubUrl, jwt))
                 .thenReturn(StatusResult.failure(FAKER.options().option(ResponseStatus.class), failure));
 
@@ -137,7 +137,7 @@ class VerifiableCredentialServiceImplTest {
 
     @NotNull
     private AbstractStringAssert<?> assertThatCallFailsWith(ResponseStatus status) {
-        StatusResult<Void> result = service.publishVerifiableCredential(participantBuilder.build());
+        StatusResult<Void> result = service.pushVerifiableCredential(participantBuilder.build());
         assertThat(result.failed()).isTrue();
         assertThat(result.getFailure().status()).isEqualTo(status);
         return assertThat(result.getFailureDetail());

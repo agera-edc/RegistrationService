@@ -74,18 +74,18 @@ class ParticipantManagerTest {
 
     @Test
     void advancesStateFromAuthorizedToOnboarded() throws Exception {
-        when(verifiableCredentialService.publishVerifiableCredential(any()))
+        when(verifiableCredentialService.pushVerifiableCredential(any()))
                 .thenReturn(StatusResult.success());
         var participant = advancesState(AUTHORIZED, ONBOARDED);
-        verify(verifiableCredentialService).publishVerifiableCredential(participant);
+        verify(verifiableCredentialService).pushVerifiableCredential(participant);
     }
 
     @Test
     void advancesStateFromAuthorizedToFailed() throws Exception {
-        when(verifiableCredentialService.publishVerifiableCredential(any()))
+        when(verifiableCredentialService.pushVerifiableCredential(any()))
                 .thenReturn(StatusResult.failure(ResponseStatus.FATAL_ERROR));
         var participant = advancesState(AUTHORIZED, FAILED);
-        verify(verifiableCredentialService).publishVerifiableCredential(participant);
+        verify(verifiableCredentialService).pushVerifiableCredential(participant);
     }
 
 
