@@ -23,6 +23,7 @@ import org.eclipse.dataspaceconnector.identityhub.credentials.VerifiableCredenti
 import org.eclipse.dataspaceconnector.identityhub.credentials.model.VerifiableCredential;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.eclipse.dataspaceconnector.spi.response.ResponseStatus;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 
@@ -65,24 +66,24 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
         try {
             jwt = jwtService.buildSignedJwt(vc, dataspaceDid, did, privateKeyWrapper);
         } catch (Exception e) {
-            return StatusResult.failure(FATAL_ERROR, e.toString());
+            return failureResult(FATAL_ERROR, e.toString());
         }
 
         monitor.debug(() -> "Resolving DID Document for " + did);
         var didDocument = resolverRegistry.resolve(did);
         if (didDocument.failed()) {
-            return StatusResult.failure(ERROR_RETRY, "Failed to resolve DID " + did + ". " + didDocument.getFailureDetail());
+            return failureResult(ERROR_RETRY, "Failed to resolve DID " + did + ". " + didDocument.getFailureDetail());
         }
         var identityHubUrlResult = getIdentityHubBaseUrl(didDocument.getContent());
         if (identityHubUrlResult.failed()) {
-            return StatusResult.failure(FATAL_ERROR, "Failed to resolve Identity Hub URL from DID document for " + did);
+            return failureResult(FATAL_ERROR, "Failed to resolve Identity Hub URL from DID document for " + did);
         }
         String identityHubUrl = identityHubUrlResult.getContent();
 
         monitor.debug(() -> "Sending VC to identity hub " + identityHubUrl);
         var addVcResult = identityHubClient.addVerifiableCredential(identityHubUrl, jwt);
         if (addVcResult.failed()) {
-            return StatusResult.failure(ERROR_RETRY, "Failed to send VC. " + addVcResult.getFailureDetail());
+            return failureResult(ERROR_RETRY, "Failed to send VC. " + addVcResult.getFailureDetail());
         }
 
         monitor.info("Sent dataspace membership VC for " + did);
@@ -98,5 +99,10 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
 
         return hubBaseUrl.map(u -> Result.success(u.getServiceEndpoint()))
                 .orElse(Result.failure("Failed getting Identity Hub URL"));
+    }
+
+    private StatusResult<Void> failureResult(ResponseStatus status, String message) {
+        monitor.warning(message);
+        return StatusResult.failure(status, message);
     }
 }
