@@ -7,7 +7,7 @@ These tests deploy the application in a docker environment, and use the generate
 Build the application launchers:
 
 ```
-./gradlew shadowJar
+./gradlew -DuseFsVault="true" shadowJar
 ```
 
 Run the application using Docker compose:
