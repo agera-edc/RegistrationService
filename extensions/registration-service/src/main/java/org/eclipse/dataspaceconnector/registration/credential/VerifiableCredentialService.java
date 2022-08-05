@@ -17,6 +17,10 @@ package org.eclipse.dataspaceconnector.registration.credential;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 
+/**
+ * Generates dataspace membership verifiable credential, and pushes it to the participant's identity hub
+ * resolved from its DID Document.
+ */
 public interface VerifiableCredentialService {
     StatusResult<Void> pushVerifiableCredential(Participant participant);
 }
