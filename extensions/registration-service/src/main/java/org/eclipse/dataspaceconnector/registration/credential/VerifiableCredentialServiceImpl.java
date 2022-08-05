@@ -58,31 +58,34 @@ public class VerifiableCredentialServiceImpl implements VerifiableCredentialServ
                 .credentialSubject(Map.of("memberOfDataspace", dataspaceDid))
                 .build();
 
-        var subject = participant.getDid();
+        var did = participant.getDid();
+
+        monitor.debug("Building VC JWT");
         SignedJWT jwt;
         try {
-            jwt = jwtService.buildSignedJwt(vc, dataspaceDid, subject, privateKeyWrapper);
+            jwt = jwtService.buildSignedJwt(vc, dataspaceDid, did, privateKeyWrapper);
         } catch (Exception e) {
             return StatusResult.failure(FATAL_ERROR, e.toString());
         }
-        monitor.info("Created dataspace membership VC for " + subject);
 
-        var did = participant.getDid();
+        monitor.debug(() -> "Resolving DID Document for " + did);
         var didDocument = resolverRegistry.resolve(did);
         if (didDocument.failed()) {
             return StatusResult.failure(ERROR_RETRY, "Failed to resolve DID " + did + ". " + didDocument.getFailureDetail());
         }
-        var hubBaseUrl = getIdentityHubBaseUrl(didDocument.getContent());
-        if (hubBaseUrl.failed()) {
+        var identityHubUrlResult = getIdentityHubBaseUrl(didDocument.getContent());
+        if (identityHubUrlResult.failed()) {
             return StatusResult.failure(FATAL_ERROR, "Failed to resolve Identity Hub URL from DID document for " + did);
         }
+        String identityHubUrl = identityHubUrlResult.getContent();
 
-        var addVcResult = identityHubClient.addVerifiableCredential(hubBaseUrl.getContent(), jwt);
+        monitor.debug(() -> "Sending VC to identity hub " + identityHubUrl);
+        var addVcResult = identityHubClient.addVerifiableCredential(identityHubUrl, jwt);
         if (addVcResult.failed()) {
             return StatusResult.failure(ERROR_RETRY, "Failed to send VC. " + addVcResult.getFailureDetail());
         }
 
-        monitor.info("Sent dataspace membership VC for " + subject);
+        monitor.info("Sent dataspace membership VC for " + did);
         return StatusResult.success();
     }
 
