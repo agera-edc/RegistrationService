@@ -40,7 +40,7 @@ public class RegistrationServiceCli {
 
     private static final ObjectMapper MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    @CommandLine.Option(names = { "-d", "--dataspace-did" }, description = "Dataspace Authority DID.", defaultValue = "")
+    @CommandLine.Option(names = { "-d", "--dataspace-did" }, required = true, description = "Dataspace Authority DID.")
     String dataspaceDid;
 
     @CommandLine.Option(names = { "-c", "--client-did" }, required = true, description = "Client DID.")

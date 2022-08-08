@@ -70,7 +70,9 @@ public class RegistrationApiCommandLineClientTest {
         cmd.setOut(new PrintWriter(writer));
         var listCmdExitCode = cmd.execute(
                 "-c", CLIENT_DID_WEB,
+                "-d", DATASPACE_DID_WEB,
                 "-k", privateKeyFile.toString(),
+                "--http-scheme",
                 "participants", "list");
         assertThat(listCmdExitCode).isEqualTo(0);
 
