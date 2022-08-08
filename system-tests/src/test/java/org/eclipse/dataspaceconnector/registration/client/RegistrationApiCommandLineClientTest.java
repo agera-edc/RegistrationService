@@ -52,6 +52,9 @@ public class RegistrationApiCommandLineClientTest {
 
     static final ObjectMapper MAPPER = new ObjectMapper();
     static Path privateKeyFile;
+    /*
+    host.docker.internal is used in docker-compose file to connect from Registration Service container to a mock-service on the host
+     */
     String didWeb = "did:web:host.docker.internal%3A" + API_PORT;
     static ClientAndServer httpSourceClientAndServer;
 
