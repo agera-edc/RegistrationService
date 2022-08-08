@@ -17,6 +17,12 @@ docker-compose up --build
 ```
 
 Run tests:
-```
+
+```bash
 INTEGRATION_TEST=true ./gradlew :system-tests:test
+```
+
+``````powershell
+$Env:INTEGRATION_TEST='true'
+.\gradlew :system-tests:test
 ```
