@@ -126,8 +126,8 @@ public class AuthorityExtension implements ServiceExtension {
     public CredentialsVerifier credentialsVerifier(ServiceExtensionContext context) {
         var mapper = context.getTypeManager().getMapper();
 
-        var identityHubClient = new IdentityHubClientImpl(context.getService(OkHttpClient.class), mapper, monitor);
-        return new DummyCredentialsVerifier(monitor, context.getService(DidResolverRegistry.class), identityHubClient);
+        var identityHubClient = new IdentityHubClientImpl(context.getService(OkHttpClient.class), mapper, context.getMonitor());
+        return new DummyCredentialsVerifier(context.getMonitor(), context.getService(DidResolverRegistry.class), identityHubClient);
     }
 
     private VerifiableCredentialService verifiableCredentialService(ServiceExtensionContext context) {
