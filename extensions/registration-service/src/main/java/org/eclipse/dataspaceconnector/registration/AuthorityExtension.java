@@ -15,6 +15,7 @@
 package org.eclipse.dataspaceconnector.registration;
 
 import okhttp3.OkHttpClient;
+import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
 import org.eclipse.dataspaceconnector.extension.jersey.mapper.EdcApiExceptionMapper;
 import org.eclipse.dataspaceconnector.iam.did.spi.credentials.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
@@ -31,6 +32,7 @@ import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredenti
 import org.eclipse.dataspaceconnector.registration.manager.ParticipantManager;
 import org.eclipse.dataspaceconnector.registration.store.InMemoryParticipantStore;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
+import org.eclipse.dataspaceconnector.registration.transform.ParticipantToParticipantDtoTransformer;
 import org.eclipse.dataspaceconnector.spi.EdcException;
 import org.eclipse.dataspaceconnector.spi.EdcSetting;
 import org.eclipse.dataspaceconnector.spi.WebService;
@@ -85,6 +87,9 @@ public class AuthorityExtension implements ServiceExtension {
     @Inject
     private PrivateKeyResolver privateKeyResolver;
 
+    @Inject
+    private DtoTransformerRegistry transformerRegistry;
+
     private ParticipantManager participantManager;
     @Inject
     private PolicyEngine policyEngine;
@@ -109,6 +114,7 @@ public class AuthorityExtension implements ServiceExtension {
         var participantVerifier = new DefaultParticipantVerifier(didResolverRegistry, verifier);
 
         participantManager = new ParticipantManager(monitor, participantStore, participantVerifier, executorInstrumentation, verifiableCredentialService);
+        transformerRegistry.register(new ParticipantToParticipantDtoTransformer());
 
         var registrationService = new RegistrationServiceImpl(monitor, participantStore, policyEngine, dataspacePolicy.get(), verifier, didResolverRegistry);
         webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
