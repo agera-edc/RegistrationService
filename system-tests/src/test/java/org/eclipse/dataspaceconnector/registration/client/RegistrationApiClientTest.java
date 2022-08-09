@@ -30,13 +30,13 @@ import java.time.Instant;
 import java.util.Collection;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.CLIENT_DID_WEB;
 import static org.eclipse.dataspaceconnector.registration.client.TestUtils.UNREGISTERED_CLIENT_DID_WEB;
 
+@IntegrationTest
 public class RegistrationApiClientTest {
     static final String API_URL = "http://localhost:8182/authority";
     static final Faker FAKER = new Faker();
@@ -67,13 +67,12 @@ public class RegistrationApiClientTest {
 
     @Test
     void addsVerifiableCredential() {
-
         // sanity check
         assertThat(getVerifiableCredentialsFromIdentityHub()).noneSatisfy(this::assertIssuedVerifiableCredential);
 
         api.addParticipant(participantUrl);
 
-        await().atMost(20, SECONDS).untilAsserted(() -> {
+        await().atMost(2, MINUTES).untilAsserted(() -> {
             assertThat(getVerifiableCredentialsFromIdentityHub()).anySatisfy(this::assertIssuedVerifiableCredential);
         });
     }
