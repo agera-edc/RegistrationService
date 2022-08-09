@@ -17,6 +17,7 @@ package org.eclipse.dataspaceconnector.registration.manager;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
+import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.response.ResponseStatus;
@@ -49,7 +50,8 @@ class ParticipantManagerTest {
     Monitor monitor = mock(Monitor.class);
     ParticipantStore participantStore = mock(ParticipantStore.class);
     CredentialsVerifier credentialsVerifier = mock(CredentialsVerifier.class);
-    ParticipantManager service = new ParticipantManager(monitor, participantStore, credentialsVerifier, ExecutorInstrumentation.noop());
+    VerifiableCredentialService verifiableCredentialService = mock(VerifiableCredentialService.class);
+    ParticipantManager service = new ParticipantManager(monitor, participantStore, credentialsVerifier, ExecutorInstrumentation.noop(), verifiableCredentialService);
     Participant.Builder participantBuilder = createParticipant();
     ArgumentCaptor<Participant> captor = ArgumentCaptor.forClass(Participant.class);
 
@@ -82,7 +84,7 @@ class ParticipantManagerTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void advancesState(ParticipantStatus startState, ParticipantStatus endState) throws Exception {
+    private Participant advancesState(ParticipantStatus startState, ParticipantStatus endState) throws Exception {
         var participant = participantBuilder.status(startState).build();
         when(participantStore.listParticipantsWithStatus(eq(startState)))
                 .thenReturn(List.of(participant), List.of());
@@ -103,5 +105,6 @@ class ParticipantManagerTest {
                 .isEqualTo(participant);
 
         service.stop();
+        return participant;
     }
 }
