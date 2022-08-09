@@ -30,4 +30,4 @@ ENV WEB_HTTP_PATH="/api"
 ENV JVM_ARGS=$JVM_ARGS
 ENV APPINSIGHTS_AGENT_VERSION=$APPINSIGHTS_AGENT_VERSION
 ENTRYPOINT [ "sh", "-c", \
-    "exec java ${ENV_JVM_ARGS} -Djava.util.logging.config.file=/app/logging.properties -jar app.jar" ]    "exec java -javaagent:applicationinsights-agent-$APPINSIGHTS_AGENT_VERSION.jar -Djava.util.logging.config.file=/app/logging.properties $JVM_ARGS -jar app.jar"]
+    "exec java -javaagent:applicationinsights-agent-$APPINSIGHTS_AGENT_VERSION.jar -Djava.util.logging.config.file=/app/logging.properties $JVM_ARGS -jar app.jar"]
