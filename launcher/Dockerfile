@@ -3,6 +3,7 @@ FROM openjdk:17-slim-buster
 
 # Optional JVM arguments, such as memory settings
 ARG JVM_ARGS=""
+ARG APPINSIGHTS_AGENT_VERSION=3.2.11
 
 # Install curl, then delete apt indexes to save image space
 RUN apt update \
@@ -10,6 +11,9 @@ RUN apt update \
     && rm -rf /var/cache/apt/archives /var/lib/apt/lists
 
 WORKDIR /app
+
+RUN curl --fail -LO https://github.com/microsoft/ApplicationInsights-Java/releases/download/$APPINSIGHTS_AGENT_VERSION/applicationinsights-agent-$APPINSIGHTS_AGENT_VERSION.jar
+
 COPY ./build/libs/app.jar /app
 COPY ./src/main/resources/logging.properties /app
 
@@ -22,7 +26,8 @@ ENV WEB_HTTP_PORT="8181"
 ENV WEB_HTTP_PATH="/api"
 
 # Use "exec" for graceful termination (SIGINT) to reach JVM.
-# ARG can not be used in ENTRYPOINT so storing value in an ENV variable
-ENV ENV_JVM_ARGS=$JVM_ARGS
+# ARG can not be used in ENTRYPOINT so storing values in ENV variables
+ENV JVM_ARGS=$JVM_ARGS
+ENV APPINSIGHTS_AGENT_VERSION=$APPINSIGHTS_AGENT_VERSION
 ENTRYPOINT [ "sh", "-c", \
-    "exec java ${ENV_JVM_ARGS} -Djava.util.logging.config.file=/app/logging.properties -jar app.jar" ]
+    "exec java ${ENV_JVM_ARGS} -Djava.util.logging.config.file=/app/logging.properties -jar app.jar" ]    "exec java -javaagent:applicationinsights-agent-$APPINSIGHTS_AGENT_VERSION.jar -Djava.util.logging.config.file=/app/logging.properties $JVM_ARGS -jar app.jar"]
