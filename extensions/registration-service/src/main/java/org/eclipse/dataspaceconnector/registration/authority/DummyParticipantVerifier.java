@@ -14,15 +14,14 @@
 
 package org.eclipse.dataspaceconnector.registration.authority;
 
+import org.eclipse.dataspaceconnector.iam.did.spi.credentials.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
-import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClient;
 import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 
-import static org.eclipse.dataspaceconnector.registration.utils.DidDocumentUtils.getIdentityHubBaseUrl;
+import static java.lang.String.format;
 import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.ERROR_RETRY;
-import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.FATAL_ERROR;
 
 /**
  * Implementation of {@link ParticipantVerifier} that only retrieves verifiable credentials,
@@ -33,35 +32,32 @@ import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.FATAL_E
  */
 public class DummyParticipantVerifier implements ParticipantVerifier {
 
-    private final IdentityHubClient identityHubClient;
     private final Monitor monitor;
     private final DidResolverRegistry resolverRegistry;
+    private final CredentialsVerifier credentialsVerifier;
 
-    public DummyParticipantVerifier(Monitor monitor, DidResolverRegistry resolverRegistry, IdentityHubClient identityHubClient) {
+    public DummyParticipantVerifier(Monitor monitor, DidResolverRegistry resolverRegistry, CredentialsVerifier credentialsVerifier) {
         this.monitor = monitor;
         this.resolverRegistry = resolverRegistry;
-        this.identityHubClient = identityHubClient;
+        this.credentialsVerifier = credentialsVerifier;
     }
 
     @Override
     public StatusResult<Boolean> verifyCredentials(String did) {
-        monitor.info("Get credentials VC for " + did);
+        monitor.info(() -> "Get credentials VC for " + did);
 
         var didDocument = resolverRegistry.resolve(did);
         if (didDocument.failed()) {
             return StatusResult.failure(ERROR_RETRY, "Failed to resolve DID " + did + ". " + didDocument.getFailureDetail());
         }
-        var hubBaseUrl = getIdentityHubBaseUrl(didDocument.getContent());
-        if (hubBaseUrl.failed()) {
-            return StatusResult.failure(FATAL_ERROR, "Failed to resolve Identity Hub URL from DID document for " + did);
-        }
 
-        var vcResult = identityHubClient.getVerifiableCredentials(hubBaseUrl.getContent());
+        var vcResult = credentialsVerifier.getVerifiedCredentials(didDocument.getContent());
         if (vcResult.failed()) {
             return StatusResult.failure(ERROR_RETRY, "Failed to retrieve VCs. " + vcResult.getFailureDetail());
         }
+        var credentials = vcResult.getContent();
 
-        monitor.info("Retrieved VCs for " + did);
+        monitor.info(() -> format("Retrieved VCs for %s: %s", did, credentials));
         return StatusResult.success(true);
     }
 }

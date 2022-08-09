@@ -16,6 +16,7 @@ package org.eclipse.dataspaceconnector.registration;
 
 import okhttp3.OkHttpClient;
 import org.eclipse.dataspaceconnector.extension.jersey.mapper.EdcApiExceptionMapper;
+import org.eclipse.dataspaceconnector.iam.did.spi.credentials.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidPublicKeyResolver;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
@@ -51,7 +52,7 @@ import static org.eclipse.dataspaceconnector.iam.did.spi.document.DidConstants.D
 /**
  * EDC extension to boot the services used by the Authority Service.
  */
-@Requires({PrivateKeyResolver.class, OkHttpClient.class, DidResolverRegistry.class})
+@Requires({PrivateKeyResolver.class, OkHttpClient.class, DidResolverRegistry.class, CredentialsVerifier.class})
 public class AuthorityExtension implements ServiceExtension {
 
     public static final String CONTEXT_ALIAS = "authority";
@@ -123,11 +124,8 @@ public class AuthorityExtension implements ServiceExtension {
     }
 
     @Provider(isDefault = true)
-    public ParticipantVerifier credentialsVerifier(ServiceExtensionContext context) {
-        var mapper = context.getTypeManager().getMapper();
-
-        var identityHubClient = new IdentityHubClientImpl(context.getService(OkHttpClient.class), mapper, context.getMonitor());
-        return new DummyParticipantVerifier(context.getMonitor(), context.getService(DidResolverRegistry.class), identityHubClient);
+    public ParticipantVerifier participantVerifier(ServiceExtensionContext context) {
+        return new DummyParticipantVerifier(context.getMonitor(), context.getService(DidResolverRegistry.class), context.getService(CredentialsVerifier.class));
     }
 
     private VerifiableCredentialService verifiableCredentialService(ServiceExtensionContext context) {
