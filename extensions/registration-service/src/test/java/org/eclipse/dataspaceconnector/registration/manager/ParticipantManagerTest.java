@@ -24,6 +24,8 @@ import org.eclipse.dataspaceconnector.spi.response.ResponseStatus;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
@@ -72,14 +74,25 @@ class ParticipantManagerTest {
         advancesState(AUTHORIZING, DENIED);
     }
 
-    @Test
-    void advancesStateFromAuthorizingToFailed() throws Exception {
-        when(credentialsVerifier.verifyCredentials(any())).thenReturn(StatusResult.failure(ResponseStatus.ERROR_RETRY));
+    @ParameterizedTest
+    @EnumSource(ResponseStatus.class)
+    void advancesStateFromAuthorizingToFailed(ResponseStatus errorStatus) throws Exception {
+        when(credentialsVerifier.verifyCredentials(any())).thenReturn(StatusResult.failure(errorStatus));
         advancesState(AUTHORIZING, FAILED);
+    }
+
+    @ParameterizedTest
+    @EnumSource(ResponseStatus.class)
+    void advancesStateFromAuthorizedToFailed(ResponseStatus errorStatus) throws Exception {
+        when(verifiableCredentialService.pushVerifiableCredential(any()))
+                .thenReturn(StatusResult.failure(errorStatus));
+        advancesState(AUTHORIZED, FAILED);
     }
 
     @Test
     void advancesStateFromAuthorizedToOnboarded() throws Exception {
+        when(verifiableCredentialService.pushVerifiableCredential(any()))
+                .thenReturn(StatusResult.success());
         advancesState(AUTHORIZED, ONBOARDED);
     }
 
