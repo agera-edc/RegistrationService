@@ -22,7 +22,6 @@ import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVeri
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
-import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.eclipse.dataspaceconnector.spi.retry.WaitStrategy;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 

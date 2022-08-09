@@ -14,14 +14,13 @@
 
 package org.eclipse.dataspaceconnector.registration.authority;
 
-import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
 import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClient;
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
-import org.eclipse.dataspaceconnector.spi.result.Result;
 
+import static org.eclipse.dataspaceconnector.registration.utils.DidDocumentUtils.getIdentityHubBaseUrl;
 import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.ERROR_RETRY;
 import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.FATAL_ERROR;
 
@@ -33,7 +32,6 @@ import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.FATAL_E
  * This is meant as a starting point for implementing custom dataspace onboarding logic.
  */
 public class DummyCredentialsVerifier implements CredentialsVerifier {
-    private static final String IDENTITY_HUB_SERVICE_TYPE = "IdentityHub";
 
     private final IdentityHubClient identityHubClient;
     private final Monitor monitor;
@@ -65,17 +63,5 @@ public class DummyCredentialsVerifier implements CredentialsVerifier {
 
         monitor.info("Retrieved VCs for " + did);
         return StatusResult.success(true);
-    }
-
-    // FIXME duplicate code with https://github.com/agera-edc/RegistrationService/pull/19/files
-    private Result<String> getIdentityHubBaseUrl(DidDocument didDocument) {
-        var hubBaseUrl = didDocument
-                .getService()
-                .stream()
-                .filter(s -> s.getType().equals(IDENTITY_HUB_SERVICE_TYPE))
-                .findFirst();
-
-        return hubBaseUrl.map(u -> Result.success(u.getServiceEndpoint()))
-                .orElse(Result.failure("Failed getting Identity Hub URL"));
     }
 }
