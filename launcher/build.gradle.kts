@@ -29,6 +29,9 @@ dependencies {
     implementation("${edcGroup}:observability-api:${edcVersion}")
     implementation("${edcGroup}:filesystem-configuration:${edcVersion}")
 
+    // JDK Logger
+    implementation("${edcGroup}:jdk-logger-monitor:${edcVersion}")
+
     // To use FileSystem vault e.g. -DuseFsVault="true".Only for non-production usages.
     val useFsVault: Boolean = System.getProperty("useFsVault", "false").toBoolean()
     if (useFsVault) {

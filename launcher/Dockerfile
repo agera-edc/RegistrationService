@@ -11,6 +11,7 @@ RUN apt update \
 
 WORKDIR /app
 COPY ./build/libs/app.jar /app
+COPY ./src/main/resources/logging.properties /app
 
 EXPOSE 8182
 
@@ -24,4 +25,4 @@ ENV WEB_HTTP_PATH="/api"
 # ARG can not be used in ENTRYPOINT so storing value in an ENV variable
 ENV ENV_JVM_ARGS=$JVM_ARGS
 ENTRYPOINT [ "sh", "-c", \
-    "exec java ${ENV_JVM_ARGS} -jar app.jar"]
+    "exec java ${ENV_JVM_ARGS} -Djava.util.logging.config.file=/app/logging.properties -jar app.jar" ]
