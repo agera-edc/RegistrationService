@@ -15,75 +15,97 @@
 package org.eclipse.dataspaceconnector.registration.api;
 
 import com.github.javafaker.Faker;
-import org.eclipse.dataspaceconnector.iam.did.spi.credentials.CredentialsVerifier;
-import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
-import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
-import org.eclipse.dataspaceconnector.policy.model.Policy;
+import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
+import org.eclipse.dataspaceconnector.registration.model.ParticipantDto;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
+import org.eclipse.dataspaceconnector.spi.EdcException;
+import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
-import org.eclipse.dataspaceconnector.spi.policy.PolicyEngine;
-import org.eclipse.dataspaceconnector.spi.result.Result;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspaceconnector.registration.DataspacePolicy.ONBOARDING_SCOPE;
-import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipant;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.eclipse.dataspaceconnector.registration.TestUtils.createParticipantDto;
+import static org.eclipse.dataspaceconnector.registration.authority.TestUtils.createParticipant;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.eclipse.dataspaceconnector.spi.result.Result.failure;
+import static org.eclipse.dataspaceconnector.spi.result.Result.success;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class RegistrationServiceTest {
     static final Faker FAKER = new Faker();
 
-    private final Monitor monitor = mock(Monitor.class);
-    private final ParticipantStore participantStore = mock(ParticipantStore.class);
-    private final PolicyEngine policyEngine = mock(PolicyEngine.class);
+    Monitor monitor = mock(Monitor.class);
+    ParticipantStore participantStore = mock(ParticipantStore.class);
+    DtoTransformerRegistry dtoTransformerRegistry = mock(DtoTransformerRegistry.class);
+    RegistrationService service = new RegistrationService(monitor, participantStore, dtoTransformerRegistry);
 
-    private final Policy dataspacePolicy = Policy.Builder.newInstance().build();
-    private final CredentialsVerifier verifier = mock(CredentialsVerifier.class);
-    private final Participant.Builder participantBuilder = createParticipant();
-    private final String did = FAKER.internet().url();
-    private final String idsUrl = FAKER.internet().url();
-    private final DidResolverRegistry didResolverRegistry = mock(DidResolverRegistry.class);
-    private RegistrationServiceImpl service;
-
-    @BeforeEach
-    void setup() {
-        when(policyEngine.evaluate(any(), any(), any())).thenReturn(Result.success(Policy.Builder.newInstance().build()));
-        when(didResolverRegistry.resolve(eq(did))).thenReturn(Result.success(new DidDocument()));
-        when(verifier.getVerifiedCredentials(any())).thenReturn(Result.success(Map.of("region", "eu")));
-        service = new RegistrationServiceImpl(monitor, participantStore, policyEngine, dataspacePolicy, verifier, didResolverRegistry);
-    }
+    Participant.Builder participantBuilder = createParticipant();
+    ParticipantDto.Builder participantDtoBuilder = createParticipantDto();
+    String did = FAKER.internet().url();
+    String idsUrl = FAKER.internet().url();
 
     @Test
     void listParticipants_empty() {
+        when(participantStore.listParticipants()).thenReturn(List.of());
+
         assertThat(service.listParticipants()).isEmpty();
+        verify(participantStore).listParticipants();
+        verifyNoInteractions(dtoTransformerRegistry);
     }
 
     @Test
     void listParticipants() {
         var participant = participantBuilder.build();
+        var participantDto = participantDtoBuilder.build();
         when(participantStore.listParticipants()).thenReturn(List.of(participant));
-        assertThat(service.listParticipants()).containsExactly(participant);
+        when(dtoTransformerRegistry.transform(participant, ParticipantDto.class))
+                .thenReturn(success(participantDto));
+
+        var result = service.listParticipants();
+
+        assertThat(result).hasSize(1);
+        assertThat(result).containsExactly(participantDto);
+        verify(participantStore).listParticipants();
+        verify(dtoTransformerRegistry).transform(participant, ParticipantDto.class);
+    }
+
+    @Test
+    void listParticipants_verifyResultFilter() {
+        var participant1 = participantBuilder.build();
+        var participant2 = createParticipant().build();
+        var participantDto1 = participantDtoBuilder.build();
+
+        when(participantStore.listParticipants()).thenReturn(List.of(participant1, participant2));
+        // Transform for participant1 returns success.
+        when(dtoTransformerRegistry.transform(participant1, ParticipantDto.class))
+                .thenReturn(success(participantDto1));
+        // Transform for participant2 returns failure.
+        when(dtoTransformerRegistry.transform(participant2, ParticipantDto.class))
+                .thenReturn(failure("dummy-failure-from-test"));
+
+        var result = service.listParticipants();
+
+        assertThat(result).hasSize(1);
+        assertThat(result).containsExactly(participantDto1);
+        verify(participantStore).listParticipants();
+        verify(dtoTransformerRegistry).transform(participant1, ParticipantDto.class);
+        verify(dtoTransformerRegistry).transform(participant2, ParticipantDto.class);
     }
 
     @Test
     void addParticipant() {
-        var result = service.addParticipant(did, idsUrl);
+        service.addParticipant(did, idsUrl);
 
         var captor = ArgumentCaptor.forClass(Participant.class);
         verify(participantStore).save(captor.capture());
-        assertThat(result.succeeded()).isTrue();
         assertThat(captor.getValue())
                 .usingRecursiveComparison()
                 .isEqualTo(Participant.Builder.newInstance()
@@ -96,32 +118,48 @@ class RegistrationServiceTest {
     }
 
     @Test
-    void addParticipant_whenPolicyNotSatisfied_shouldFail() {
-        when(policyEngine.evaluate(eq(ONBOARDING_SCOPE), any(), any())).thenReturn(Result.failure("foo"));
+    void findByDid() {
+        var participant = participantBuilder.build();
+        var participantDto = participantDtoBuilder.build();
+        when(participantStore.findByDid(participant.getDid()))
+                .thenReturn(participant);
+        when(dtoTransformerRegistry.transform(participant, ParticipantDto.class))
+                .thenReturn(success(participantDto));
 
-        var result = service.addParticipant(did, idsUrl);
-        assertThat(result.failed()).isTrue();
+        assertThat(service.findByDid(participant.getDid())).isEqualTo(participantDto);
+
+        verify(participantStore).findByDid(participant.getDid());
+        verify(dtoTransformerRegistry).transform(participant, ParticipantDto.class);
     }
 
     @Test
-    void addParticipant_didNotResolved_shouldFail() {
-        when(didResolverRegistry.resolve(eq(did))).thenReturn(Result.failure("not found"));
+    void findByDid_dtoTransformerFailure() {
+        var participant = participantBuilder.build();
+        when(participantStore.findByDid(participant.getDid()))
+                .thenReturn(participant);
+        when(dtoTransformerRegistry.transform(participant, ParticipantDto.class))
+                .thenReturn(failure("dummy-failure-from-test"));
 
-        var voidResult = service.addParticipant(did, idsUrl);
-        assertThat(voidResult.failed()).isTrue();
+        assertThatThrownBy(() ->
+                service.findByDid(participant.getDid())
+        ).isInstanceOf(EdcException.class);
+
+        verify(participantStore).findByDid(participant.getDid());
+        verify(dtoTransformerRegistry).transform(participant, ParticipantDto.class);
     }
 
     @Test
-    void addParticipant_claimsVerificationFails_shouldFail() {
-        when(verifier.getVerifiedCredentials(any())).thenReturn(Result.failure("not verified"));
-        var result = service.addParticipant(did, idsUrl);
-        assertThat(result.failed()).isTrue();
+    void findByDid_notFound() {
+        var participant = participantBuilder.build();
+        when(participantStore.findByDid(participant.getDid()))
+                .thenReturn(null);
+
+        assertThatThrownBy(() ->
+                service.findByDid(participant.getDid())
+        ).isInstanceOf(ObjectNotFoundException.class);
+
+        verify(participantStore).findByDid(participant.getDid());
+        verifyNoInteractions(dtoTransformerRegistry);
     }
 
-    @Test
-    void addParticipant_noClaims_shouldFail() {
-        when(verifier.getVerifiedCredentials(any())).thenReturn(Result.success(Collections.emptyMap()));
-        var result = service.addParticipant(did, idsUrl);
-        assertThat(result.failed()).isTrue();
-    }
 }

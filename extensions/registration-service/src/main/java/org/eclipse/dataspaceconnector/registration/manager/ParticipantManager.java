@@ -78,8 +78,10 @@ public class ParticipantManager {
     }
 
     private Boolean processAuthorizing(Participant participant) {
-        var credentialsValid = participantVerifier.verifyCredentials(participant).succeeded();
-        if (credentialsValid) {
+        var credentialsValid = participantVerifier.verifyCredentials(participant.getDid());
+        if (credentialsValid.failed()) {
+            participant.transitionFailed();
+        } else if (credentialsValid.getContent()) {
             participant.transitionAuthorized();
         } else {
             participant.transitionDenied(); // todo: pass result failure message to the participant state?

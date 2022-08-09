@@ -14,13 +14,12 @@
 
 package org.eclipse.dataspaceconnector.registration.authority.spi;
 
-import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
-import org.eclipse.dataspaceconnector.spi.result.Result;
+import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 
 /**
- * Placeholder for future verifier definition that will verify caller identity, and fetch and evaluate verifiable
- * presentations.
+ * Verifier that fetches and evaluate verifiable credentials to
+ * authorize dataspace membership.
  */
 public interface ParticipantVerifier {
-    Result<Void> verifyCredentials(Participant participant);
+    StatusResult<Boolean> verifyCredentials(String did);
 }

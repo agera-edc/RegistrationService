@@ -13,7 +13,8 @@ val faker: String by project
 val swagger: String by project
 
 dependencies {
-    implementation("${edcGroup}:policy-spi:${edcVersion}")
+    api("${edcGroup}:core-spi:${edcVersion}")
+    api("${edcGroup}:policy-spi:${edcVersion}")
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
     implementation("io.swagger.core.v3:swagger-annotations:${swagger}")
     testImplementation("org.assertj:assertj-core:${assertj}")
