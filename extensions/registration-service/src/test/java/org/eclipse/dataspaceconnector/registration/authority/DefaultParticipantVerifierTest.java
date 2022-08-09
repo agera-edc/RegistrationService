@@ -20,7 +20,6 @@ import org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.policy.PolicyEngine;
 import org.eclipse.dataspaceconnector.spi.result.Result;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -42,14 +41,8 @@ class DefaultParticipantVerifierTest {
     Policy policy = mock(Policy.class);
     Policy policyResult = mock(Policy.class);
     Monitor monitor = mock(Monitor.class);
-    DataspaceRegistrationPolicy dataspaceRegistrationPolicy = mock(DataspaceRegistrationPolicy.class);
+    DataspaceRegistrationPolicy dataspaceRegistrationPolicy = new DataspaceRegistrationPolicy(policy);
     DefaultParticipantVerifier service = new DefaultParticipantVerifier(monitor, policyEngine, dataspaceRegistrationPolicy);
-
-    @BeforeEach
-    void beforeEach() {
-        when(dataspaceRegistrationPolicy.get())
-                .thenReturn(policy);
-    }
 
     @Test
     void verifyCredentials_success() {
