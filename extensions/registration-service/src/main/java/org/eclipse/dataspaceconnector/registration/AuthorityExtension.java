@@ -24,8 +24,8 @@ import org.eclipse.dataspaceconnector.identityhub.credentials.VerifiableCredenti
 import org.eclipse.dataspaceconnector.registration.api.RegistrationApiController;
 import org.eclipse.dataspaceconnector.registration.api.RegistrationService;
 import org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter;
-import org.eclipse.dataspaceconnector.registration.authority.DummyCredentialsVerifier;
-import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
+import org.eclipse.dataspaceconnector.registration.authority.DummyParticipantVerifier;
+import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialServiceImpl;
 import org.eclipse.dataspaceconnector.registration.manager.ParticipantManager;
@@ -74,7 +74,7 @@ public class AuthorityExtension implements ServiceExtension {
     private ParticipantStore participantStore;
 
     @Inject
-    private CredentialsVerifier credentialsVerifier;
+    private ParticipantVerifier participantVerifier;
 
     @Inject
     private ExecutorInstrumentation executorInstrumentation;
@@ -98,7 +98,7 @@ public class AuthorityExtension implements ServiceExtension {
         var authenticationService = new DidJwtAuthenticationFilter(monitor, didPublicKeyResolver, audience);
         var verifiableCredentialService = verifiableCredentialService(context);
 
-        participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation, verifiableCredentialService);
+        participantManager = new ParticipantManager(monitor, participantStore, participantVerifier, executorInstrumentation, verifiableCredentialService);
 
         var registrationService = new RegistrationService(monitor, participantStore);
         webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
@@ -123,11 +123,11 @@ public class AuthorityExtension implements ServiceExtension {
     }
 
     @Provider(isDefault = true)
-    public CredentialsVerifier credentialsVerifier(ServiceExtensionContext context) {
+    public ParticipantVerifier credentialsVerifier(ServiceExtensionContext context) {
         var mapper = context.getTypeManager().getMapper();
 
         var identityHubClient = new IdentityHubClientImpl(context.getService(OkHttpClient.class), mapper, context.getMonitor());
-        return new DummyCredentialsVerifier(context.getMonitor(), context.getService(DidResolverRegistry.class), identityHubClient);
+        return new DummyParticipantVerifier(context.getMonitor(), context.getService(DidResolverRegistry.class), identityHubClient);
     }
 
     private VerifiableCredentialService verifiableCredentialService(ServiceExtensionContext context) {

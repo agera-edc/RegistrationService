@@ -16,7 +16,7 @@ package org.eclipse.dataspaceconnector.registration.authority;
 
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
 import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClient;
-import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
+import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
 
@@ -25,19 +25,19 @@ import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.ERROR_R
 import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.FATAL_ERROR;
 
 /**
- * Implementation of {@link CredentialsVerifier} that only retrieves verifiable credentials,
+ * Implementation of {@link ParticipantVerifier} that only retrieves verifiable credentials,
  * but performs no action on them. It authorizes any participant to onboard to the dataspace,
  * as long as its Identity Hub can be accessed.
  * <p>
  * This is meant as a starting point for implementing custom dataspace onboarding logic.
  */
-public class DummyCredentialsVerifier implements CredentialsVerifier {
+public class DummyParticipantVerifier implements ParticipantVerifier {
 
     private final IdentityHubClient identityHubClient;
     private final Monitor monitor;
     private final DidResolverRegistry resolverRegistry;
 
-    public DummyCredentialsVerifier(Monitor monitor, DidResolverRegistry resolverRegistry, IdentityHubClient identityHubClient) {
+    public DummyParticipantVerifier(Monitor monitor, DidResolverRegistry resolverRegistry, IdentityHubClient identityHubClient) {
         this.monitor = monitor;
         this.resolverRegistry = resolverRegistry;
         this.identityHubClient = identityHubClient;

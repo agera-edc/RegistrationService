@@ -20,6 +20,6 @@ import org.eclipse.dataspaceconnector.spi.response.StatusResult;
  * Verifier that fetches and evaluate verifiable credentials to
  * authorize dataspace membership.
  */
-public interface CredentialsVerifier {
+public interface ParticipantVerifier {
     StatusResult<Boolean> verifyCredentials(String did);
 }

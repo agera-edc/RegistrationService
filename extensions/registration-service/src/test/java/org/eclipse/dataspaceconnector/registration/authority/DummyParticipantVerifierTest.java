@@ -39,7 +39,7 @@ import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.FATAL_E
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class DummyCredentialsVerifierTest {
+class DummyParticipantVerifierTest {
     static final Faker FAKER = new Faker();
     static final String IDENTITY_HUB_TYPE = "IdentityHub";
 
@@ -50,7 +50,7 @@ class DummyCredentialsVerifierTest {
     String identityHubUrl = FAKER.internet().url();
     String failure = FAKER.lorem().sentence();
     Collection<SignedJWT> verifiableCredentials = mock(Collection.class);
-    DummyCredentialsVerifier service = new DummyCredentialsVerifier(monitor, resolverRegistry, identityHubClient);
+    DummyParticipantVerifier service = new DummyParticipantVerifier(monitor, resolverRegistry, identityHubClient);
 
     @BeforeEach
     void beforeEach() {
