@@ -16,6 +16,7 @@ package org.eclipse.dataspaceconnector.registration;
 
 import okhttp3.OkHttpClient;
 import org.eclipse.dataspaceconnector.extension.jersey.mapper.EdcApiExceptionMapper;
+import org.eclipse.dataspaceconnector.iam.did.spi.credentials.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidPublicKeyResolver;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
@@ -24,12 +25,9 @@ import org.eclipse.dataspaceconnector.identityhub.credentials.VerifiableCredenti
 import org.eclipse.dataspaceconnector.registration.api.RegistrationApiController;
 import org.eclipse.dataspaceconnector.registration.api.RegistrationServiceImpl;
 import org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter;
-import org.eclipse.dataspaceconnector.registration.authority.DummyCredentialsVerifier;
-import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
+import org.eclipse.dataspaceconnector.registration.authority.DefaultParticipantVerifier;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialServiceImpl;
-import org.eclipse.dataspaceconnector.registration.authority.DefaultParticipantVerifier;
-import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.registration.manager.ParticipantManager;
 import org.eclipse.dataspaceconnector.registration.store.InMemoryParticipantStore;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
@@ -37,8 +35,8 @@ import org.eclipse.dataspaceconnector.spi.EdcException;
 import org.eclipse.dataspaceconnector.spi.EdcSetting;
 import org.eclipse.dataspaceconnector.spi.WebService;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
-import org.eclipse.dataspaceconnector.spi.security.PrivateKeyResolver;
 import org.eclipse.dataspaceconnector.spi.policy.PolicyEngine;
+import org.eclipse.dataspaceconnector.spi.security.PrivateKeyResolver;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.eclipse.dataspaceconnector.spi.system.Inject;
 import org.eclipse.dataspaceconnector.spi.system.Provider;
@@ -95,7 +93,7 @@ public class AuthorityExtension implements ServiceExtension {
     private DidResolverRegistry didResolverRegistry;
 
     @Inject
-    private org.eclipse.dataspaceconnector.iam.did.spi.credentials.CredentialsVerifier verifier;
+    private CredentialsVerifier verifier;
 
     @Inject
     private DataspacePolicy dataspacePolicy;
@@ -103,14 +101,14 @@ public class AuthorityExtension implements ServiceExtension {
     @Override
     public void initialize(ServiceExtensionContext context) {
 
-
         var audience = Objects.requireNonNull(context.getSetting(JWT_AUDIENCE_SETTING, null),
                 () -> format("Missing setting %s", JWT_AUDIENCE_SETTING));
         var errorResponseVerbose = context.getSetting(ERROR_RESPONSE_VERBOSE_SETTING, false);
         var authenticationService = new DidJwtAuthenticationFilter(monitor, didPublicKeyResolver, audience);
         var verifiableCredentialService = verifiableCredentialService(context);
+        var participantVerifier = new DefaultParticipantVerifier(didResolverRegistry, verifier);
 
-        participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation, verifiableCredentialService);
+        participantManager = new ParticipantManager(monitor, participantStore, participantVerifier, executorInstrumentation, verifiableCredentialService);
 
         var registrationService = new RegistrationServiceImpl(monitor, participantStore, policyEngine, dataspacePolicy.get(), verifier, didResolverRegistry);
         webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));

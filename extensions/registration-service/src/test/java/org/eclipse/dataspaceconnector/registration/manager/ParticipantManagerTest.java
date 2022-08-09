@@ -16,15 +16,12 @@ package org.eclipse.dataspaceconnector.registration.manager;
 
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
-import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
+import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.response.ResponseStatus;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
-import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
-import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
-import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.junit.jupiter.api.Test;
@@ -53,9 +50,9 @@ class ParticipantManagerTest {
 
     Monitor monitor = mock(Monitor.class);
     ParticipantStore participantStore = mock(ParticipantStore.class);
-    CredentialsVerifier credentialsVerifier = mock(CredentialsVerifier.class);
+    ParticipantVerifier participantVerifier = mock(ParticipantVerifier.class);
     VerifiableCredentialService verifiableCredentialService = mock(VerifiableCredentialService.class);
-    ParticipantManager service = new ParticipantManager(monitor, participantStore, credentialsVerifier, ExecutorInstrumentation.noop(), verifiableCredentialService);
+    ParticipantManager service = new ParticipantManager(monitor, participantStore, participantVerifier, ExecutorInstrumentation.noop(), verifiableCredentialService);
     Participant.Builder participantBuilder = createParticipant();
     ArgumentCaptor<Participant> captor = ArgumentCaptor.forClass(Participant.class);
 
@@ -66,13 +63,13 @@ class ParticipantManagerTest {
 
     @Test
     void advancesStateFromAuthorizingToAuthorized() throws Exception {
-        when(credentialsVerifier.verifyCredentials(any())).thenReturn(Result.success());
+        when(participantVerifier.verifyCredentials(any())).thenReturn(Result.success());
         advancesState(AUTHORIZING, AUTHORIZED);
     }
 
     @Test
     void advancesStateFromAuthorizingToDenied() throws Exception {
-        when(credentialsVerifier.verifyCredentials(any())).thenReturn(Result.failure("foo"));
+        when(participantVerifier.verifyCredentials(any())).thenReturn(Result.failure("foo"));
         advancesState(AUTHORIZING, DENIED);
     }
 
