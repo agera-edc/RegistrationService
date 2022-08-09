@@ -17,6 +17,7 @@ package org.eclipse.dataspaceconnector.registration.authority;
 import org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy;
 import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.spi.agent.ParticipantAgent;
+import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.policy.PolicyEngine;
 import org.eclipse.dataspaceconnector.spi.response.ResponseStatus;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
@@ -25,13 +26,15 @@ import org.eclipse.dataspaceconnector.spi.result.Result;
 import java.util.Collections;
 import java.util.Map;
 
-import static org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy.ONBOARDING_SCOPE;
+import static org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy.PARTICIPANT_REGISTRATION_SCOPE;
 
 public class DefaultParticipantVerifier implements ParticipantVerifier {
+    private final Monitor monitor;
     private final PolicyEngine policyEngine;
     private final DataspaceRegistrationPolicy dataspaceRegistrationPolicy;
 
-    public DefaultParticipantVerifier(PolicyEngine policyEngine, DataspaceRegistrationPolicy dataspaceRegistrationPolicy) {
+    public DefaultParticipantVerifier(Monitor monitor, PolicyEngine policyEngine, DataspaceRegistrationPolicy dataspaceRegistrationPolicy) {
+        this.monitor = monitor;
         this.policyEngine = policyEngine;
         this.dataspaceRegistrationPolicy = dataspaceRegistrationPolicy;
     }
@@ -45,7 +48,11 @@ public class DefaultParticipantVerifier implements ParticipantVerifier {
         }
         var pa = new ParticipantAgent(claimsResult.getContent(), Collections.emptyMap());
 
-        var evaluationResult = policyEngine.evaluate(ONBOARDING_SCOPE, dataspaceRegistrationPolicy.get(), pa);
-        return StatusResult.success(evaluationResult.succeeded());
+        var evaluationResult = policyEngine.evaluate(PARTICIPANT_REGISTRATION_SCOPE, dataspaceRegistrationPolicy.get(), pa);
+        boolean succeeded = evaluationResult.succeeded();
+
+        monitor.debug(() -> "Policy evaluation result: " + succeeded);
+
+        return StatusResult.success(succeeded);
     }
 }

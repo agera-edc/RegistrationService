@@ -11,11 +11,7 @@ val mockitoVersion: String by project
 val faker: String by project
 
 dependencies {
-
-    implementation("${edcGroup}:core-spi:${edcVersion}")
-    implementation("${edcGroup}:identity-did-spi:${edcVersion}")
-
-    implementation(project(":extensions:dataspace-authority-spi"))
+    api(project(":extensions:dataspace-authority-spi"))
 
     testImplementation("org.assertj:assertj-core:${assertj}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")

@@ -23,8 +23,7 @@ val edcGroup: String by project
 
 dependencies {
     implementation(project(":extensions:registration-service"))
-    // this serves a dummy dataspace policy, and a dummy credential verifier:
-    implementation(project(":extensions:registration-service-mocks"))
+    implementation(project(":extensions:registration-policy-region-any"))
     implementation("${edcGroup}:identity-did-web:${edcVersion}")
     implementation("${edcGroup}:identity-did-core:${edcVersion}")
     implementation("${edcGroup}:core:${edcVersion}")

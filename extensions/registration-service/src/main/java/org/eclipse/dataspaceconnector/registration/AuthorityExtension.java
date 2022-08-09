@@ -131,7 +131,7 @@ public class AuthorityExtension implements ServiceExtension {
 
     @Provider(isDefault = true)
     public ParticipantVerifier participantVerifier(ServiceExtensionContext context) {
-        return new DefaultParticipantVerifier(context.getService(PolicyEngine.class), context.getService(DataspaceRegistrationPolicy.class));
+        return new DefaultParticipantVerifier(context.getMonitor(), context.getService(PolicyEngine.class), context.getService(DataspaceRegistrationPolicy.class));
     }
 
     private VerifiableCredentialService verifiableCredentialService(ServiceExtensionContext context) {
