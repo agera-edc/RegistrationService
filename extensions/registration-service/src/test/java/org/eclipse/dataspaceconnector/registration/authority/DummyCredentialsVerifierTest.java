@@ -1,3 +1,17 @@
+/*
+ *  Copyright (c) 2022 Microsoft Corporation
+ *
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Apache License, Version 2.0 which is available at
+ *  https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  SPDX-License-Identifier: Apache-2.0
+ *
+ *  Contributors:
+ *       Microsoft Corporation - initial API and implementation
+ *
+ */
+
 package org.eclipse.dataspaceconnector.registration.authority;
 
 import com.github.javafaker.Faker;
@@ -5,7 +19,6 @@ import com.nimbusds.jwt.SignedJWT;
 import org.assertj.core.api.AbstractStringAssert;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.DidDocument;
 import org.eclipse.dataspaceconnector.iam.did.spi.document.Service;
-import org.eclipse.dataspaceconnector.iam.did.spi.key.PrivateKeyWrapper;
 import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
 import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClient;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
@@ -50,7 +63,7 @@ class DummyCredentialsVerifierTest {
     }
 
     @Test
-    void verifyCredentials_createsMembershipCredential() throws Exception {
+    void verifyCredentials_createsMembershipCredential() {
         var result = service.verifyCredentials(participantDid);
         assertThat(result.succeeded()).isTrue();
         assertThat(result.getContent()).isTrue();
