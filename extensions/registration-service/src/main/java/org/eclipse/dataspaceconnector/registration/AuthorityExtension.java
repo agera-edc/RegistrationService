@@ -54,7 +54,7 @@ import static org.eclipse.dataspaceconnector.iam.did.spi.document.DidConstants.D
 /**
  * EDC extension to boot the services used by the Authority Service.
  */
-@Requires({ PrivateKeyResolver.class, OkHttpClient.class, DidResolverRegistry.class, PolicyEngine.class, DataspacePolicy.class })
+@Requires({ PrivateKeyResolver.class, OkHttpClient.class, DidResolverRegistry.class, PolicyEngine.class, DataspaceRegistrationPolicy.class })
 public class AuthorityExtension implements ServiceExtension {
 
     public static final String CONTEXT_ALIAS = "authority";
@@ -131,7 +131,7 @@ public class AuthorityExtension implements ServiceExtension {
 
     @Provider(isDefault = true)
     public ParticipantVerifier participantVerifier(ServiceExtensionContext context) {
-        return new DefaultParticipantVerifier(context.getService(PolicyEngine.class), context.getService(DataspacePolicy.class));
+        return new DefaultParticipantVerifier(context.getService(PolicyEngine.class), context.getService(DataspaceRegistrationPolicy.class));
     }
 
     private VerifiableCredentialService verifiableCredentialService(ServiceExtensionContext context) {

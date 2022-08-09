@@ -16,7 +16,7 @@ package org.eclipse.dataspaceconnector.registration.authority;
 
 import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.policy.model.Policy;
-import org.eclipse.dataspaceconnector.registration.DataspacePolicy;
+import org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy;
 import org.eclipse.dataspaceconnector.spi.policy.PolicyEngine;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,12 +34,12 @@ class DefaultParticipantVerifierTest {
     PolicyEngine policyEngine = mock(PolicyEngine.class);
     Policy policy = mock(Policy.class);
     Policy policyResult = mock(Policy.class);
-    DataspacePolicy dataspacePolicy = mock(DataspacePolicy.class);
-    DefaultParticipantVerifier service = new DefaultParticipantVerifier(policyEngine, dataspacePolicy);
+    DataspaceRegistrationPolicy dataspaceRegistrationPolicy = mock(DataspaceRegistrationPolicy.class);
+    DefaultParticipantVerifier service = new DefaultParticipantVerifier(policyEngine, dataspaceRegistrationPolicy);
 
     @BeforeEach
     void beforeEach() {
-        when(dataspacePolicy.get())
+        when(dataspaceRegistrationPolicy.get())
                 .thenReturn(policy);
         when(policyEngine.evaluate(any(), any(), any()))
                 .thenReturn(Result.success(policyResult));

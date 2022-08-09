@@ -14,7 +14,7 @@
 
 package org.eclipse.dataspaceconnector.registration.authority;
 
-import org.eclipse.dataspaceconnector.registration.DataspacePolicy;
+import org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy;
 import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.spi.agent.ParticipantAgent;
 import org.eclipse.dataspaceconnector.spi.policy.PolicyEngine;
@@ -25,15 +25,15 @@ import org.eclipse.dataspaceconnector.spi.result.Result;
 import java.util.Collections;
 import java.util.Map;
 
-import static org.eclipse.dataspaceconnector.registration.DataspacePolicy.ONBOARDING_SCOPE;
+import static org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy.ONBOARDING_SCOPE;
 
 public class DefaultParticipantVerifier implements ParticipantVerifier {
     private final PolicyEngine policyEngine;
-    private final DataspacePolicy dataspacePolicy;
+    private final DataspaceRegistrationPolicy dataspaceRegistrationPolicy;
 
-    public DefaultParticipantVerifier(PolicyEngine policyEngine, DataspacePolicy dataspacePolicy) {
+    public DefaultParticipantVerifier(PolicyEngine policyEngine, DataspaceRegistrationPolicy dataspaceRegistrationPolicy) {
         this.policyEngine = policyEngine;
-        this.dataspacePolicy = dataspacePolicy;
+        this.dataspaceRegistrationPolicy = dataspaceRegistrationPolicy;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class DefaultParticipantVerifier implements ParticipantVerifier {
         }
         var pa = new ParticipantAgent(claimsResult.getContent(), Collections.emptyMap());
 
-        var evaluationResult = policyEngine.evaluate(ONBOARDING_SCOPE, dataspacePolicy.get(), pa);
+        var evaluationResult = policyEngine.evaluate(ONBOARDING_SCOPE, dataspaceRegistrationPolicy.get(), pa);
         return StatusResult.success(evaluationResult.succeeded());
     }
 }

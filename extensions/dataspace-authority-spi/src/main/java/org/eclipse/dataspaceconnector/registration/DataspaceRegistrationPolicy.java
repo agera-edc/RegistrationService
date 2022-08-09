@@ -21,15 +21,15 @@ import org.eclipse.dataspaceconnector.policy.model.Policy;
  * This is a wrapper for a {@link Policy}. Every Dataspace may have a policy for onboarding participants into the
  * dataspace.
  */
-public class DataspacePolicy {
+public class DataspaceRegistrationPolicy {
     public static final String ONBOARDING_SCOPE = "PARTICIPANT_REGISTRATION";
-    private final Policy dataspacePolicy;
+    private final Policy policy;
 
-    public DataspacePolicy(Policy dataspacePolicy) {
-        this.dataspacePolicy = dataspacePolicy;
+    public DataspaceRegistrationPolicy(Policy policy) {
+        this.policy = policy;
     }
 
     public Policy get() {
-        return dataspacePolicy;
+        return policy;
     }
 }

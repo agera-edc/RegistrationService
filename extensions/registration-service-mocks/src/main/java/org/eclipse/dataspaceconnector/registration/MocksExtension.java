@@ -32,7 +32,7 @@ import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.eclipse.dataspaceconnector.registration.DataspacePolicy.ONBOARDING_SCOPE;
+import static org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy.ONBOARDING_SCOPE;
 
 /**
  * EDC extension to boot the services used by the Authority Service.
@@ -80,10 +80,10 @@ public class MocksExtension implements ServiceExtension {
     /**
      * Performs the plumbing for registering a {@link Policy} and an evaluation function that checks that "region EQ
      * eu". The rule type {@link MocksExtension#RULE_TYPE_REGION} is bound to the onboarding scope
-     * {@link DataspacePolicy#ONBOARDING_SCOPE}.
+     * {@link DataspaceRegistrationPolicy#ONBOARDING_SCOPE}.
      */
     @Provider
-    public DataspacePolicy createDataspacePolicy() {
+    public DataspaceRegistrationPolicy createDataspacePolicy() {
 
         var regionConstraint = AtomicConstraint.Builder.newInstance().leftExpression(new LiteralExpression(RULE_TYPE_REGION))
                 .operator(Operator.EQ)
@@ -93,6 +93,6 @@ public class MocksExtension implements ServiceExtension {
                 .permission(regionPermission).build();
         ruleBindingRegistry.bind(RULE_TYPE_REGION, ONBOARDING_SCOPE);
         policyEngine.registerFunction(ONBOARDING_SCOPE, Permission.class, RULE_TYPE_REGION, (operator, rightValue, rule, context) -> Operator.EQ == operator && "eu".equalsIgnoreCase(rightValue.toString()));
-        return new DataspacePolicy(p);
+        return new DataspaceRegistrationPolicy(p);
     }
 }
