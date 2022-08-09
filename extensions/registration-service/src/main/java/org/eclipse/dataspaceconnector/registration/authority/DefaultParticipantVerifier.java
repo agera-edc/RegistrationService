@@ -14,7 +14,6 @@
 
 package org.eclipse.dataspaceconnector.registration.authority;
 
-import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry;
 import org.eclipse.dataspaceconnector.registration.DataspacePolicy;
 import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.spi.agent.ParticipantAgent;
