@@ -43,13 +43,10 @@ public class DefaultParticipantVerifier implements ParticipantVerifier {
     public StatusResult<Boolean> verifyCredentials(String participantDid) {
         var claimsResult = Result.success(Map.<String, Object>of("region", "eu")); // TODO retrieve real credentials
 
-        if (claimsResult.failed()) {
-            return StatusResult.failure(ResponseStatus.ERROR_RETRY, claimsResult.getFailureDetail());
-        }
-        var pa = new ParticipantAgent(claimsResult.getContent(), Collections.emptyMap());
+        var agent = new ParticipantAgent(claimsResult.getContent(), Collections.emptyMap());
 
-        var evaluationResult = policyEngine.evaluate(PARTICIPANT_REGISTRATION_SCOPE, dataspaceRegistrationPolicy.get(), pa);
-        boolean succeeded = evaluationResult.succeeded();
+        var evaluationResult = policyEngine.evaluate(PARTICIPANT_REGISTRATION_SCOPE, dataspaceRegistrationPolicy.get(), agent);
+        var succeeded = evaluationResult.succeeded();
 
         monitor.debug(() -> "Policy evaluation result: " + succeeded);
 

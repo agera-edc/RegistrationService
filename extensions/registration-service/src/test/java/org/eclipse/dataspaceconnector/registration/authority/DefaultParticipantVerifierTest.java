@@ -17,13 +17,19 @@ package org.eclipse.dataspaceconnector.registration.authority;
 import com.github.javafaker.Faker;
 import org.eclipse.dataspaceconnector.policy.model.Policy;
 import org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy;
+import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.policy.PolicyEngine;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.dataspaceconnector.registration.DataspaceRegistrationPolicy.PARTICIPANT_REGISTRATION_SCOPE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,24 +37,41 @@ class DefaultParticipantVerifierTest {
     static final Faker FAKER = new Faker();
 
     String participantDid = FAKER.internet().url();
+    String failure = FAKER.lorem().sentence();
     PolicyEngine policyEngine = mock(PolicyEngine.class);
     Policy policy = mock(Policy.class);
     Policy policyResult = mock(Policy.class);
+    Monitor monitor = mock(Monitor.class);
     DataspaceRegistrationPolicy dataspaceRegistrationPolicy = mock(DataspaceRegistrationPolicy.class);
-    DefaultParticipantVerifier service = new DefaultParticipantVerifier(policyEngine, dataspaceRegistrationPolicy);
+    DefaultParticipantVerifier service = new DefaultParticipantVerifier(monitor, policyEngine, dataspaceRegistrationPolicy);
 
     @BeforeEach
     void beforeEach() {
         when(dataspaceRegistrationPolicy.get())
                 .thenReturn(policy);
-        when(policyEngine.evaluate(any(), any(), any()))
-                .thenReturn(Result.success(policyResult));
     }
 
     @Test
-    void verifyCredentials_createsMembershipCredential() {
+    void verifyCredentials_success() {
+        when(policyEngine.evaluate(eq(PARTICIPANT_REGISTRATION_SCOPE), eq(policy), argThat(a ->
+                Map.of("region", "eu").equals(a.getClaims()) &&
+                        Map.of().equals(a.getAttributes()))))
+                .thenReturn(Result.success(policyResult));
+
         var result = service.verifyCredentials(participantDid);
+
         assertThat(result.succeeded()).isTrue();
         assertThat(result.getContent()).isTrue();
+    }
+
+    @Test
+    void verifyCredentials_failure() {
+        when(policyEngine.evaluate(any(), any(), any()))
+                .thenReturn(Result.failure(failure));
+
+        var result = service.verifyCredentials(participantDid);
+
+        assertThat(result.succeeded()).isTrue();
+        assertThat(result.getContent()).isFalse();
     }
 }

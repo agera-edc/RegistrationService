@@ -84,7 +84,7 @@ public class ParticipantManager {
         } else if (credentialsValid.getContent()) {
             participant.transitionAuthorized();
         } else {
-            participant.transitionDenied(); // todo: pass result failure message to the participant state?
+            participant.transitionDenied();
         }
         participantStore.save(participant);
         return true;

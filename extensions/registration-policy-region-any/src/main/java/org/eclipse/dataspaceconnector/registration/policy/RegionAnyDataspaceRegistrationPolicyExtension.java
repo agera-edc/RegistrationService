@@ -56,7 +56,9 @@ public class RegionAnyDataspaceRegistrationPolicyExtension implements ServiceExt
         var p = Policy.Builder.newInstance()
                 .permission(regionPermission).build();
         ruleBindingRegistry.bind(RULE_TYPE_REGION, PARTICIPANT_REGISTRATION_SCOPE);
-        policyEngine.registerFunction(PARTICIPANT_REGISTRATION_SCOPE, Permission.class, RULE_TYPE_REGION, (operator, rightValue, rule, context) -> Operator.NEQ == operator && "".equalsIgnoreCase(rightValue.toString()));
+        policyEngine.registerFunction(PARTICIPANT_REGISTRATION_SCOPE, Permission.class, RULE_TYPE_REGION, (operator, rightValue, rule, context) ->
+                Operator.NEQ == operator &&
+                        "".equalsIgnoreCase(rightValue.toString()));
         return new DataspaceRegistrationPolicy(p);
     }
 }
