@@ -15,58 +15,31 @@
 package org.eclipse.dataspaceconnector.registration.api;
 
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
-import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
-import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.eclipse.dataspaceconnector.spi.result.Result;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.ONBOARDING_INITIATED;
-
 /**
- * Registration service for dataspace participants.
+ * Service to list and add participants to the internal membership database.
  */
-public class RegistrationService {
-
-    private final Monitor monitor;
-    private final ParticipantStore participantStore;
-
-    public RegistrationService(Monitor monitor, ParticipantStore participantStore) {
-        this.monitor = monitor;
-        this.participantStore = participantStore;
-    }
+public interface RegistrationService {
+    /**
+     * List all participants that are in the dataspace.
+     */
+    List<Participant> listParticipants();
 
     /**
-     * Lists all dataspace participants.
+     * Adds a participant ("onboarding") to the database. For this to succeed, the following conditions must be true:
+     * <ul>
+     *     <li>DID must be resolvable</li>
+     *     <li>DID must contain verifiable claims</li>
+     *     <li>Claims must not be empty and satisfy the dataspace onboarding policy.</li>
+     * </ul>
      *
-     * @return list of dataspace participants.
+     * @param did The DID of the participant.
+     * @param idsUrl The IDS URL that should be registered for the participant
+     * @return a success result, if the onboarding was successful, a failed result otherwise.
+     * @see org.eclipse.dataspaceconnector.registration.DataspacePolicy
      */
-    public List<Participant> listParticipants() {
-        monitor.info("List all participants of the dataspace.");
-        return new ArrayList<>(participantStore.listParticipants());
-    }
-
-    /**
-     * Add a participant to a dataspace.
-     * <p>
-     * In a future version, the {@code idsUrl} argument will be removed, as the {@code did}
-     * provides sufficient information to identify the participant, and the
-     * Registration Service will not manage service URLs.
-     *
-     * @param did    the DID of the dataspace participant to add.
-     * @param idsUrl the IDS URL of the dataspace participant to add.
-     */
-    public void addParticipant(String did, String idsUrl) {
-        monitor.info("Adding a participant in the dataspace.");
-
-        var participant = Participant.Builder.newInstance()
-                .did(did)
-                .status(ONBOARDING_INITIATED)
-                .name(did)
-                .url(idsUrl)
-                .supportedProtocol("ids-multipart")
-                .build();
-
-        participantStore.save(participant);
-    }
+    Result<Void> addParticipant(String did, String idsUrl);
 }

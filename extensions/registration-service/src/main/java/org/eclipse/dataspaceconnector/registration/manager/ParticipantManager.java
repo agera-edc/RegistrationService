@@ -20,6 +20,7 @@ import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
 import org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus;
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
+import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.retry.WaitStrategy;
@@ -37,7 +38,7 @@ import static org.eclipse.dataspaceconnector.registration.authority.model.Partic
 public class ParticipantManager {
 
     private final ParticipantStore participantStore;
-    private final CredentialsVerifier credentialsVerifier;
+    private final ParticipantVerifier participantVerifier;
     private final StateMachineManager stateMachineManager;
     private final VerifiableCredentialService verifiableCredentialService;
 
@@ -78,11 +79,11 @@ public class ParticipantManager {
     }
 
     private Boolean processAuthorizing(Participant participant) {
-        var credentialsValid = credentialsVerifier.verifyCredentials();
+        var credentialsValid = participantVerifier.verifyCredentials(participant).succeeded();
         if (credentialsValid) {
             participant.transitionAuthorized();
         } else {
-            participant.transitionDenied();
+            participant.transitionDenied();// todo: pass result failure message to the participant state?
         }
         participantStore.save(participant);
         return true;

@@ -22,12 +22,14 @@ import org.eclipse.dataspaceconnector.iam.did.spi.resolution.DidResolverRegistry
 import org.eclipse.dataspaceconnector.identityhub.client.IdentityHubClientImpl;
 import org.eclipse.dataspaceconnector.identityhub.credentials.VerifiableCredentialsJwtServiceImpl;
 import org.eclipse.dataspaceconnector.registration.api.RegistrationApiController;
-import org.eclipse.dataspaceconnector.registration.api.RegistrationService;
+import org.eclipse.dataspaceconnector.registration.api.RegistrationServiceImpl;
 import org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter;
 import org.eclipse.dataspaceconnector.registration.authority.DummyCredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.authority.spi.CredentialsVerifier;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialServiceImpl;
+import org.eclipse.dataspaceconnector.registration.authority.DefaultParticipantVerifier;
+import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.registration.manager.ParticipantManager;
 import org.eclipse.dataspaceconnector.registration.store.InMemoryParticipantStore;
 import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
@@ -36,6 +38,7 @@ import org.eclipse.dataspaceconnector.spi.EdcSetting;
 import org.eclipse.dataspaceconnector.spi.WebService;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.security.PrivateKeyResolver;
+import org.eclipse.dataspaceconnector.spi.policy.PolicyEngine;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.eclipse.dataspaceconnector.spi.system.Inject;
 import org.eclipse.dataspaceconnector.spi.system.Provider;
@@ -55,12 +58,10 @@ import static org.eclipse.dataspaceconnector.iam.did.spi.document.DidConstants.D
 public class AuthorityExtension implements ServiceExtension {
 
     public static final String CONTEXT_ALIAS = "authority";
-
-    @EdcSetting
-    private static final String JWT_AUDIENCE_SETTING = "jwt.audience";
     @EdcSetting
     public static final String ERROR_RESPONSE_VERBOSE_SETTING = "edc.error.response.verbose";
-
+    @EdcSetting
+    private static final String JWT_AUDIENCE_SETTING = "jwt.audience";
     @Inject
     private DidPublicKeyResolver didPublicKeyResolver;
 
@@ -73,8 +74,6 @@ public class AuthorityExtension implements ServiceExtension {
     @Inject
     private ParticipantStore participantStore;
 
-    @Inject
-    private CredentialsVerifier credentialsVerifier;
 
     @Inject
     private ExecutorInstrumentation executorInstrumentation;
@@ -89,9 +88,22 @@ public class AuthorityExtension implements ServiceExtension {
     private PrivateKeyResolver privateKeyResolver;
 
     private ParticipantManager participantManager;
+    @Inject
+    private PolicyEngine policyEngine;
+
+    @Inject
+    private DidResolverRegistry didResolverRegistry;
+
+    @Inject
+    private org.eclipse.dataspaceconnector.iam.did.spi.credentials.CredentialsVerifier verifier;
+
+    @Inject
+    private DataspacePolicy dataspacePolicy;
 
     @Override
     public void initialize(ServiceExtensionContext context) {
+
+
         var audience = Objects.requireNonNull(context.getSetting(JWT_AUDIENCE_SETTING, null),
                 () -> format("Missing setting %s", JWT_AUDIENCE_SETTING));
         var errorResponseVerbose = context.getSetting(ERROR_RESPONSE_VERBOSE_SETTING, false);
@@ -100,7 +112,7 @@ public class AuthorityExtension implements ServiceExtension {
 
         participantManager = new ParticipantManager(monitor, participantStore, credentialsVerifier, executorInstrumentation, verifiableCredentialService);
 
-        var registrationService = new RegistrationService(monitor, participantStore);
+        var registrationService = new RegistrationServiceImpl(monitor, participantStore, policyEngine, dataspacePolicy.get(), verifier, didResolverRegistry);
         webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
 
         webService.registerResource(CONTEXT_ALIAS, authenticationService);
@@ -120,11 +132,6 @@ public class AuthorityExtension implements ServiceExtension {
     @Provider(isDefault = true)
     public ParticipantStore participantStore() {
         return new InMemoryParticipantStore();
-    }
-
-    @Provider(isDefault = true)
-    public CredentialsVerifier credentialsVerifier() {
-        return new DummyCredentialsVerifier();
     }
 
     private VerifiableCredentialService verifiableCredentialService(ServiceExtensionContext context) {

@@ -22,6 +22,10 @@ import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.response.ResponseStatus;
 import org.eclipse.dataspaceconnector.spi.response.StatusResult;
+import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
+import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
+import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.eclipse.dataspaceconnector.spi.system.ExecutorInstrumentation;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -62,13 +66,13 @@ class ParticipantManagerTest {
 
     @Test
     void advancesStateFromAuthorizingToAuthorized() throws Exception {
-        when(credentialsVerifier.verifyCredentials()).thenReturn(true);
+        when(credentialsVerifier.verifyCredentials(any())).thenReturn(Result.success());
         advancesState(AUTHORIZING, AUTHORIZED);
     }
 
     @Test
     void advancesStateFromAuthorizingToDenied() throws Exception {
-        when(credentialsVerifier.verifyCredentials()).thenReturn(false);
+        when(credentialsVerifier.verifyCredentials(any())).thenReturn(Result.failure("foo"));
         advancesState(AUTHORIZING, DENIED);
     }
 
