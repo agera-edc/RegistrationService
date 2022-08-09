@@ -30,13 +30,13 @@ import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.ERROR_R
  * <p>
  * This is meant as a starting point for implementing custom dataspace onboarding logic.
  */
-public class DummyParticipantVerifier implements ParticipantVerifier {
+public class DefaultParticipantVerifier implements ParticipantVerifier {
 
     private final Monitor monitor;
     private final DidResolverRegistry resolverRegistry;
     private final CredentialsVerifier credentialsVerifier;
 
-    public DummyParticipantVerifier(Monitor monitor, DidResolverRegistry resolverRegistry, CredentialsVerifier credentialsVerifier) {
+    public DefaultParticipantVerifier(Monitor monitor, DidResolverRegistry resolverRegistry, CredentialsVerifier credentialsVerifier) {
         this.monitor = monitor;
         this.resolverRegistry = resolverRegistry;
         this.credentialsVerifier = credentialsVerifier;

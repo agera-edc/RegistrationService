@@ -25,7 +25,7 @@ import org.eclipse.dataspaceconnector.identityhub.credentials.VerifiableCredenti
 import org.eclipse.dataspaceconnector.registration.api.RegistrationApiController;
 import org.eclipse.dataspaceconnector.registration.api.RegistrationService;
 import org.eclipse.dataspaceconnector.registration.auth.DidJwtAuthenticationFilter;
-import org.eclipse.dataspaceconnector.registration.authority.DummyParticipantVerifier;
+import org.eclipse.dataspaceconnector.registration.authority.DefaultParticipantVerifier;
 import org.eclipse.dataspaceconnector.registration.authority.spi.ParticipantVerifier;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialService;
 import org.eclipse.dataspaceconnector.registration.credential.VerifiableCredentialServiceImpl;
@@ -125,7 +125,7 @@ public class AuthorityExtension implements ServiceExtension {
 
     @Provider(isDefault = true)
     public ParticipantVerifier participantVerifier(ServiceExtensionContext context) {
-        return new DummyParticipantVerifier(context.getMonitor(), context.getService(DidResolverRegistry.class), context.getService(CredentialsVerifier.class));
+        return new DefaultParticipantVerifier(context.getMonitor(), context.getService(DidResolverRegistry.class), context.getService(CredentialsVerifier.class));
     }
 
     private VerifiableCredentialService verifiableCredentialService(ServiceExtensionContext context) {

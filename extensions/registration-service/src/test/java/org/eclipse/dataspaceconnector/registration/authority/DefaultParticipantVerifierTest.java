@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class DummyParticipantVerifierTest {
+class DefaultParticipantVerifierTest {
     static final Faker FAKER = new Faker();
     static final String IDENTITY_HUB_TYPE = "IdentityHub";
 
@@ -48,7 +48,7 @@ class DummyParticipantVerifierTest {
     String identityHubUrl = FAKER.internet().url();
     String failure = FAKER.lorem().sentence();
     Map<String, Object> verifiableCredentials = mock(Map.class);
-    DummyParticipantVerifier service = new DummyParticipantVerifier(monitor, resolverRegistry, credentialsVerifier);
+    DefaultParticipantVerifier service = new DefaultParticipantVerifier(monitor, resolverRegistry, credentialsVerifier);
 
     @BeforeEach
     void beforeEach() {
