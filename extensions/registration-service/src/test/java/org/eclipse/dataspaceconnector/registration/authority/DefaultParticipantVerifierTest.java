@@ -47,7 +47,7 @@ class DefaultParticipantVerifierTest {
     @Test
     void verifyCredentials_success() {
         when(policyEngine.evaluate(eq(PARTICIPANT_REGISTRATION_SCOPE), eq(policy), argThat(a ->
-                Map.of("region", "eu").equals(a.getClaims()) &&
+                Map.of("gaiaXMember", "true").equals(a.getClaims()) &&
                         Map.of().equals(a.getAttributes()))))
                 .thenReturn(Result.success(policyResult));
 

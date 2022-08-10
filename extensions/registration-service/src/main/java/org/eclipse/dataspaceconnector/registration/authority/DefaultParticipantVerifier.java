@@ -40,7 +40,7 @@ public class DefaultParticipantVerifier implements ParticipantVerifier {
 
     @Override
     public StatusResult<Boolean> verifyCredentials(String participantDid) {
-        var claimsResult = Result.success(Map.<String, Object>of("region", "eu")); // TODO retrieve real credentials
+        var claimsResult = Result.success(Map.<String, Object>of("gaiaXMember", "true")); // TODO retrieve real credentials
 
         var agent = new ParticipantAgent(claimsResult.getContent(), Collections.emptyMap());
 

@@ -18,7 +18,7 @@ package org.eclipse.dataspaceconnector.registration;
 import org.eclipse.dataspaceconnector.policy.model.Policy;
 
 /**
- * This is a wrapper for a {@link Policy}. Every Dataspace may have a policy for onboarding participants into the
+ * This is a wrapper for a {@link Policy}. Every Dataspace must have a policy for onboarding participants into the
  * dataspace.
  */
 public class DataspaceRegistrationPolicy {

@@ -18,7 +18,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:${jupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}")
     testImplementation("org.mockito:mockito-core:${mockitoVersion}")
-    testImplementation(testFixtures(project(":extensions:dataspace-authority-spi")))
-    testImplementation(testFixtures(project(":rest-client")))
+    testImplementation("${edcGroup}:junit:${edcVersion}")
+    testImplementation("com.github.javafaker:javafaker:${faker}")
 }
 
