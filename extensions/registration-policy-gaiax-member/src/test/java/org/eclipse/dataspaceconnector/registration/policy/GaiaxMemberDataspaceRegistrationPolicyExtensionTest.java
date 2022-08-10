@@ -39,20 +39,16 @@ class GaiaxMemberDataspaceRegistrationPolicyExtensionTest {
     private static final Faker FAKER = new Faker();
 
     @ParameterizedTest
-    @MethodSource("listsOfServices")
+    @MethodSource("claims")
     void createDataspaceRegistrationPolicy(Map<String, Object> claims, boolean expected, PolicyEngine policyEngine, DataspaceRegistrationPolicy policy) {
-        var policy1 = policy.get();
+        var agent = new ParticipantAgent(claims, Collections.emptyMap());
 
-        var claimsResult = Result.success(claims); // TODO retrieve real credentials
-
-        var agent = new ParticipantAgent(claimsResult.getContent(), Collections.emptyMap());
-
-        var evaluationResult = policyEngine.evaluate(PARTICIPANT_REGISTRATION_SCOPE, policy1, agent);
+        var evaluationResult = policyEngine.evaluate(PARTICIPANT_REGISTRATION_SCOPE, policy.get(), agent);
 
         assertThat(evaluationResult.succeeded()).isEqualTo(expected);
     }
 
-    private static Stream<Arguments> listsOfServices() {
+    private static Stream<Arguments> claims() {
         return Stream.of(
                 arguments(Map.of("gaiaXMember", "true"), true),
                 arguments(Map.of("gaiaXMember", FAKER.lorem().sentence()), false),
