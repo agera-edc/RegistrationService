@@ -21,5 +21,14 @@ import org.eclipse.dataspaceconnector.spi.response.StatusResult;
  * authorize dataspace membership.
  */
 public interface ParticipantVerifier {
-    StatusResult<Boolean> verifyCredentials(String did);
+    /**
+     * Apply dataspace membership policy to evaluate whether a participant may be onboarded.
+     *
+     * @param did The putative participant's DID URL. Used to resolve participant Identity Hub and retrieve Verifiable Credentials.
+     * @return a successful {@link StatusResult} if the policy could be evaluated.
+     * The payload then contains the policy evaluation result.
+     * A failure result indicates that the policy could not be evaluated,
+     * for example, because Verifiable Credentials could not be retrieved from the Identity Hub.
+     */
+    StatusResult<Boolean> applyOnboardingPolicy(String did);
 }

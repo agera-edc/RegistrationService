@@ -39,16 +39,16 @@ public class DefaultParticipantVerifier implements ParticipantVerifier {
     }
 
     @Override
-    public StatusResult<Boolean> verifyCredentials(String participantDid) {
+    public StatusResult<Boolean> applyOnboardingPolicy(String participantDid) {
         var claimsResult = Result.success(Map.<String, Object>of("gaiaXMember", "true")); // TODO retrieve real credentials
 
         var agent = new ParticipantAgent(claimsResult.getContent(), Collections.emptyMap());
 
         var evaluationResult = policyEngine.evaluate(PARTICIPANT_REGISTRATION_SCOPE, dataspaceRegistrationPolicy.get(), agent);
-        var succeeded = evaluationResult.succeeded();
+        var policyResult = evaluationResult.succeeded();
 
-        monitor.debug(() -> "Policy evaluation result: " + succeeded);
+        monitor.debug(() -> "Policy evaluation result: " + policyResult);
 
-        return StatusResult.success(succeeded);
+        return StatusResult.success(policyResult);
     }
 }
