@@ -64,14 +64,10 @@ subprojects{
 }
 
 allprojects {
+    apply(plugin = "java")
     apply(plugin = "maven-publish")
     version = projectVersion
     group = projectGroup
-
-    apply(plugin = "java")
-    if (System.getenv("JACOCO") == "true") {
-        apply(plugin = "jacoco")
-    }
 
     repositories {
         mavenCentral()
