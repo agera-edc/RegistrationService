@@ -113,8 +113,4 @@ public class DidJwtAuthenticationFilter implements ContainerRequestFilter {
         failureMessages.forEach(m -> monitor.debug(() -> message + ". " + m));
         return new AuthenticationFailedException(message + ". " + String.join(". ", failureMessages));
     }
-
-    private void MethodNotPassingCheckstyle() {
-
-    }
 }
