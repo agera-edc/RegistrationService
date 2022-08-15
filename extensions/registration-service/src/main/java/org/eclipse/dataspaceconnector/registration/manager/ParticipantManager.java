@@ -14,6 +14,7 @@
 
 package org.eclipse.dataspaceconnector.registration.manager;
 
+import io.opentelemetry.extension.annotations.WithSpan;
 import org.eclipse.dataspaceconnector.common.statemachine.StateMachineManager;
 import org.eclipse.dataspaceconnector.common.statemachine.StateProcessorImpl;
 import org.eclipse.dataspaceconnector.registration.authority.model.Participant;
