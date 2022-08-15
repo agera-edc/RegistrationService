@@ -80,6 +80,8 @@ allprojects {
         }
     }
 
+    System.setProperty("org.checkstyle.google.suppressionfilter.config", file("${rootProject.projectDir.path}/resources/checkstyle-suppressions.xml").absolutePath)
+
     checkstyle {
         toolVersion = "9.0"
         configFile = rootProject.file("resources/checkstyle-config.xml")
