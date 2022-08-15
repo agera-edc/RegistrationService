@@ -22,6 +22,7 @@ import org.eclipse.dataspaceconnector.registration.store.spi.ParticipantStore;
 import org.eclipse.dataspaceconnector.spi.EdcException;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
+import org.eclipse.dataspaceconnector.spi.telemetry.Telemetry;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -45,7 +46,7 @@ class RegistrationServiceTest {
     Monitor monitor = mock(Monitor.class);
     ParticipantStore participantStore = mock(ParticipantStore.class);
     DtoTransformerRegistry dtoTransformerRegistry = mock(DtoTransformerRegistry.class);
-    RegistrationService service = new RegistrationService(monitor, participantStore, dtoTransformerRegistry);
+    RegistrationService service = new RegistrationService(monitor, participantStore, dtoTransformerRegistry, new Telemetry());
 
     Participant.Builder participantBuilder = createParticipant();
     ParticipantDto.Builder participantDtoBuilder = createParticipantDto();

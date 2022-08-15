@@ -44,6 +44,7 @@ import org.eclipse.dataspaceconnector.spi.system.Provider;
 import org.eclipse.dataspaceconnector.spi.system.Requires;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtension;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
+import org.eclipse.dataspaceconnector.spi.telemetry.Telemetry;
 
 import java.util.Objects;
 
@@ -53,7 +54,7 @@ import static org.eclipse.dataspaceconnector.iam.did.spi.document.DidConstants.D
 /**
  * EDC extension to boot the services used by the Authority Service.
  */
-@Requires({ PrivateKeyResolver.class, OkHttpClient.class, DidResolverRegistry.class, CredentialsVerifier.class })
+@Requires({ PrivateKeyResolver.class, OkHttpClient.class, DidResolverRegistry.class, CredentialsVerifier.class, Telemetry.class })
 public class AuthorityExtension implements ServiceExtension {
 
     public static final String CONTEXT_ALIAS = "authority";
@@ -93,6 +94,9 @@ public class AuthorityExtension implements ServiceExtension {
     @Inject
     private DtoTransformerRegistry transformerRegistry;
 
+    @Inject
+    private Telemetry telemetry;
+
     private ParticipantManager participantManager;
 
     @Override
@@ -103,10 +107,10 @@ public class AuthorityExtension implements ServiceExtension {
         var authenticationService = new DidJwtAuthenticationFilter(monitor, didPublicKeyResolver, audience);
         var verifiableCredentialService = verifiableCredentialService(context);
 
-        participantManager = new ParticipantManager(monitor, participantStore, participantVerifier, executorInstrumentation, verifiableCredentialService);
+        participantManager = new ParticipantManager(monitor, participantStore, participantVerifier, executorInstrumentation, verifiableCredentialService, telemetry);
         transformerRegistry.register(new ParticipantToParticipantDtoTransformer());
 
-        var registrationService = new RegistrationService(monitor, participantStore, transformerRegistry);
+        var registrationService = new RegistrationService(monitor, participantStore, transformerRegistry, telemetry);
         webService.registerResource(CONTEXT_ALIAS, new RegistrationApiController(registrationService));
 
         webService.registerResource(CONTEXT_ALIAS, authenticationService);

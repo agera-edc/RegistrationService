@@ -22,6 +22,7 @@ import org.eclipse.dataspaceconnector.spi.EdcException;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.result.Result;
+import org.eclipse.dataspaceconnector.spi.telemetry.Telemetry;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,11 +38,13 @@ public class RegistrationService {
     private final Monitor monitor;
     private final ParticipantStore participantStore;
     private final DtoTransformerRegistry transformerRegistry;
+    private final Telemetry telemetry;
 
-    public RegistrationService(Monitor monitor, ParticipantStore participantStore, DtoTransformerRegistry transformerRegistry) {
+    public RegistrationService(Monitor monitor, ParticipantStore participantStore, DtoTransformerRegistry transformerRegistry, Telemetry telemetry) {
         this.monitor = monitor;
         this.participantStore = participantStore;
         this.transformerRegistry = transformerRegistry;
+        this.telemetry = telemetry;
     }
 
     /**
@@ -98,6 +101,7 @@ public class RegistrationService {
                 .name(did)
                 .url(idsUrl)
                 .supportedProtocol("ids-multipart")
+                .traceContext(telemetry.getCurrentTraceContext())
                 .build();
 
         participantStore.save(participant);

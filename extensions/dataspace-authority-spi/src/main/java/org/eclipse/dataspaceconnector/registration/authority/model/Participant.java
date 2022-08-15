@@ -16,11 +16,13 @@ package org.eclipse.dataspaceconnector.registration.authority.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import org.eclipse.dataspaceconnector.spi.telemetry.TraceCarrier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static java.lang.String.format;
@@ -39,13 +41,14 @@ import static org.eclipse.dataspaceconnector.registration.authority.model.Partic
  * information can be retrieved from the participant's DID document.
  */
 @JsonDeserialize(builder = Participant.Builder.class)
-public class Participant {
+public class Participant implements TraceCarrier {
 
     private String did;
     private String name;
     private String url;
     private List<String> supportedProtocols = new ArrayList<>();
     private ParticipantStatus status = ONBOARDING_INITIATED;
+    private Map<String, String> traceContext;
 
     private Participant() {
     }
@@ -71,6 +74,11 @@ public class Participant {
 
     public ParticipantStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public Map<String, String> getTraceContext() {
+        return Collections.unmodifiableMap(traceContext);
     }
 
     public void transitionAuthorizing() {
@@ -149,6 +157,11 @@ public class Participant {
 
         public Builder status(ParticipantStatus status) {
             participant.status = status;
+            return this;
+        }
+
+        public Builder traceContext(Map<String, String> traceContext) {
+            participant.traceContext = traceContext;
             return this;
         }
 
