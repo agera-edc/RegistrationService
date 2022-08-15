@@ -2,10 +2,19 @@ name: Test Code (Style, Tests)
 
 on:
   push:
+    branches:
+      - main
+      paths-ignore:
+        - '**.md'
+        - 'docs/**'
+        - 'CODEOWNERS'
+        - 'LICENSE'
   pull_request:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'CODEOWNERS'
+      - 'LICENSE'
 
 jobs:
   Checkstyle:
