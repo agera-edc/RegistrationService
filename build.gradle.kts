@@ -80,6 +80,7 @@ allprojects {
         }
     }
 
+    // Specify config file excluding generated source files
     System.setProperty("org.checkstyle.google.suppressionfilter.config", file("${rootProject.projectDir.path}/resources/checkstyle-suppressions.xml").absolutePath)
 
     checkstyle {
