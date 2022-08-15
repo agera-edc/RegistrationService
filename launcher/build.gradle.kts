@@ -31,6 +31,9 @@ dependencies {
     implementation("${edcGroup}:identity-did-core:${edcVersion}")
     implementation("${edcGroup}:core:${edcVersion}")
     implementation("${edcGroup}:observability-api:${edcVersion}")
+    implementation("${edcGroup}:core-micrometer:${edcVersion}")
+    runtimeOnly("${edcGroup}:jetty-micrometer:${edcVersion}")
+    runtimeOnly("${edcGroup}:jersey-micrometer:${edcVersion}")
     implementation("${edcGroup}:filesystem-configuration:${edcVersion}")
     implementation("${identityHubGroup}:identity-hub-credentials-verifier:${identityHubVersion}")
 
