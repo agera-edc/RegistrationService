@@ -34,6 +34,9 @@ dependencies {
     implementation("${edcGroup}:filesystem-configuration:${edcVersion}")
     implementation("${identityHubGroup}:identity-hub-credentials-verifier:${identityHubVersion}")
 
+    // JDK Logger
+    implementation("${edcGroup}:jdk-logger-monitor:${edcVersion}")
+
     // To use FileSystem vault e.g. -DuseFsVault="true".Only for non-production usages.
     val useFsVault: Boolean = System.getProperty("useFsVault", "false").toBoolean()
     if (useFsVault) {

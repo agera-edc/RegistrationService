@@ -15,6 +15,7 @@ WORKDIR /app
 RUN curl --fail -LO https://github.com/microsoft/ApplicationInsights-Java/releases/download/$APPINSIGHTS_AGENT_VERSION/applicationinsights-agent-$APPINSIGHTS_AGENT_VERSION.jar
 
 COPY ./build/libs/app.jar /app
+COPY ./logging.properties /app
 
 EXPOSE 8182
 
@@ -29,4 +30,4 @@ ENV WEB_HTTP_PATH="/api"
 ENV ENV_JVM_ARGS=$JVM_ARGS
 ENV ENV_APPINSIGHTS_AGENT_VERSION=$APPINSIGHTS_AGENT_VERSION
 ENTRYPOINT [ "sh", "-c", \
-    "exec java -javaagent:applicationinsights-agent-$ENV_APPINSIGHTS_AGENT_VERSION.jar $ENV_JVM_ARGS -jar app.jar"]
+    "exec java -javaagent:applicationinsights-agent-$ENV_APPINSIGHTS_AGENT_VERSION.jar $ENV_JVM_ARGS -Djava.util.logging.config.file=/app/logging.properties -jar app.jar"]
