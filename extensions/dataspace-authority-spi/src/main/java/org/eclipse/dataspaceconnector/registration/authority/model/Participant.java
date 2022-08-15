@@ -21,6 +21,7 @@ import org.eclipse.dataspaceconnector.spi.telemetry.TraceCarrier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,7 +49,7 @@ public class Participant implements TraceCarrier {
     private String url;
     private List<String> supportedProtocols = new ArrayList<>();
     private ParticipantStatus status = ONBOARDING_INITIATED;
-    private Map<String, String> traceContext;
+    private Map<String, String> traceContext = new HashMap<>();
 
     private Participant() {
     }
