@@ -19,6 +19,7 @@ import org.eclipse.dataspaceconnector.spi.iam.TokenRepresentation;
 import org.eclipse.dataspaceconnector.spi.result.Result;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.function.Function;
 
 /**
@@ -31,6 +32,7 @@ public class ApiClientFactory {
     /**
      * Create a new instance of {@link ApiClient} configured to access the given URL.
      * <p>
+     * Configured readTimeout is 30 seconds and connectTimeout is 10 seconds.
      * Note that the type of {@code credentialsProvider} is modeled on the EDC {@code IdentityService} interface, for easier integration.
      *
      * @param baseUri             API base URL.
@@ -40,6 +42,11 @@ public class ApiClientFactory {
     @NotNull
     public static ApiClient createApiClient(String baseUri, Function<TokenParameters, Result<TokenRepresentation>> credentialsProvider) {
         var apiClient = new ApiClient();
+        apiClient.setHttpClientBuilder(
+                apiClient.createDefaultHttpClientBuilder()
+                        .connectTimeout(Duration.ofSeconds(10))
+        );
+        apiClient.setReadTimeout(Duration.ofSeconds(30));
         apiClient.updateBaseUri(baseUri);
         apiClient.setRequestInterceptor(new JsonWebSignatureHeaderInterceptor(credentialsProvider, baseUri));
         return apiClient;
