@@ -51,7 +51,6 @@ class RegistrationServiceTest {
     Participant.Builder participantBuilder = createParticipant();
     ParticipantDto.Builder participantDtoBuilder = createParticipantDto();
     String did = FAKER.internet().url();
-    String idsUrl = FAKER.internet().url();
 
     @Test
     void listParticipants_empty() {
@@ -103,7 +102,7 @@ class RegistrationServiceTest {
 
     @Test
     void addParticipant() {
-        service.addParticipant(did, idsUrl);
+        service.addParticipant(did);
 
         var captor = ArgumentCaptor.forClass(Participant.class);
         verify(participantStore).save(captor.capture());
@@ -112,9 +111,6 @@ class RegistrationServiceTest {
                 .isEqualTo(Participant.Builder.newInstance()
                         .did(did)
                         .status(ONBOARDING_INITIATED)
-                        .name(did)
-                        .url(idsUrl)
-                        .supportedProtocol("ids-multipart")
                         .build());
     }
 
