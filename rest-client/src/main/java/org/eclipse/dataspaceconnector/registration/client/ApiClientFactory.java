@@ -32,7 +32,7 @@ public class ApiClientFactory {
     /**
      * Create a new instance of {@link ApiClient} configured to access the given URL.
      * <p>
-     * Configured readTimeout is 30 seconds and connectTimeout is 10 seconds.
+     * Configured readTimeout is 60 seconds and connectTimeout is 30 seconds.
      * Note that the type of {@code credentialsProvider} is modeled on the EDC {@code IdentityService} interface, for easier integration.
      *
      * @param baseUri             API base URL.
@@ -44,9 +44,9 @@ public class ApiClientFactory {
         var apiClient = new ApiClient();
         apiClient.setHttpClientBuilder(
                 apiClient.createDefaultHttpClientBuilder()
-                        .connectTimeout(Duration.ofSeconds(10))
+                        .connectTimeout(Duration.ofSeconds(30))
         );
-        apiClient.setReadTimeout(Duration.ofSeconds(30));
+        apiClient.setReadTimeout(Duration.ofSeconds(60));
         apiClient.updateBaseUri(baseUri);
         apiClient.setRequestInterceptor(new JsonWebSignatureHeaderInterceptor(credentialsProvider, baseUri));
         return apiClient;
