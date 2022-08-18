@@ -19,12 +19,12 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import org.eclipse.dataspaceconnector.spi.telemetry.TraceCarrier;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZED;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.AUTHORIZING;
 import static org.eclipse.dataspaceconnector.registration.authority.model.ParticipantStatus.DENIED;
@@ -55,7 +55,7 @@ public class Participant implements TraceCarrier {
 
     @Override
     public Map<String, String> getTraceContext() {
-        return Collections.unmodifiableMap(traceContext);
+        return unmodifiableMap(traceContext);
     }
 
     public void transitionAuthorizing() {
@@ -114,7 +114,7 @@ public class Participant implements TraceCarrier {
         }
 
         public Builder traceContext(Map<String, String> traceContext) {
-            participant.traceContext = traceContext;
+            participant.traceContext = unmodifiableMap(traceContext);
             return this;
         }
 
