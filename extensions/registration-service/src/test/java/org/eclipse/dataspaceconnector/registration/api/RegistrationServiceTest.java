@@ -46,7 +46,7 @@ class RegistrationServiceTest {
     Monitor monitor = mock(Monitor.class);
     ParticipantStore participantStore = mock(ParticipantStore.class);
     DtoTransformerRegistry dtoTransformerRegistry = mock(DtoTransformerRegistry.class);
-    RegistrationService service = new RegistrationService(monitor, participantStore, dtoTransformerRegistry, new Telemetry());
+    RegistrationService service = new RegistrationService(monitor, participantStore, dtoTransformerRegistry, mock(Telemetry.class));
 
     Participant.Builder participantBuilder = createParticipant();
     ParticipantDto.Builder participantDtoBuilder = createParticipantDto();
