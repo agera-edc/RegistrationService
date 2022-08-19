@@ -40,7 +40,7 @@ public class Participant implements TraceCarrier {
 
     private String did;
     private ParticipantStatus status = ONBOARDING_INITIATED;
-    private Map<String, String> traceContext = new HashMap<>();
+    private Map<String, String> traceContext = Map.of();
 
     private Participant() {
     }
@@ -55,7 +55,7 @@ public class Participant implements TraceCarrier {
 
     @Override
     public Map<String, String> getTraceContext() {
-        return unmodifiableMap(traceContext);
+        return traceContext;
     }
 
     public void transitionAuthorizing() {
